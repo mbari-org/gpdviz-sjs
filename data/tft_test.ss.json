@@ -1,0 +1,234 @@
+{
+  "sysid": "tft_test",
+  "streams": {
+    "q1.2": {
+      "strid": "q1.2",
+      "style": {
+        "color": "green"
+      },
+      "zOrder": 0,
+      "obs": [{
+        "timestamp": 1476418748104,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-121.97993411338862, 36.83993695918703]
+        }
+      }]
+    },
+    "w1.2": {
+      "strid": "w1.2",
+      "style": {
+        "color": "blue"
+      },
+      "zOrder": 0,
+      "obs": [{
+        "timestamp": 1476418747900,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-122.08, 36.74]
+        }
+      }]
+    },
+    "p2.1": {
+      "strid": "p2.1",
+      "style": {
+        "color": "red"
+      },
+      "zOrder": 0,
+      "obs": [{
+        "timestamp": 1476418748625,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-122.08, 36.74]
+        }
+      }]
+    },
+    "p1.2": {
+      "strid": "p1.2",
+      "style": {
+        "color": "red"
+      },
+      "zOrder": 0,
+      "obs": [{
+        "timestamp": 1476418747797,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-121.93, 36.89]
+        }
+      }]
+    },
+    "w2.2": {
+      "strid": "w2.2",
+      "style": {
+        "color": "blue"
+      },
+      "zOrder": 0,
+      "obs": [{
+        "timestamp": 1476418749548,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-122.08, 36.74]
+        }
+      }]
+    },
+    "q1.1": {
+      "strid": "q1.1",
+      "style": {
+        "color": "green"
+      },
+      "zOrder": 0,
+      "obs": [{
+        "timestamp": 1476418747280,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-122.03019593340578, 36.79010587451219]
+        }
+      }]
+    },
+    "q2.2": {
+      "strid": "q2.2",
+      "style": {
+        "color": "green"
+      },
+      "zOrder": 0,
+      "obs": [{
+        "timestamp": 1476418749745,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-122.22670365947577, 36.83992033946637]
+        }
+      }]
+    },
+    "w1.1": {
+      "strid": "w1.1",
+      "style": {
+        "color": "blue"
+      },
+      "zOrder": 0,
+      "obs": [{
+        "timestamp": 1476418747081,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-121.93, 36.89]
+        }
+      }]
+    },
+    "L1.2": {
+      "strid": "L1.2",
+      "style": {
+        "color": "yellow"
+      },
+      "zOrder": 0,
+      "obs": [{
+        "timestamp": 1476418748007,
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [[-121.93, 36.89], [-122.08, 36.74]]
+        }
+      }]
+    },
+    "L2.2": {
+      "strid": "L2.2",
+      "style": {
+        "color": "yellow"
+      },
+      "zOrder": 0,
+      "obs": [{
+        "timestamp": 1476418749647,
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [[-122.3, 36.89], [-122.08, 36.74]]
+        }
+      }]
+    },
+    "p2.2": {
+      "strid": "p2.2",
+      "style": {
+        "color": "red"
+      },
+      "zOrder": 0,
+      "obs": [{
+        "timestamp": 1476418749445,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-122.3, 36.89]
+        }
+      }]
+    },
+    "q2.1": {
+      "strid": "q2.1",
+      "style": {
+        "color": "green"
+      },
+      "zOrder": 0,
+      "obs": [{
+        "timestamp": 1476418748926,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-122.1531055274511, 36.790170866758984]
+        }
+      }]
+    },
+    "p1.1": {
+      "strid": "p1.1",
+      "style": {
+        "color": "red"
+      },
+      "zOrder": 0,
+      "obs": [{
+        "timestamp": 1476418746978,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-122.08, 36.74]
+        }
+      }]
+    },
+    "w2.1": {
+      "strid": "w2.1",
+      "style": {
+        "color": "blue"
+      },
+      "zOrder": 0,
+      "obs": [{
+        "timestamp": 1476418748722,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-122.3, 36.89]
+        }
+      }]
+    },
+    "L2.1": {
+      "strid": "L2.1",
+      "style": {
+        "color": "yellow"
+      },
+      "zOrder": 0,
+      "obs": [{
+        "timestamp": 1476418748821,
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [[-122.08, 36.74], [-122.3, 36.89]]
+        }
+      }]
+    },
+    "L1.1": {
+      "strid": "L1.1",
+      "style": {
+        "color": "yellow"
+      },
+      "zOrder": 0,
+      "obs": [{
+        "timestamp": 1476418747183,
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [[-122.08, 36.74], [-121.93, 36.89]]
+        }
+      }]
+    }
+  },
+  "pushEvents": true,
+  "center": {
+    "lat": 36.8,
+    "lon": -122.04
+  }
+}
