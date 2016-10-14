@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html ng-app="gpdviz" ng-controller="GpdvizController as vm">
+<head>
+  <title>#sysid - Gpdviz</title>
+  <link rel="stylesheet" href="//unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.css" />
+  <link rel="stylesheet" href="leaflet/Leaflet.MousePosition/src/L.Control.MousePosition.css" />
+  <link rel="stylesheet" href="leaflet/Leaflet.MagnifyingGlass/leaflet.magnifyingglass.css" />
+  <link rel="stylesheet" href="app.css" />
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.js"></script>
+  <script src="//cdn.jsdelivr.net/lodash/4.15.0/lodash.min.js"></script>
+  <script src="//cdn.jsdelivr.net/momentjs/2.15.1/moment.min.js"></script>
+  <script src="//js.pusher.com/3.2/pusher.min.js"></script>
+  <script src="//unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.js"></script>
+  <script src="//cdn-geoweb.s3.amazonaws.com/esri-leaflet/1.0.0-rc.2/esri-leaflet.js"></script>
+  <script src="leaflet/Leaflet.MousePosition/src/L.Control.MousePosition.js"></script>
+  <script src="leaflet/Leaflet.MagnifyingGlass/leaflet.magnifyingglass.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highstock/5.0.0/highstock.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highstock/5.0.0/js/highcharts-more.src.js"></script>
+
+  <script type="text/javascript" src="app.js"></script>
+  <script>
+    var Gpdviz = { "initialSs": #ssVar };
+    //Pusher.logToConsole = true; // don't include this in production
+    var pusher = new Pusher('#pusherKey', { encrypted: true });
+    var channel = pusher.subscribe('#pusherChannel');
+  </script>
+  <style>
+    body { margin:20px; }
+  </style>
+</head>
+<body>
+  <div id="mapid" style="height:1300px"></div>
+
+  <div ng-if="vm.ss">
+    <span style="font-weight:bold">{{vm.ss.sysid}}</span>
+    <span ng-if="vm.ss.name">- {{vm.ss.name}}</span>
+    <span ng-if="vm.ss.description">- {{vm.ss.description}}</span>:
+    Sensor system registered. Waiting for events...
+    <div ng-if="vm.ss.streams">
+      <ul>
+        <li ng-repeat="(strid, str) in vm.ss.streams">
+          <div>
+            strid: {{strid}}
+            type: {{str.type}}
+            style: {{str.style}}
+            <span ng-if="str.name">name: {{str.name}}</span>
+            <span ng-if="str.description">description: {{str.description}}</span>
+          </div>
+          <div>
+            <ul>
+              <li ng-repeat="obs in str.obs">
+                {{obs.timestamp}}: {{obs.value}}
+              </li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div ng-if="!vm.ss">
+    <span style="font-weight:bold">#sysid</span>:
+    Sensor system not registered. Waiting for registration event...
+  </div>
+
+  <div ng-if="vm.debug">
+    <br>vm:<pre ng-bind="vm | json"></pre>
+  </div>
+</body>
+</html>
