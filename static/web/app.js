@@ -232,7 +232,7 @@
         //console.debug("obs.chartData=", obs.chartData);
         if (!str._charter) {
           var names = _.map(obs.chartData, function(v, index) {
-            return "char data #" + index;
+            return "series#" + index;
           });
           str._charter = Charter(str.strid, names);
         }
@@ -286,6 +286,16 @@
       return {
         name: name,
         data: []
+        ,marker: {
+          enabled: true,
+          radius: 2
+        }
+        ,lineWidth: 1
+        //,states: {
+        //  hover: {
+        //    lineWidthPlus: 0
+        //  }
+        //}
       };
     });
     var chart = undefined;
@@ -333,6 +343,12 @@
         },
 
         series: initialSeriesData || [],
+
+        tooltip: {
+          pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>',
+          valueDecimals: 4,
+          split: true
+        },
 
         rangeSelector: {
           buttons: [{
