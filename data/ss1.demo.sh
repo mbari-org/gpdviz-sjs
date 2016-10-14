@@ -5,18 +5,18 @@ GPDVIZ=http://localhost:5050
 SS=ss1
 
 function run() {
-#	unregister
-#	register
-#	update
-#	add_str1
-#	add_str2
-#	add_str3
-#
-#	add_values_str1
-#	add_values_str2
-#	add_values_str3
-#
-#	add_values_chartDataTest
+	unregister
+	register
+	update
+	add_str1
+	add_str2
+	add_str3
+
+	add_values_str1
+	add_values_str2
+	add_values_str3
+
+	add_values_chartDataTest
 
 	some_chart_data str2
 }
