@@ -9,9 +9,10 @@
 
   GpdvizController.$inject = ['$scope'];
   function GpdvizController($scope) {
-    if (debug) console.debug("==GpdvizController==");
     var vm = this;
     vm.debug = debug;
+
+    var byStrId = [];
 
     var center = [36.8, -122.04];
     var map = L.map('mapid', {maxZoom: 20}).setView(center, 11);
@@ -37,7 +38,7 @@
 
       var marker = createMarker();
       marker.addTo(map);
-      str._marker = marker;
+      byStrId[strid].marker = marker;
       markersLayer.addLayer(marker);
 
       var group = overlayGroupByStreamId[strid];
@@ -94,6 +95,7 @@
 
       var streams = _.sortBy(_.values(vm.ss.streams), 'zOrder');
       _.each(streams, function (str) {
+        byStrId[str.strid] = {str: str};
         _.each(str.obs, function (obs) {
           addObs(str, obs);
         });
@@ -126,6 +128,7 @@
         str.obs = [];
         $scope.$apply(function () {
           vm.ss.streams[str.strid] = str;
+          byStrId[str.strid] = {str: str};
         });
       }
 
@@ -170,22 +173,22 @@
     }
 
     map.on('popupopen', function(e) {
-      var str = e.popup && e.popup._gpdviz_str;
+      var strid = e.popup && e.popup._strid;
+      var str = strid && byStrId[strid].str;
       //console.debug("popupopen: str=", str);
-      if (str && str._charter) {
-        //console.debug("popupopen: charter=", str._charter);
-        str._charter.activate();
+      if (str && byStrId[strid].charter) {
+        //console.debug("popupopen: charter=", byStrId[str.strid].charter);
+        byStrId[str.strid].charter.activate();
       }
     });
     map.on('popupclose', function(e) {
-      var str = e.popup && e.popup._gpdviz_str;
+      var strid = e.popup && e.popup._strid;
+      var str = strid && byStrId[strid].str;
       //console.debug("popupclose: str=", str);
-      if (str) {
-        var charter = str._charter;
+      if (str && byStrId[strid].charter) {
+        var charter = byStrId[str.strid].charter;
         //console.debug("popupclose: charter=", charter);
-        if (charter) {
-          charter.deactivate();
-        }
+        charter.deactivate();
       }
     });
 
@@ -200,27 +203,27 @@
 
       if (obs.chartData) {
         // console.debug("str=", str, "obs.chartData=", obs.chartData);
-        if (!str._charter) {
+        if (!byStrId[str.strid].charter) {
           var names = _.map(obs.chartData, function(v, index) {
             return "series#" + index;
           });
-          str._charter = Charter(str.strid, names);
+          byStrId[str.strid].charter = Charter(str.strid, names);
         }
         _.each(obs.chartData, function(v, index) {
-          str._charter.addChartPoint(index, timestamp, v);
+          byStrId[str.strid].charter.addChartPoint(index, timestamp, v);
         });
 
-        if (str._marker && !str._marker._popupInfo) {
+        if (byStrId[str.strid].marker && !byStrId[str.strid].popupInfo) {
           if (debug) console.debug("setting popup for stream ", str.strid);
           var popupInfo = L.popup(
             //{autoClose: false, closeOnClick: false}
           );
-          popupInfo._gpdviz_str = str;
+          popupInfo._strid = str.strid;
           popupInfo.setContent('<div id="' +"chart-container-" + str.strid +
             '" style="min-width:300px;height:250px;margin:0 auto"></div>');
 
-          str._marker._popupInfo = popupInfo;
-          str._marker.bindPopup(str._marker._popupInfo);
+          byStrId[str.strid].marker.bindPopup(popupInfo);
+          byStrId[str.strid].popupInfo = popupInfo;
         }
         return;
       }
