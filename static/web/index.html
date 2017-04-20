@@ -30,38 +30,47 @@
   </style>
 </head>
 <body>
-  <div id="mapid" style="height:1300px"></div>
-
-  <div ng-if="vm.ss">
-    <span style="font-weight:bold">{{vm.ss.sysid}}</span>
-    <span ng-if="vm.ss.name">- {{vm.ss.name}}</span>
-    <span ng-if="vm.ss.description">- {{vm.ss.description}}</span>:
-    Sensor system registered. Waiting for events...
-    <div ng-if="vm.ss.streams">
-      <ul>
-        <li ng-repeat="(strid, str) in vm.ss.streams">
-          <div>
-            strid: {{strid}}
-            type: {{str.type}}
-            style: {{str.style}}
-            <span ng-if="str.name">name: {{str.name}}</span>
-            <span ng-if="str.description">description: {{str.description}}</span>
-          </div>
-          <div>
+  <table style="width: 100%">
+    <tbody>
+    <tr>
+      <td style="width: 300px; vertical-align: top">
+        <div ng-if="vm.ss">
+          <span style="font-weight:bold">{{vm.ss.sysid}}</span>
+          <span ng-if="vm.ss.name">- {{vm.ss.name}}</span>
+          <span ng-if="vm.ss.description">- {{vm.ss.description}}</span>:
+          Sensor system registered. Waiting for events...
+          <div ng-if="vm.ss.streams">
             <ul>
-              <li ng-repeat="obs in str.obs">
-                {{obs.timestamp}}: {{obs.value}}
+              <li ng-repeat="(strid, str) in vm.ss.streams">
+                <div>
+                  strid: {{strid}}
+                  type: {{str.type}}
+                  style: {{str.style}}
+                  <span ng-if="str.name">name: {{str.name}}</span>
+                  <span ng-if="str.description">description: {{str.description}}</span>
+                </div>
+                <div>
+                  <ul>
+                    <li ng-repeat="obs in str.obs">
+                      {{obs.timestamp}}: {{obs.value}}
+                    </li>
+                  </ul>
+                </div>
               </li>
             </ul>
           </div>
-        </li>
-      </ul>
-    </div>
-  </div>
-  <div ng-if="!vm.ss">
-    <span style="font-weight:bold">#sysid</span>:
-    Sensor system not registered. Waiting for registration event...
-  </div>
+        </div>
+        <div ng-if="!vm.ss">
+          <span style="font-weight:bold">#sysid</span>:
+          Sensor system not registered. Waiting for registration event...
+        </div>
+      </td>
+      <td style="vertical-align: top">
+        <div id="mapid" style="height:1300px"></div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
 
   <div ng-if="vm.debug">
     <br>vm:<pre ng-bind="vm | json"></pre>

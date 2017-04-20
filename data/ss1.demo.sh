@@ -8,17 +8,19 @@ function run() {
 	unregister
 	register
 	update
+
 	add_str1
 	add_str2
 	add_str3
 
-	add_values_str1
-	add_values_str2
-	add_values_str3
+	add_str1_values
+	add_str2_values
+	add_str3_values
 
-	add_values_chartDataTest
+	add_str2_data
 
-	some_chart_data str2
+	add_str4_and_point
+	add_str4_data
 }
 
 function unregister() {
@@ -45,7 +47,7 @@ function add_str3() {
 	http post ${GPDVIZ}/api/ss/${SS} strid=str3 style:='{"color":"blue"}'
 }
 
-function add_values_str1() {
+function add_str1_values() {
 	timestamp="`date +%s`000"
 	read -r -d '' values <<-EOF
 		[{
@@ -64,7 +66,7 @@ EOF
 	add_values str1 "${values}"
 }
 
-function add_values_str2() {
+function add_str2_values() {
 	timestamp="`date +%s`000"
 	read -r -d '' values <<-EOF
 		[{
@@ -89,22 +91,7 @@ EOF
 	add_values str2 "${values}"
 }
 
-function add_values_chartDataTest() {
-	http post ${GPDVIZ}/api/ss/${SS} strid=chartDataTest style:='{"color":"yellow", "radius": 10}' zOrder:=10
-	timestamp="`date +%s`000"
-	read -r -d '' values <<-EOF
-		[{
-		  "timestamp": ${timestamp},
-		  "geometry": {
-			"type": "Point",
-			"coordinates": [-122.09,36.865]
-		  }
-		}]
-EOF
-	http post ${GPDVIZ}/api/ss/${SS}/chartDataTest values:="${values}"
-}
-
-function add_values_str3() {
+function add_str3_values() {
 	timestamp="`date +%s`000"
 	read -r -d '' values <<-EOF
 		[{"timestamp": ${timestamp},
@@ -125,8 +112,8 @@ function add_values() {
 	http post ${GPDVIZ}/api/ss/${SS}/${strid} values:="${values}"
 }
 
-function some_chart_data() {
-	strid=$1
+function add_str2_data() {
+	strid=str2
 	echo "chart data: ${strid}"
 	timestamp="`date +%s`000"
 	secs=30
@@ -143,6 +130,35 @@ function some_chart_data() {
 	done
 	values="${values}]"
 	add_values "${strid}" "${values}"
+}
+
+function add_str4_and_point() {
+    strid=str4
+	http post ${GPDVIZ}/api/ss/${SS} strid=${strid} style:='{"color":"yellow", "radius": 10}' zOrder:=10
+	timestamp="`date +%s`000"
+	read -r -d '' values <<-EOF
+		[{
+		  "timestamp": ${timestamp},
+		  "geometry": {
+			"type": "Point",
+			"coordinates": [-122.09,36.865]
+		  }
+		}]
+EOF
+	http post ${GPDVIZ}/api/ss/${SS}/${strid} values:="${values}"
+	
+}
+function add_str4_data() {
+    strid=str4
+	secs=60
+	for i in `seq ${secs}`; do
+	    timestamp="`date +%s`000"
+		val=$(( (RANDOM % 100) + 1 ))
+		element='{ "timestamp": '${timestamp}', "chartData": [ '${val}' ]}'
+        add_values "${strid}" "[${element}]"
+	    echo "added value to ${strid}"
+        sleep 1
+	done
 }
 
 run

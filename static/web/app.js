@@ -5,11 +5,13 @@
     .controller('GpdvizController', GpdvizController)
   ;
 
+  var debug = window && window.location.toString().match(/.*\?debug/);
+
   GpdvizController.$inject = ['$scope'];
   function GpdvizController($scope) {
-    console.debug("==GpdvizController==");
+    if (debug) console.debug("==GpdvizController==");
     var vm = this;
-    vm.debug = false;
+    vm.debug = debug;
 
     var center = [36.8, -122.04];
     var map = L.map('mapid', {maxZoom: 20}).setView(center, 11);
@@ -102,7 +104,7 @@
     });
 
     function handleNotification(payload) {
-      //console.debug("handleNotification: payload=", payload);
+      if (debug) console.debug("handleNotification: payload=", payload);
       var what = payload.what;
       var data = payload.data;
       var str;
@@ -128,7 +130,7 @@
 
       else if (what === 'observationsAdded') {
         str = vm.ss.streams[data.strid];
-        console.debug("str=", str, "data.strid=", data.strid, "data.obss=", data.obss);
+        if (debug) console.debug("str=", str, "data.strid=", data.strid, "data.obss=", data.obss);
         str.obs = str.obs || [];
         $scope.$apply(function () {
           _.each(data.obss, function (data_obs) {
@@ -169,19 +171,9 @@
     map.on('popupopen', function(e) {
       var str = e.popup && e.popup._gpdviz_str;
       //console.debug("popupopen: str=", str);
-      if (str) {
-        var charter = str._charter;
-        //console.debug("popupopen: charter=", charter);
-        if (charter) {
-          charter.activate();
-
-          if (charter.strid === 'chartDataTest') {
-            charter._interval_code = setInterval(function() {
-              var x = new Date().getTime();
-              charter.addChartPoint(0, x, Math.round(Math.random() * 100));
-            },1000);
-          }
-        }
+      if (str && str._charter) {
+        console.debug("popupopen: charter=", str._charter);
+        str._charter.activate();
       }
     });
     map.on('popupclose', function(e) {
@@ -192,11 +184,6 @@
         //console.debug("popupclose: charter=", charter);
         if (charter) {
           charter.deactivate();
-
-          if (charter.strid === 'chartDataTest') {
-            clearInterval(charter._interval_code);
-            delete charter._interval_code;
-          }
         }
       }
     });
@@ -229,7 +216,7 @@
         geometry = obs.geometry;
       }
       else if (obs.chartData) {
-        //console.debug("obs.chartData=", obs.chartData);
+        // console.debug("str=", str, "obs.chartData=", obs.chartData);
         if (!str._charter) {
           var names = _.map(obs.chartData, function(v, index) {
             return "series#" + index;
@@ -246,20 +233,13 @@
         return;
       }
 
-      console.debug("addObs: style=", style, "str=", str, "geojson=", geojson);
+      if (debug) console.debug("addObs: style=", style, "str=", str, "geojson=", geojson);
 
       //var popupInfo = L.popup({autoClose: false, closeOnClick: false});
       var popupInfo = L.popup();
       popupInfo._gpdviz_str = str;
       popupInfo.setContent('<div id="' +"chart-container-" + str.strid+
         '" style="min-width:300px;height:250px;margin:0 auto"></div>');
-
-      if (str.strid === 'chartDataTest') {
-        popupInfo._gpdviz_str._charter = Charter(str.strid, ["chartDataTest"]);
-        _.each(randomData(30), function(xy) {
-          popupInfo._gpdviz_str._charter.addChartPoint(0, xy[0], xy[1]);
-        });
-      }
 
       addMarker(str.strid, function () {
         return L.geoJSON(geojson, {
