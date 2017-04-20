@@ -30,14 +30,16 @@
   </style>
 </head>
 <body>
+  <div ng-if="vm.ss.name" style="text-align: center; background-color: #ebfaf5">
+    <span ng-bind="vm.ss.name" style="font-weight: bold"></span>
+    <span ng-bind="vm.ss.description"></span>
+  </div>
   <table style="width: 100%">
     <tbody>
     <tr>
       <td style="width: 300px; vertical-align: top">
         <div ng-if="vm.ss">
           <span style="font-weight:bold">{{vm.ss.sysid}}</span>
-          <span ng-if="vm.ss.name">- {{vm.ss.name}}</span>
-          <span ng-if="vm.ss.description">- {{vm.ss.description}}</span>:
           Sensor system registered. Waiting for events...
           <div ng-if="vm.ss.streams">
             <ul>

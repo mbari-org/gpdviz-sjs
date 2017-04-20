@@ -7,6 +7,8 @@ import spray.json.JsValue
 case class LatLon(lat: Double, lon: Double)
 
 case class SensorSystem(sysid: String,
+                        name: Option[String] = None,
+                        description: Option[String] = None,
                         streams: Map[String, DataStream] = Map.empty,
                         pushEvents: Boolean = true,
                         center: Option[LatLon] = None

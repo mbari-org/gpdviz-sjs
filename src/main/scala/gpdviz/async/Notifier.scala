@@ -29,7 +29,9 @@ class Notifier(config: Config) extends JsonImplicits {
 
   def notifySensorSystemRegistered(ss: SensorSystem): Unit = {
     if (ss.pushEvents) {
-      val map = Map("sysid" -> ss.sysid)
+      var map = Map("sysid" -> ss.sysid)
+      ss.name foreach        { v ⇒ map = map + ("name" → v) }
+      ss.description foreach { v ⇒ map = map + ("description" → v) }
       notifyEvent(ss.sysid, "sensorSystemRegistered", map.asJava)
     }
   }

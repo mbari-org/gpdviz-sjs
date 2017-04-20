@@ -28,7 +28,7 @@ function unregister() {
 }
 
 function register() {
-	http post ${GPDVIZ}/api/ss sysid=${SS} center:='{"lat":36, "lon":-122}' pushEvents:=true
+	http post ${GPDVIZ}/api/ss sysid=${SS} name='Test sensor system' center:='{"lat":36, "lon":-122}' pushEvents:=true
 }
 
 function update() {

@@ -2,6 +2,7 @@
 
 2017-04-20
 
+- capture name and description in sensor system model
 - avoid cyclic references (mainly to allow json display/debugging of vm)
 - set popup only when chartData is associated
 - some rather minor adjs

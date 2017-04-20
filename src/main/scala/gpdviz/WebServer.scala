@@ -24,6 +24,8 @@ case class GnError(code: Int,
                    )
 
 case class SSRegister(sysid: String,
+                      name: Option[String] = None,
+                      description: Option[String] = None,
                       pushEvents: Option[Boolean] = None,
                       center: Option[LatLon] = None
                       )
@@ -44,14 +46,14 @@ case class ObsRegister(values: List[DataObs]
 
 trait JsonImplicits extends DefaultJsonProtocol with SprayJsonSupport with GeoJsonProtocol {
   implicit val llRegFormat  = jsonFormat2(LatLon)
-  implicit val ssRegFormat  = jsonFormat3(SSRegister)
+  implicit val ssRegFormat  = jsonFormat5(SSRegister)
   implicit val ssUpdFormat  = jsonFormat3(SSUpdate)
   implicit val strRegFormat = jsonFormat3(StreamRegister)
   implicit val obsFormat    = jsonFormat4(DataObs)
   implicit val obsRegFormat = jsonFormat1(ObsRegister)
 
   implicit val streamFormat  = jsonFormat4(DataStream)
-  implicit val systemFormat  = jsonFormat4(SensorSystem)
+  implicit val systemFormat  = jsonFormat6(SensorSystem)
 
   implicit val dbErrorFormat = jsonFormat4(GnError)
 }
@@ -137,6 +139,8 @@ trait MyService extends SimpleRoutingApp with JsonImplicits  {
     db.getSensorSystem(ssr.sysid) match {
       case None =>
         val ss = SensorSystem(ssr.sysid,
+          name = ssr.name,
+          description = ssr.description,
           pushEvents = ssr.pushEvents.getOrElse(true),
           center = ssr.center
         )

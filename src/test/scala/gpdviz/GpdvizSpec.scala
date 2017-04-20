@@ -36,12 +36,14 @@ class GpdvizSpec extends FlatSpec with Matchers with ScalatestRouteTest with MyS
 
   it should "register a new sensor system" in {
     val ssRegister = SSRegister(sysid.get,
+      name = Some("test ss"),
       center = Some(LatLon(36.8, -122.04)))
     Post(s"/api/ss", ssRegister) ~> routes ~> check {
       status shouldBe OK
       contentType shouldBe `application/json`
       val ss = responseAs[SensorSystem]
       ss.sysid shouldBe sysid.get
+      ss.name shouldBe Some("test ss")
       ss.center shouldBe Some(LatLon(36.8, -122.04))
       ss.pushEvents shouldBe true
     }
