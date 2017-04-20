@@ -32,11 +32,13 @@
 
     var overlayGroupByStreamId = {};
 
-    function addMarker(strid, createMarker, popupInfo) {
-      var m = createMarker();
-      m.addTo(map);
-      if (popupInfo) m.bindPopup(popupInfo);
-      markersLayer.addLayer(m);
+    function addMarker(str, createMarker) {
+      var strid = str.strid;
+
+      var marker = createMarker();
+      marker.addTo(map);
+      str._marker = marker;
+      markersLayer.addLayer(marker);
 
       var group = overlayGroupByStreamId[strid];
       if (!group) {
@@ -44,11 +46,10 @@
         overlayGroupByStreamId[strid] = group;
         controlLayers.addOverlay(group, strid);
       }
-      group.addLayer(m);
+      group.addLayer(marker);
 
-      m = createMarker();
-      //if (popupInfo) m.bindPopup(popupInfo);
-      markersLayerMG.addLayer(m);
+      marker = createMarker();
+      markersLayerMG.addLayer(marker);
     }
 
     function clearMarkers() {
@@ -172,7 +173,7 @@
       var str = e.popup && e.popup._gpdviz_str;
       //console.debug("popupopen: str=", str);
       if (str && str._charter) {
-        console.debug("popupopen: charter=", str._charter);
+        //console.debug("popupopen: charter=", str._charter);
         str._charter.activate();
       }
     });
@@ -188,34 +189,16 @@
       }
     });
 
-    function randomData(secs) {
-      var time = new Date().getTime();
-      var data = [];
-      for (var i = -secs; i <= 0; i += 1) {
-        data.push([
-          time + i * 1000,
-          Math.round(Math.random() * 100)
-        ]);
-      }
-      return data;
-    }
-
     function addObs(str, obs) {
+      if (!obs.chartData && !obs.feature && !obs.geometry) {
+        console.error("expecting observation with feature, geometry, or chartData");
+        return;
+      }
+
       var style = str.style || {};
       var timestamp = obs.timestamp;
 
-      if (obs.feature) {
-        var geojson = angular.fromJson(obs.feature);
-        var geometry = obs.feature.geometry;
-        if (obs.feature.properties && obs.feature.properties.style) {
-          style = _.assign(style, obs.feature.properties.style);
-        }
-      }
-      else if (obs.geometry) {
-        geojson = angular.fromJson(obs.geometry);
-        geometry = obs.geometry;
-      }
-      else if (obs.chartData) {
+      if (obs.chartData) {
         // console.debug("str=", str, "obs.chartData=", obs.chartData);
         if (!str._charter) {
           var names = _.map(obs.chartData, function(v, index) {
@@ -226,23 +209,38 @@
         _.each(obs.chartData, function(v, index) {
           str._charter.addChartPoint(index, timestamp, v);
         });
+
+        if (str._marker && !str._marker._popupInfo) {
+          if (debug) console.debug("setting popup for stream ", str.strid);
+          var popupInfo = L.popup(
+            //{autoClose: false, closeOnClick: false}
+          );
+          popupInfo._gpdviz_str = str;
+          popupInfo.setContent('<div id="' +"chart-container-" + str.strid +
+            '" style="min-width:300px;height:250px;margin:0 auto"></div>');
+
+          str._marker._popupInfo = popupInfo;
+          str._marker.bindPopup(str._marker._popupInfo);
+        }
         return;
       }
+
+      if (obs.feature) {
+        var geojson = angular.fromJson(obs.feature);
+        var geometry = obs.feature.geometry;
+        if (obs.feature.properties && obs.feature.properties.style) {
+          style = _.assign(style, obs.feature.properties.style);
+        }
+      }
       else {
-        console.error("expecting observation with feature, geometry, or chartData");
-        return;
+        geojson = angular.fromJson(obs.geometry);
+        geometry = obs.geometry;
       }
 
       if (debug) console.debug("addObs: style=", style, "str=", str, "geojson=", geojson);
 
-      //var popupInfo = L.popup({autoClose: false, closeOnClick: false});
-      var popupInfo = L.popup();
-      popupInfo._gpdviz_str = str;
-      popupInfo.setContent('<div id="' +"chart-container-" + str.strid+
-        '" style="min-width:300px;height:250px;margin:0 auto"></div>');
-
-      addMarker(str.strid, function () {
-        return L.geoJSON(geojson, {
+      addMarker(str, function() {
+        return  L.geoJSON(geojson, {
           style: style,
           pointToLayer: function (feature, latlng) {
             if (!style.radius) {
@@ -251,7 +249,7 @@
             return L.circleMarker(latlng, style);
           }
         });
-      }, popupInfo);
+      });
     }
   }
 

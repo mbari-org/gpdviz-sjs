@@ -2,6 +2,7 @@
 
 2017-04-20
 
+- set popup only when chartData is associated
 - some rather minor adjs
 
 2016-10-14
