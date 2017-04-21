@@ -341,6 +341,21 @@
       }, {
         "timestamp": 1492744979000,
         "chartData": [37.0]
+      }, {
+        "timestamp": 1492744981000,
+        "chartData": [3.0]
+      }, {
+        "timestamp": 1492744982000,
+        "chartData": [95.0]
+      }, {
+        "timestamp": 1492744984000,
+        "chartData": [27.0]
+      }, {
+        "timestamp": 1492744985000,
+        "chartData": [41.0]
+      }, {
+        "timestamp": 1492744987000,
+        "chartData": [40.0]
       }]
     }
   }
