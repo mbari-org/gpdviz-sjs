@@ -83,7 +83,7 @@ function add_str2_values() {
 			},
 			"geometry": {
 			  "type": "Point",
-			  "coordinates": [-122,36.89]
+			  "coordinates": [-121.965,36.81]
 			}
 		  }
 		}]

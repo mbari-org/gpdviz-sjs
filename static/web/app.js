@@ -14,7 +14,7 @@
 
     var byStrId = [];
 
-    var center = [36.8, -122.04];
+    var center = [36.62, -122.04];
     var map = L.map('mapid', {maxZoom: 20}).setView(center, 11);
     var layer = L.esri.basemapLayer('Oceans').addTo(map);
     L.control.mousePosition({position: 'topright', emptyString: ''}).addTo(map);

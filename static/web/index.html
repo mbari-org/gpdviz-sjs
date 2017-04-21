@@ -26,12 +26,14 @@
     var channel = pusher.subscribe('#pusherChannel');
   </script>
   <style>
-    body { margin:20px; }
+    body { margin: 5px 10px; }
   </style>
 </head>
 <body>
   <div style="text-align: center; background-color: #ebfaf5">
-    <span ng-bind="vm.ss.sysid + ' - ' + vm.ss.name" style="font-weight: bold"></span>
+    <span style="font-weight: bold">
+      #sysid - {{vm.ss.name}}
+    </span>
     <span ng-bind="vm.ss.description"></span>
   </div>
   <table style="width: 100%">
@@ -40,31 +42,28 @@
       <td style="width: 300px; vertical-align: top">
         <div ng-if="vm.ss">
           <span style="font-weight:bold">{{vm.ss.sysid}}</span>
-          Sensor system registered. Waiting for events...
+          Sensor system registered. <br>Waiting for events...
           <div ng-if="vm.ss.streams">
             <ul>
               <li ng-repeat="(strid, str) in vm.ss.streams">
                 <div>
-                  strid: {{strid}}
-                  type: {{str.type}}
-                  style: {{str.style}}
+                  <span style="font-weight:bold">{{strid}}</span>
                   <span ng-if="str.name">name: {{str.name}}</span>
                   <span ng-if="str.description">description: {{str.description}}</span>
                 </div>
-                <div>
-                  <ul>
-                    <li ng-repeat="obs in str.obs">
-                      {{obs.timestamp}}: {{obs.value}}
-                    </li>
-                  </ul>
-                </div>
+                <div>Obs: {{str.obs.length}}</div>
+                <!-- ul>
+                  <li ng-repeat="obs in str.obs">
+                    {{obs.timestamp}}: {{obs.chartData}}
+                  </li>
+                </ul -->
               </li>
             </ul>
           </div>
         </div>
         <div ng-if="!vm.ss">
           <span style="font-weight:bold">#sysid</span>:
-          Sensor system not registered. Waiting for registration event...
+          Sensor system not registered.<br>Waiting for registration event...
         </div>
       </td>
       <td style="vertical-align: top">
