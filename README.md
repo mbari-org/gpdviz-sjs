@@ -27,7 +27,7 @@ On another terminal (this requires [httpie](https://httpie.org/)):
 	$ data/ss1.demo.sh
 
 
-![](https://github.com/carueda/gpdviz2/blob/master/static/gpdviz2.png)
+![](https://github.com/carueda/gpdviz2/blob/master/static/gpdviz2.gif)
 
 
 ## build/install fat jar
