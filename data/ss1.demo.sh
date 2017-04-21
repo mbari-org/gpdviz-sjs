@@ -19,7 +19,7 @@ function run() {
 	add_str2_data
 
 	add_str4_and_point
-	add_str4_data
+	add_delayed_data str4
 }
 
 function unregister() {
@@ -148,8 +148,8 @@ EOF
 	http post ${GPDVIZ}/api/ss/${SS}/${strid} values:="${values}" > /dev/null
 	
 }
-function add_str4_data() {
-    strid=str4
+function add_delayed_data() {
+    strid=$1
 	secs=60
 	for i in `seq ${secs}`; do
 	    timestamp="`date +%s`000"
@@ -157,7 +157,7 @@ function add_str4_data() {
 		element='{ "timestamp": '${timestamp}', "chartData": [ '${val}' ]}'
         add_values "${strid}" "[${element}]"
 	    echo "added value to ${strid}: ${val}"
-        sleep 1
+        sleep 0.5
 	done
 }
 
