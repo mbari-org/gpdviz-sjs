@@ -1,8 +1,8 @@
 {
   "name": "Test sensor system",
   "center": {
-    "lat": 36.8,
-    "lon": -122.04
+    "lat": 36.62,
+    "lon": -122.0
   },
   "sysid": "ss1",
   "pushEvents": true,
@@ -15,7 +15,7 @@
       },
       "zOrder": 0,
       "obs": [{
-        "timestamp": 1492732170000,
+        "timestamp": 1492742919000,
         "feature": {
           "type": "Feature",
           "properties": {
@@ -36,100 +36,100 @@
       },
       "zOrder": 10,
       "obs": [{
-        "timestamp": 1492732141000,
-        "chartData": [82.0, 40.0]
+        "timestamp": 1492742891000,
+        "chartData": [53.0, 41.0]
       }, {
-        "timestamp": 1492732142000,
-        "chartData": [44.0, 51.0]
+        "timestamp": 1492742892000,
+        "chartData": [65.0, 67.0]
       }, {
-        "timestamp": 1492732143000,
-        "chartData": [36.0, 70.0]
+        "timestamp": 1492742893000,
+        "chartData": [27.0, 73.0]
       }, {
-        "timestamp": 1492732144000,
-        "chartData": [51.0, 29.0]
+        "timestamp": 1492742894000,
+        "chartData": [92.0, 98.0]
       }, {
-        "timestamp": 1492732145000,
-        "chartData": [68.0, 72.0]
+        "timestamp": 1492742895000,
+        "chartData": [36.0, 61.0]
       }, {
-        "timestamp": 1492732146000,
-        "chartData": [69.0, 43.0]
+        "timestamp": 1492742896000,
+        "chartData": [10.0, 31.0]
       }, {
-        "timestamp": 1492732147000,
-        "chartData": [13.0, 22.0]
+        "timestamp": 1492742897000,
+        "chartData": [54.0, 100.0]
       }, {
-        "timestamp": 1492732148000,
-        "chartData": [86.0, 96.0]
+        "timestamp": 1492742898000,
+        "chartData": [47.0, 83.0]
       }, {
-        "timestamp": 1492732149000,
-        "chartData": [41.0, 59.0]
+        "timestamp": 1492742899000,
+        "chartData": [63.0, 47.0]
       }, {
-        "timestamp": 1492732150000,
-        "chartData": [41.0, 43.0]
+        "timestamp": 1492742900000,
+        "chartData": [86.0, 6.0]
       }, {
-        "timestamp": 1492732151000,
-        "chartData": [68.0, 53.0]
+        "timestamp": 1492742901000,
+        "chartData": [88.0, 16.0]
       }, {
-        "timestamp": 1492732152000,
-        "chartData": [10.0, 84.0]
+        "timestamp": 1492742902000,
+        "chartData": [63.0, 29.0]
       }, {
-        "timestamp": 1492732153000,
-        "chartData": [50.0, 65.0]
+        "timestamp": 1492742903000,
+        "chartData": [75.0, 5.0]
       }, {
-        "timestamp": 1492732154000,
-        "chartData": [2.0, 23.0]
+        "timestamp": 1492742904000,
+        "chartData": [42.0, 99.0]
       }, {
-        "timestamp": 1492732155000,
-        "chartData": [49.0, 67.0]
+        "timestamp": 1492742905000,
+        "chartData": [89.0, 17.0]
       }, {
-        "timestamp": 1492732156000,
-        "chartData": [11.0, 32.0]
+        "timestamp": 1492742906000,
+        "chartData": [34.0, 3.0]
       }, {
-        "timestamp": 1492732157000,
-        "chartData": [45.0, 74.0]
+        "timestamp": 1492742907000,
+        "chartData": [73.0, 4.0]
       }, {
-        "timestamp": 1492732158000,
-        "chartData": [94.0, 77.0]
+        "timestamp": 1492742908000,
+        "chartData": [33.0, 68.0]
       }, {
-        "timestamp": 1492732159000,
-        "chartData": [83.0, 12.0]
+        "timestamp": 1492742909000,
+        "chartData": [99.0, 98.0]
       }, {
-        "timestamp": 1492732160000,
-        "chartData": [55.0, 38.0]
+        "timestamp": 1492742910000,
+        "chartData": [59.0, 86.0]
       }, {
-        "timestamp": 1492732161000,
-        "chartData": [24.0, 20.0]
+        "timestamp": 1492742911000,
+        "chartData": [92.0, 33.0]
       }, {
-        "timestamp": 1492732162000,
-        "chartData": [63.0, 61.0]
+        "timestamp": 1492742912000,
+        "chartData": [1.0, 8.0]
       }, {
-        "timestamp": 1492732163000,
-        "chartData": [25.0, 17.0]
+        "timestamp": 1492742913000,
+        "chartData": [42.0, 2.0]
       }, {
-        "timestamp": 1492732164000,
-        "chartData": [72.0, 46.0]
+        "timestamp": 1492742914000,
+        "chartData": [82.0, 46.0]
       }, {
-        "timestamp": 1492732165000,
-        "chartData": [83.0, 6.0]
+        "timestamp": 1492742915000,
+        "chartData": [84.0, 77.0]
       }, {
-        "timestamp": 1492732166000,
-        "chartData": [36.0, 17.0]
+        "timestamp": 1492742916000,
+        "chartData": [11.0, 43.0]
       }, {
-        "timestamp": 1492732167000,
-        "chartData": [31.0, 72.0]
+        "timestamp": 1492742917000,
+        "chartData": [79.0, 21.0]
       }, {
-        "timestamp": 1492732168000,
-        "chartData": [80.0, 57.0]
+        "timestamp": 1492742918000,
+        "chartData": [75.0, 64.0]
       }, {
-        "timestamp": 1492732169000,
-        "chartData": [8.0, 2.0]
+        "timestamp": 1492742919000,
+        "chartData": [63.0, 83.0]
       }, {
-        "timestamp": 1492732170000,
+        "timestamp": 1492742920000,
         "geometry": {
           "type": "Point",
           "coordinates": [-121.906, 36.882]
         }
       }, {
-        "timestamp": 1492732170000,
+        "timestamp": 1492742920000,
         "feature": {
           "type": "Feature",
           "properties": {
@@ -145,8 +145,8 @@
           }
         }
       }, {
-        "timestamp": 1492732170000,
-        "chartData": [35.0, 12.0]
+        "timestamp": 1492742920000,
+        "chartData": [73.0, 71.0]
       }]
     },
     "str3": {
@@ -156,7 +156,7 @@
       },
       "zOrder": 0,
       "obs": [{
-        "timestamp": 1492732171000,
+        "timestamp": 1492742920000,
         "geometry": {
           "type": "LineString",
           "coordinates": [[-122.123, 36.92], [-122.186, 36.774], [-121.9, 36.7]]
@@ -171,191 +171,191 @@
       },
       "zOrder": 10,
       "obs": [{
-        "timestamp": 1492732172000,
+        "timestamp": 1492742922000,
         "geometry": {
           "type": "Point",
           "coordinates": [-122.09, 36.865]
         }
       }, {
-        "timestamp": 1492732173000,
-        "chartData": [78.0]
+        "timestamp": 1492742922000,
+        "chartData": [91.0]
       }, {
-        "timestamp": 1492732174000,
-        "chartData": [43.0]
+        "timestamp": 1492742924000,
+        "chartData": [77.0]
       }, {
-        "timestamp": 1492732176000,
-        "chartData": [88.0]
-      }, {
-        "timestamp": 1492732177000,
-        "chartData": [32.0]
-      }, {
-        "timestamp": 1492732179000,
-        "chartData": [48.0]
-      }, {
-        "timestamp": 1492732180000,
-        "chartData": [35.0]
-      }, {
-        "timestamp": 1492732182000,
-        "chartData": [37.0]
-      }, {
-        "timestamp": 1492732183000,
-        "chartData": [97.0]
-      }, {
-        "timestamp": 1492732185000,
-        "chartData": [62.0]
-      }, {
-        "timestamp": 1492732186000,
-        "chartData": [65.0]
-      }, {
-        "timestamp": 1492732188000,
-        "chartData": [92.0]
-      }, {
-        "timestamp": 1492732189000,
-        "chartData": [6.0]
-      }, {
-        "timestamp": 1492732191000,
-        "chartData": [27.0]
-      }, {
-        "timestamp": 1492732192000,
-        "chartData": [46.0]
-      }, {
-        "timestamp": 1492732194000,
-        "chartData": [99.0]
-      }, {
-        "timestamp": 1492732196000,
+        "timestamp": 1492742925000,
         "chartData": [59.0]
       }, {
-        "timestamp": 1492732197000,
-        "chartData": [45.0]
+        "timestamp": 1492742927000,
+        "chartData": [64.0]
       }, {
-        "timestamp": 1492732199000,
-        "chartData": [58.0]
+        "timestamp": 1492742928000,
+        "chartData": [11.0]
       }, {
-        "timestamp": 1492732200000,
-        "chartData": [94.0]
-      }, {
-        "timestamp": 1492732202000,
-        "chartData": [53.0]
-      }, {
-        "timestamp": 1492732203000,
-        "chartData": [6.0]
-      }, {
-        "timestamp": 1492732205000,
-        "chartData": [15.0]
-      }, {
-        "timestamp": 1492732206000,
-        "chartData": [84.0]
-      }, {
-        "timestamp": 1492732208000,
-        "chartData": [78.0]
-      }, {
-        "timestamp": 1492732209000,
-        "chartData": [26.0]
-      }, {
-        "timestamp": 1492732211000,
-        "chartData": [89.0]
-      }, {
-        "timestamp": 1492732212000,
-        "chartData": [15.0]
-      }, {
-        "timestamp": 1492732214000,
-        "chartData": [28.0]
-      }, {
-        "timestamp": 1492732215000,
-        "chartData": [13.0]
-      }, {
-        "timestamp": 1492732217000,
-        "chartData": [54.0]
-      }, {
-        "timestamp": 1492732218000,
-        "chartData": [61.0]
-      }, {
-        "timestamp": 1492732220000,
-        "chartData": [30.0]
-      }, {
-        "timestamp": 1492732221000,
-        "chartData": [86.0]
-      }, {
-        "timestamp": 1492732223000,
-        "chartData": [2.0]
-      }, {
-        "timestamp": 1492732224000,
-        "chartData": [87.0]
-      }, {
-        "timestamp": 1492732226000,
-        "chartData": [8.0]
-      }, {
-        "timestamp": 1492732227000,
-        "chartData": [98.0]
-      }, {
-        "timestamp": 1492732229000,
-        "chartData": [45.0]
-      }, {
-        "timestamp": 1492732230000,
-        "chartData": [23.0]
-      }, {
-        "timestamp": 1492732232000,
+        "timestamp": 1492742930000,
         "chartData": [82.0]
       }, {
-        "timestamp": 1492732233000,
-        "chartData": [23.0]
-      }, {
-        "timestamp": 1492732235000,
-        "chartData": [58.0]
-      }, {
-        "timestamp": 1492732236000,
-        "chartData": [52.0]
-      }, {
-        "timestamp": 1492732238000,
-        "chartData": [18.0]
-      }, {
-        "timestamp": 1492732239000,
-        "chartData": [45.0]
-      }, {
-        "timestamp": 1492732241000,
-        "chartData": [7.0]
-      }, {
-        "timestamp": 1492732242000,
-        "chartData": [89.0]
-      }, {
-        "timestamp": 1492732244000,
-        "chartData": [45.0]
-      }, {
-        "timestamp": 1492732245000,
-        "chartData": [31.0]
-      }, {
-        "timestamp": 1492732247000,
-        "chartData": [58.0]
-      }, {
-        "timestamp": 1492732248000,
-        "chartData": [49.0]
-      }, {
-        "timestamp": 1492732250000,
+        "timestamp": 1492742931000,
         "chartData": [44.0]
       }, {
-        "timestamp": 1492732251000,
-        "chartData": [1.0]
+        "timestamp": 1492742933000,
+        "chartData": [4.0]
       }, {
-        "timestamp": 1492732253000,
-        "chartData": [21.0]
+        "timestamp": 1492742934000,
+        "chartData": [2.0]
       }, {
-        "timestamp": 1492732254000,
+        "timestamp": 1492742936000,
+        "chartData": [29.0]
+      }, {
+        "timestamp": 1492742937000,
+        "chartData": [86.0]
+      }, {
+        "timestamp": 1492742939000,
+        "chartData": [30.0]
+      }, {
+        "timestamp": 1492742940000,
+        "chartData": [35.0]
+      }, {
+        "timestamp": 1492742942000,
+        "chartData": [86.0]
+      }, {
+        "timestamp": 1492742943000,
+        "chartData": [34.0]
+      }, {
+        "timestamp": 1492742945000,
+        "chartData": [45.0]
+      }, {
+        "timestamp": 1492742947000,
+        "chartData": [30.0]
+      }, {
+        "timestamp": 1492742948000,
+        "chartData": [82.0]
+      }, {
+        "timestamp": 1492742950000,
         "chartData": [98.0]
       }, {
-        "timestamp": 1492732256000,
-        "chartData": [12.0]
+        "timestamp": 1492742951000,
+        "chartData": [48.0]
       }, {
-        "timestamp": 1492732257000,
-        "chartData": [68.0]
+        "timestamp": 1492742953000,
+        "chartData": [80.0]
       }, {
-        "timestamp": 1492732259000,
-        "chartData": [88.0]
+        "timestamp": 1492742954000,
+        "chartData": [69.0]
       }, {
-        "timestamp": 1492732260000,
-        "chartData": [58.0]
+        "timestamp": 1492742956000,
+        "chartData": [53.0]
       }, {
-        "timestamp": 1492732262000,
+        "timestamp": 1492742957000,
+        "chartData": [44.0]
+      }, {
+        "timestamp": 1492742959000,
         "chartData": [94.0]
+      }, {
+        "timestamp": 1492742960000,
+        "chartData": [37.0]
+      }, {
+        "timestamp": 1492742962000,
+        "chartData": [94.0]
+      }, {
+        "timestamp": 1492742963000,
+        "chartData": [72.0]
+      }, {
+        "timestamp": 1492742965000,
+        "chartData": [23.0]
+      }, {
+        "timestamp": 1492742966000,
+        "chartData": [19.0]
+      }, {
+        "timestamp": 1492742968000,
+        "chartData": [21.0]
+      }, {
+        "timestamp": 1492742969000,
+        "chartData": [34.0]
+      }, {
+        "timestamp": 1492742971000,
+        "chartData": [94.0]
+      }, {
+        "timestamp": 1492742972000,
+        "chartData": [73.0]
+      }, {
+        "timestamp": 1492742974000,
+        "chartData": [16.0]
+      }, {
+        "timestamp": 1492742975000,
+        "chartData": [75.0]
+      }, {
+        "timestamp": 1492742977000,
+        "chartData": [42.0]
+      }, {
+        "timestamp": 1492742978000,
+        "chartData": [27.0]
+      }, {
+        "timestamp": 1492742980000,
+        "chartData": [76.0]
+      }, {
+        "timestamp": 1492742981000,
+        "chartData": [63.0]
+      }, {
+        "timestamp": 1492742983000,
+        "chartData": [73.0]
+      }, {
+        "timestamp": 1492742984000,
+        "chartData": [82.0]
+      }, {
+        "timestamp": 1492742986000,
+        "chartData": [7.0]
+      }, {
+        "timestamp": 1492742987000,
+        "chartData": [73.0]
+      }, {
+        "timestamp": 1492742989000,
+        "chartData": [95.0]
+      }, {
+        "timestamp": 1492742990000,
+        "chartData": [30.0]
+      }, {
+        "timestamp": 1492742992000,
+        "chartData": [34.0]
+      }, {
+        "timestamp": 1492742993000,
+        "chartData": [60.0]
+      }, {
+        "timestamp": 1492742995000,
+        "chartData": [38.0]
+      }, {
+        "timestamp": 1492742996000,
+        "chartData": [80.0]
+      }, {
+        "timestamp": 1492742998000,
+        "chartData": [18.0]
+      }, {
+        "timestamp": 1492742999000,
+        "chartData": [91.0]
+      }, {
+        "timestamp": 1492743001000,
+        "chartData": [98.0]
+      }, {
+        "timestamp": 1492743002000,
+        "chartData": [47.0]
+      }, {
+        "timestamp": 1492743004000,
+        "chartData": [42.0]
+      }, {
+        "timestamp": 1492743005000,
+        "chartData": [95.0]
+      }, {
+        "timestamp": 1492743007000,
+        "chartData": [93.0]
+      }, {
+        "timestamp": 1492743008000,
+        "chartData": [15.0]
+      }, {
+        "timestamp": 1492743010000,
+        "chartData": [38.0]
+      }, {
+        "timestamp": 1492743011000,
+        "chartData": [63.0]
       }]
     }
   }

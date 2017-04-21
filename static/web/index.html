@@ -30,8 +30,8 @@
   </style>
 </head>
 <body>
-  <div ng-if="vm.ss.name" style="text-align: center; background-color: #ebfaf5">
-    <span ng-bind="vm.ss.name" style="font-weight: bold"></span>
+  <div style="text-align: center; background-color: #ebfaf5">
+    <span ng-bind="vm.ss.sysid + ' - ' + vm.ss.name" style="font-weight: bold"></span>
     <span ng-bind="vm.ss.description"></span>
   </div>
   <table style="width: 100%">

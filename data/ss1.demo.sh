@@ -7,7 +7,6 @@ SS=ss1
 function run() {
 	unregister
 	register
-	update
 
 	add_str1
 	add_str2
@@ -24,27 +23,28 @@ function run() {
 }
 
 function unregister() {
-	http delete ${GPDVIZ}/api/ss/${SS}
+    echo "unregister ${SS}"
+	http delete ${GPDVIZ}/api/ss/${SS} > /dev/null
 }
 
 function register() {
-	http post ${GPDVIZ}/api/ss sysid=${SS} name='Test sensor system' center:='{"lat":36, "lon":-122}' pushEvents:=true
-}
-
-function update() {
-	http put ${GPDVIZ}/api/ss/${SS} center:='{"lat":36.8, "lon":-122.04}'
+    echo "register ${SS}"
+	http post ${GPDVIZ}/api/ss sysid=${SS} name='Test sensor system' center:='{"lat":36.62, "lon":-122}' pushEvents:=true > /dev/null
 }
 
 function add_str1() {
-	http post ${GPDVIZ}/api/ss/${SS} strid=str1 style:='{"color":"green", "dashArray": "5,5"}'
+    echo "add stream str1"
+	http post ${GPDVIZ}/api/ss/${SS} strid=str1 style:='{"color":"green", "dashArray": "5,5"}' > /dev/null
 }
 
 function add_str2() {
-	http post ${GPDVIZ}/api/ss/${SS} strid=str2 style:='{"color":"red", "radius": 14}' zOrder:=10
+    echo "add stream str2"
+	http post ${GPDVIZ}/api/ss/${SS} strid=str2 style:='{"color":"red", "radius": 14}' zOrder:=10 > /dev/null
 }
 
 function add_str3() {
-	http post ${GPDVIZ}/api/ss/${SS} strid=str3 style:='{"color":"blue"}'
+    echo "add stream str3"
+	http post ${GPDVIZ}/api/ss/${SS} strid=str3 style:='{"color":"blue"}' > /dev/null
 }
 
 function add_str1_values() {
@@ -109,7 +109,7 @@ EOF
 function add_values() {
 	strid=$1
 	values=$2
-	http post ${GPDVIZ}/api/ss/${SS}/${strid} values:="${values}"
+	http post ${GPDVIZ}/api/ss/${SS}/${strid} values:="${values}" > /dev/null
 }
 
 function add_str2_data() {
@@ -134,7 +134,7 @@ function add_str2_data() {
 
 function add_str4_and_point() {
     strid=str4
-	http post ${GPDVIZ}/api/ss/${SS} strid=${strid} style:='{"color":"yellow", "radius": 10}' zOrder:=10
+	http post ${GPDVIZ}/api/ss/${SS} strid=${strid} style:='{"color":"yellow", "radius": 10}' zOrder:=10 > /dev/null
 	timestamp="`date +%s`000"
 	read -r -d '' values <<-EOF
 		[{
@@ -145,7 +145,7 @@ function add_str4_and_point() {
 		  }
 		}]
 EOF
-	http post ${GPDVIZ}/api/ss/${SS}/${strid} values:="${values}"
+	http post ${GPDVIZ}/api/ss/${SS}/${strid} values:="${values}" > /dev/null
 	
 }
 function add_str4_data() {
@@ -156,9 +156,13 @@ function add_str4_data() {
 		val=$(( (RANDOM % 100) + 1 ))
 		element='{ "timestamp": '${timestamp}', "chartData": [ '${val}' ]}'
         add_values "${strid}" "[${element}]"
-	    echo "added value to ${strid}"
+	    echo "added value to ${strid}: ${val}"
         sleep 1
 	done
 }
 
-run
+if [ "$1" != "" ]; then
+    $1
+else
+    run
+fi

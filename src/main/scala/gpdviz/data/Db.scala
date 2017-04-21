@@ -63,7 +63,7 @@ class Db(dataDir: String) extends JsonImplicits {
 
   private def doSave(ss: SensorSystem): Either[GnError, SensorSystem] = {
     val filename = ss.sysid + ".ss.json"
-    println(s"SAVE $filename")
+    //println(s"SAVE $filename")
     val ssPath = Paths.get(dataDir, filename)
     try {
       Files.write(ssPath, ss.toJson.prettyPrint.getBytes(StandardCharsets.UTF_8))

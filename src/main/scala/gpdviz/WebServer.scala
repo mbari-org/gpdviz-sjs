@@ -158,7 +158,7 @@ trait MyService extends SimpleRoutingApp with JsonImplicits  {
   private def getSensorSystem(sysid: String): ToResponseMarshallable = withSensorSystem(sysid) { ss => ss }
 
   private def updateSensorSystem(sysid: String, ssu: SSUpdate): ToResponseMarshallable = withSensorSystem(sysid) { ss =>
-    println(s"updateSensorSystem: sysid=$sysid ssu=$ssu")
+    //println(s"updateSensorSystem: sysid=$sysid ssu=$ssu")
 
     var updated = ss.copy()
     ssu.pushEvents foreach {
@@ -205,7 +205,7 @@ trait MyService extends SimpleRoutingApp with JsonImplicits  {
   }
 
   private def addObservation(sysid: String, strid: String, obsr: ObsRegister): ToResponseMarshallable = withSensorSystem(sysid) { ss =>
-    println(s"addObservation: sysid=$sysid, strid=$strid, obsr=$obsr")
+    //println(s"addObservation: sysid=$sysid, strid=$strid, obsr=$obsr")
     ss.streams.get(strid) match {
       case Some(str) =>
         val newObs = obsr.values
