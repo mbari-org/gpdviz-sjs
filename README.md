@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/carueda/gpdviz2.svg?branch=master)](https://travis-ci.org/carueda/gpdviz2)
+
 # gpdviz2
 
 Web-based visualization of geo-located point data streams in real-time.
