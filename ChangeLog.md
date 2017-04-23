@@ -1,5 +1,10 @@
 # gpdviz2
 
+2017-04-23
+
+- at init, add non-charData observations first so the marker has already been 
+  associated to the relevant streams when adding the charData
+
 2017-04-20
 
 - capture name and description in sensor system model

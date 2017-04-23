@@ -96,8 +96,16 @@
       var streams = _.sortBy(_.values(vm.ss.streams), 'zOrder');
       _.each(streams, function (str) {
         byStrId[str.strid] = {str: str};
+
+        // little hack: add non-charData observations first...
         _.each(str.obs, function (obs) {
-          addObs(str, obs);
+          if (!obs.chartData)
+            addObs(str, obs);
+        });
+        // ... so the marker has already been associated to the relevant streams:
+        _.each(str.obs, function (obs) {
+          if (obs.chartData)
+            addObs(str, obs);
         });
       });
     }
