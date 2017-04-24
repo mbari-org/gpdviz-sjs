@@ -17,11 +17,14 @@ case class SensorSystem(sysid:        String,
 case class DataStream(strid:    String,
                       style:    Option[Map[String, JsValue]] = None,
                       zOrder:   Int = 0,
+                      variables: Option[List[String]] = None,
                       obs:      Option[List[DataObs]] = None
                       )
 
+case class TimestampedData(timestamp: Long, values: List[Double])
+
 case class DataObs(timestamp:   Long,
-                   feature:     Option[Feature],
-                   geometry:    Option[Geometry],
-                   chartData:   Option[List[Double]]
+                   feature:     Option[Feature] = None,
+                   geometry:    Option[Geometry] = None,
+                   chartTsData: Option[List[TimestampedData]] = None
                    )

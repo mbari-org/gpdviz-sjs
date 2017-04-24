@@ -2,6 +2,7 @@
 
 2017-04-23
 
+- now chartTsData, not chartData: as a next step toward better model (but still preliminary)
 - at init, add non-charData observations first so the marker has already been 
   associated to the relevant streams when adding the charData
 

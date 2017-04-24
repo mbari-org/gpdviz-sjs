@@ -56,7 +56,7 @@ class Notifier(config: Config) extends JsonImplicits {
         var map = Map[String, Any]("timestamp" -> o.timestamp)
         o.feature.foreach(x => map = map.updated("feature", x.toJson.compactPrint))
         o.geometry.foreach(x => map = map.updated("geometry", x.toJson.compactPrint))
-        o.chartData.foreach(x => map = map.updated("chartData", x.toJson.compactPrint))
+        o.chartTsData.foreach(x => map = map.updated("chartTsData", x.toJson.compactPrint))
         map.asJava
       }
       @tailrec

@@ -99,12 +99,12 @@
 
         // little hack: add non-charData observations first...
         _.each(str.obs, function (obs) {
-          if (!obs.chartData)
+          if (!obs.chartTsData)
             addObs(str, obs);
         });
         // ... so the marker has already been associated to the relevant streams:
         _.each(str.obs, function (obs) {
-          if (obs.chartData)
+          if (obs.chartTsData)
             addObs(str, obs);
         });
       });
@@ -150,7 +150,7 @@
               timestamp: data_obs.timestamp,
               feature:   data_obs.feature ? angular.fromJson(data_obs.feature) : undefined,
               geometry:  data_obs.geometry? angular.fromJson(data_obs.geometry) : undefined,
-              chartData:  data_obs.chartData? angular.fromJson(data_obs.chartData) : undefined
+              chartTsData: data_obs.chartTsData ? angular.fromJson(data_obs.chartTsData) : undefined
             };
             str.obs.push(obs);
             addObs(str, obs);
@@ -201,29 +201,27 @@
     });
 
     function addObs(str, obs) {
-      if (!obs.chartData && !obs.feature && !obs.geometry) {
-        console.error("expecting observation with feature, geometry, or chartData");
+      if (!obs.chartTsData && !obs.feature && !obs.geometry) {
+        console.error("expecting observation with feature, geometry, or chartTsData");
         return;
       }
 
-      var style = str.style || {};
-      var timestamp = obs.timestamp;
+      var popupInfo;
 
-      if (obs.chartData) {
-        // console.debug("str=", str, "obs.chartData=", obs.chartData);
+      if (obs.chartTsData) {
+        //console.debug("str=", str, "obs.chartTsData=", obs.chartTsData);
         if (!byStrId[str.strid].charter) {
-          var names = _.map(obs.chartData, function(v, index) {
-            return "series#" + index;
-          });
-          byStrId[str.strid].charter = Charter(str.strid, names);
+          byStrId[str.strid].charter = Charter(str.strid, str.variables);
         }
-        _.each(obs.chartData, function(v, index) {
-          byStrId[str.strid].charter.addChartPoint(index, timestamp, v);
+        _.each(obs.chartTsData, function(tsd) {
+          _.each(tsd.values, function(v, index) {
+            byStrId[str.strid].charter.addChartPoint(index, tsd.timestamp, v);
+          });
         });
 
         if (byStrId[str.strid].marker && !byStrId[str.strid].popupInfo) {
           if (debug) console.debug("setting popup for stream ", str.strid);
-          var popupInfo = L.popup(
+          popupInfo = L.popup(
             //{autoClose: false, closeOnClick: false}
           );
           popupInfo._strid = str.strid;
@@ -235,6 +233,8 @@
         }
         return;
       }
+
+      var style = str.style || {};
 
       if (obs.feature) {
         var geojson = angular.fromJson(obs.feature);

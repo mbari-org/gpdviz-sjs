@@ -10,229 +10,110 @@
       "zOrder": 0
     },
     "ctd": {
-      "strid": "ctd",
+      "obs": [{
+        "timestamp": 1493005162000,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-122.17245833333334, 36.899921666666664]
+        }
+      }, {
+        "timestamp": 1493005172000,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-122.17245833333334, 36.899921666666664]
+        }
+      }, {
+        "timestamp": 1493005181000,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-122.17253666666667, 36.89991833333333]
+        }
+      }, {
+        "timestamp": 1493005191000,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-122.17253666666667, 36.89991833333333]
+        }
+      }, {
+        "timestamp": 1493005761000,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-122.17562666666667, 36.899876666666664]
+        }
+      }, {
+        "timestamp": 1493005771000,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-122.17573333333333, 36.899905]
+        }
+      }, {
+        "timestamp": 1493005781000,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-122.17573333333333, 36.899905]
+        }
+      }, {
+        "timestamp": 1493005791000,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-122.175795, 36.89988666666667]
+        }
+      }, {
+        "timestamp": 1493006263632,
+        "chartTsData": [{
+          "timestamp": 1493005162000,
+          "values": [11.084299]
+        }]
+      }, {
+        "timestamp": 1493006263642,
+        "chartTsData": [{
+          "timestamp": 1493005172000,
+          "values": [11.083099]
+        }]
+      }, {
+        "timestamp": 1493006263650,
+        "chartTsData": [{
+          "timestamp": 1493005181000,
+          "values": [11.084499]
+        }]
+      }, {
+        "timestamp": 1493006263658,
+        "chartTsData": [{
+          "timestamp": 1493005191000,
+          "values": [11.0849]
+        }]
+      }, {
+        "timestamp": 1493006263666,
+        "chartTsData": [{
+          "timestamp": 1493005761000,
+          "values": [11.1322]
+        }]
+      }, {
+        "timestamp": 1493006263673,
+        "chartTsData": [{
+          "timestamp": 1493005771000,
+          "values": [11.132799]
+        }]
+      }, {
+        "timestamp": 1493006263680,
+        "chartTsData": [{
+          "timestamp": 1493005781000,
+          "values": [11.132]
+        }]
+      }, {
+        "timestamp": 1493006263688,
+        "chartTsData": [{
+          "timestamp": 1493005791000,
+          "values": [11.1324005]
+        }]
+      }],
       "style": {
         "color": "yellow",
         "radius": 1
       },
+      "variables": ["temperature"],
       "zOrder": 0,
-      "obs": [{
-        "timestamp": 1476421742000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.15615666666666, 36.71480666666667]
-        }
-      }, {
-        "timestamp": 1476421742000,
-        "chartData": [15.6835]
-      }, {
-        "timestamp": 1476421751000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.15608666666667, 36.714815]
-        }
-      }, {
-        "timestamp": 1476421751000,
-        "chartData": [15.684]
-      }, {
-        "timestamp": 1476421761000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.15608666666667, 36.714815]
-        }
-      }, {
-        "timestamp": 1476421761000,
-        "chartData": [15.686199]
-      }, {
-        "timestamp": 1476421771000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.15602833333334, 36.71483166666667]
-        }
-      }, {
-        "timestamp": 1476421771000,
-        "chartData": [15.683901]
-      }, {
-        "timestamp": 1476421781000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.15602833333334, 36.71483166666667]
-        }
-      }, {
-        "timestamp": 1476421781000,
-        "chartData": [15.6849]
-      }, {
-        "timestamp": 1476421791000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.155955, 36.714845]
-        }
-      }, {
-        "timestamp": 1476421791000,
-        "chartData": [15.6849]
-      }, {
-        "timestamp": 1476421801000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.155955, 36.714845]
-        }
-      }, {
-        "timestamp": 1476421801000,
-        "chartData": [15.688101]
-      }, {
-        "timestamp": 1476421811000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.155955, 36.714845]
-        }
-      }, {
-        "timestamp": 1476421811000,
-        "chartData": [15.679701]
-      }, {
-        "timestamp": 1476422341000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.15398, 36.71527666666667]
-        }
-      }, {
-        "timestamp": 1476422341000,
-        "chartData": [15.345699]
-      }, {
-        "timestamp": 1476422351000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.15398, 36.71527666666667]
-        }
-      }, {
-        "timestamp": 1476422351000,
-        "chartData": [15.3342]
-      }, {
-        "timestamp": 1476422361000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.153925, 36.7153]
-        }
-      }, {
-        "timestamp": 1476422361000,
-        "chartData": [15.332199]
-      }, {
-        "timestamp": 1476422371000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.153925, 36.7153]
-        }
-      }, {
-        "timestamp": 1476422371000,
-        "chartData": [15.32]
-      }, {
-        "timestamp": 1476422382000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.15383666666666, 36.715305]
-        }
-      }, {
-        "timestamp": 1476422382000,
-        "chartData": [15.325701]
-      }, {
-        "timestamp": 1476422392000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.15383666666666, 36.715305]
-        }
-      }, {
-        "timestamp": 1476422392000,
-        "chartData": [15.3218]
-      }, {
-        "timestamp": 1476422402000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.153775, 36.71532666666667]
-        }
-      }, {
-        "timestamp": 1476422402000,
-        "chartData": [15.3244]
-      }, {
-        "timestamp": 1476422412000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.153775, 36.71532666666667]
-        }
-      }, {
-        "timestamp": 1476422412000,
-        "chartData": [15.3155]
-      }, {
-        "timestamp": 1476422941000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.15195333333334, 36.715685]
-        }
-      }, {
-        "timestamp": 1476422941000,
-        "chartData": [15.267]
-      }, {
-        "timestamp": 1476422951000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.15195333333334, 36.715685]
-        }
-      }, {
-        "timestamp": 1476422951000,
-        "chartData": [15.2596]
-      }, {
-        "timestamp": 1476422961000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.15188166666667, 36.715693333333334]
-        }
-      }, {
-        "timestamp": 1476422961000,
-        "chartData": [15.2572]
-      }, {
-        "timestamp": 1476422971000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.15188166666667, 36.715693333333334]
-        }
-      }, {
-        "timestamp": 1476422971000,
-        "chartData": [15.2596]
-      }, {
-        "timestamp": 1476422981000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.151835, 36.71571333333333]
-        }
-      }, {
-        "timestamp": 1476422981000,
-        "chartData": [15.2593]
-      }, {
-        "timestamp": 1476422991000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.151835, 36.71571333333333]
-        }
-      }, {
-        "timestamp": 1476422991000,
-        "chartData": [15.240801]
-      }, {
-        "timestamp": 1476423001000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.15175666666667, 36.71572666666667]
-        }
-      }, {
-        "timestamp": 1476423001000,
-        "chartData": [15.224701]
-      }, {
-        "timestamp": 1476423011000,
-        "geometry": {
-          "type": "Point",
-          "coordinates": [-122.15175666666667, 36.71572666666667]
-        }
-      }, {
-        "timestamp": 1476423011000,
-        "chartData": [15.221399]
-      }]
+      "strid": "ctd"
     }
   },
   "pushEvents": true,

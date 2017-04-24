@@ -39,7 +39,9 @@ function add_str1() {
 
 function add_str2() {
     echo "add stream str2"
-	http post ${GPDVIZ}/api/ss/${SS} strid=str2 style:='{"color":"red", "radius": 14}' zOrder:=10 > /dev/null
+	http post ${GPDVIZ}/api/ss/${SS} strid=str2 \
+	    variables:='[ "foo", "bar" ]' \
+	    style:='{"color":"red", "radius": 14}' zOrder:=10 > /dev/null
 }
 
 function add_str3() {
@@ -123,7 +125,7 @@ function add_str2_data() {
 	for i in `seq ${secs}`; do
 		val0=$(( (RANDOM % 100) + 1 ))
 		val1=$(( (RANDOM % 100) + 1 ))
-		element='{ "timestamp": '${timestamp}', "chartData": [ '${val0}', '${val1}' ]}'
+		element='{ "timestamp": '${timestamp}', "chartTsData": [ { "timestamp": '${timestamp}', "values": [ '${val0}', '${val1}' ] } ]}'
 		values="${values}${comma}${element}"
 		comma=","
 		timestamp=$(( timestamp + 1000 ))
@@ -134,7 +136,9 @@ function add_str2_data() {
 
 function add_str4_and_point() {
     strid=str4
-	http post ${GPDVIZ}/api/ss/${SS} strid=${strid} style:='{"color":"yellow", "radius": 10}' zOrder:=10 > /dev/null
+	http post ${GPDVIZ}/api/ss/${SS} strid=${strid} \
+	    variables:='[ "temperature" ]' \
+	    style:='{"color":"yellow", "radius": 10}' zOrder:=10 > /dev/null
 	timestamp="`date +%s`000"
 	read -r -d '' values <<-EOF
 		[{
@@ -154,7 +158,7 @@ function add_delayed_data() {
 	for i in `seq ${secs}`; do
 	    timestamp="`date +%s`000"
 		val=$(( (RANDOM % 100) + 1 ))
-		element='{ "timestamp": '${timestamp}', "chartData": [ '${val}' ]}'
+		element='{ "timestamp": '${timestamp}', "chartTsData": [ { "timestamp": '${timestamp}', "values": ['${val}'] } ] }'
         add_values "${strid}" "[${element}]"
 	    echo "added value to ${strid}: ${val}"
         sleep 0.5
