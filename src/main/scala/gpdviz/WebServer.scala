@@ -269,9 +269,9 @@ trait MyService extends SimpleRoutingApp with JsonImplicits  {
 }
 
 object WebServer extends MyService {
-  val config = ConfigFactory.load().resolve()
-  val db = new Db("data")
-  val notifier = new Notifier(config)
+  val config: Config = ConfigFactory.load().resolve()
+  val db: Db = new Db("data")
+  val notifier: Notifier = new Notifier(config)
 
   def main(args: Array[String]) {
     implicit val system = ActorSystem()
@@ -283,7 +283,7 @@ object WebServer extends MyService {
       routes
     }
 
-    println(s"Server online at $interface:$port/")
+    println(s"Gpdviz server '${notifier.serverName}' online at $interface:$port/")
     if (!args.contains("-d")) {
       println("Press RETURN to stop...")
       StdIn.readLine()

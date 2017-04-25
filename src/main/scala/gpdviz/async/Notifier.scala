@@ -13,6 +13,7 @@ import scala.collection.JavaConverters._
 
 
 class Notifier(config: Config) extends JsonImplicits {
+  val serverName: String = config.getString("gpdviz.serverName")
 
   def getSensorSystemIndex(sysid: String, ssOpt: Option[SensorSystem]): String = {
     val ssVar = ssOpt match {
@@ -24,7 +25,7 @@ class Notifier(config: Config) extends JsonImplicits {
       .replace("#sysid", sysid)
       .replace("#ssVar", ssVar)
       .replace("#pusherKey", key)
-      .replace("#pusherChannel", s"gpdviz-$sysid")
+      .replace("#pusherChannel", s"$serverName-$sysid")
   }
 
   def notifySensorSystemRegistered(ss: SensorSystem): Unit = {
@@ -102,7 +103,7 @@ class Notifier(config: Config) extends JsonImplicits {
   private def notifyEvent(sysid: String, what: String, data: Any): Unit = {
     val map = Map("what" -> what, "data" -> data)
     //println(s"notifyEvent: sysid:$sysid  what=$what")  //  data=$data")
-    val channel = s"gpdviz-$sysid"
+    val channel = s"$serverName-$sysid"
     val res = pusher.trigger(channel, "my_event", map.asJava)
     if (res.getHttpStatus != 200)
       println(s"!!!notifyEvent: pusher.trigger ERROR: status=${res.getHttpStatus} message=${res.getMessage}")

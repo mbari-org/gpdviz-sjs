@@ -2,6 +2,8 @@
 
 2017-04-24
 
+- add cfg.gpdviz.serverName as a way to specify particular instance (so UI subscribes
+  only to events from corresponding server instance)
 - highchart adjustments 
 
 2017-04-23
