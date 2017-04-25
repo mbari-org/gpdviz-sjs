@@ -1,5 +1,9 @@
 # gpdviz2
 
+2017-04-24
+
+- highchart adjustments 
+
 2017-04-23
 
 - now chartTsData, not chartData: as a next step toward better model (but still preliminary)

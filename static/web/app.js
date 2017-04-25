@@ -221,12 +221,13 @@
 
         if (byStrId[str.strid].marker && !byStrId[str.strid].popupInfo) {
           if (debug) console.debug("setting popup for stream ", str.strid);
-          popupInfo = L.popup(
-            //{autoClose: false, closeOnClick: false}
-          );
+          popupInfo = L.popup({
+            //autoClose: false, closeOnClick: false
+            minWidth: 550
+          });
           popupInfo._strid = str.strid;
           popupInfo.setContent('<div id="' +"chart-container-" + str.strid +
-            '" style="min-width:300px;height:250px;margin:0 auto"></div>');
+            '" style="min-width:500px;height:300px;margin:0 auto"></div>');
 
           byStrId[str.strid].marker.bindPopup(popupInfo);
           byStrId[str.strid].popupInfo = popupInfo;
@@ -327,9 +328,13 @@
           events: {
             load: function () {
               serieses = this.series;
-            }
+            },
+            zoomType: 'x'
           }
         },
+        //title: { text: "TODO" },
+        xAxis: { type: 'datetime' },
+        legend: { enabled: false },
 
         series: initialSeriesData || [],
 
@@ -341,13 +346,21 @@
 
         rangeSelector: {
           buttons: [{
-            count: 1,
+            count: 10,
             type: 'minute',
-            text: '1M'
+            text: '10m'
           }, {
-            count: 5,
-            type: 'minute',
-            text: '5M'
+            count: 1,
+            type: 'hour',
+            text: '1H'
+          }, {
+            count: 12,
+            type: 'hour',
+            text: '2H'
+          }, {
+            count: 1,
+            type: 'day',
+            text: '1D'
           }, {
             type: 'all',
             text: 'All'
@@ -361,7 +374,7 @@
         //},
 
         navigator: {
-          enabled: false
+          enabled: true
         },
         scrollbar: {
           enabled: true
