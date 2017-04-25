@@ -2,6 +2,7 @@
 
 2017-04-25
 
+- preliminaries for handling of hovered mouse position on chart toward highlighting corresponding locations on map
 - dynamic adjustment of map height depending on window height (rather ad hoc for now) 
 - capture iso time of latest observation (still under revision) and other very sketchy display adjustments
 

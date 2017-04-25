@@ -220,6 +220,9 @@
         //console.debug("popupclose: charter=", charter);
         charter.deactivate();
       }
+      $scope.$apply(function() {
+        vm.hoveredPointIso = undefined;
+      });
     });
 
     function addObs(str, obs) {
@@ -233,7 +236,14 @@
       if (obs.chartTsData) {
         //console.debug("str=", str, "obs.chartTsData=", obs.chartTsData);
         if (!byStrId[str.strid].charter) {
-          byStrId[str.strid].charter = Charter(str.strid, str.variables);
+          byStrId[str.strid].charter = Charter(str.strid, str.variables, function(point) {
+            if (point) {
+              //console.debug("hovered point=", point.x, vm.hoveredPointIso);
+              $scope.$apply(function() {
+                vm.hoveredPointIso = moment.utc(point.x).format();
+              });
+            }
+          });
         }
         _.each(obs.chartTsData, function(tsd) {
           _.each(tsd.values, function(v, index) {
@@ -337,7 +347,7 @@
     }
   });
 
-  function Charter(strid, names) {
+  function Charter(strid, names, hoveredPoint) {
     var initialSeriesData = _.map(names, function(name) {
       return {
         name: name,
@@ -378,12 +388,24 @@
         s.data = _.sortBy(s.data, function(xy) { return xy[0] });
       });
       chart = createChart();
+
+      if (hoveredPoint) {
+        $(chart.container).mousemove(function(e) {
+          var event = chart.pointer.normalize(e.originalEvent);
+          // console.debug("normalizedEvent=", event);
+          var point = chart.series[0].searchPoint(event, true);
+          hoveredPoint(point);
+        });
+      }
     }
 
     function deactivate() {
       if (chart) chart.destroy();
       chart = undefined;
       serieses = undefined;
+      if (hoveredPoint) {
+        // TODO remove mousemove event handler
+      }
     }
 
     function createChart() {
@@ -444,6 +466,16 @@
         },
         scrollbar: {
           enabled: true
+        }
+
+        ,plotOptions: {
+          series: {
+            states: {
+              hover: {
+                lineWidthPlus: 0
+              }
+            }
+          }
         }
       });
     }

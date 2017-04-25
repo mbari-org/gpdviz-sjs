@@ -41,9 +41,11 @@
     <tbody>
     <tr>
       <td style="width: 300px; vertical-align: top">
-        <div ng-if="vm.ss">
+        <code style="color: gray; font-size: small; float: right"
+             ng-bind="vm.hoveredPointIso">
+        </code>
+        <div ng-if="vm.ss" style="margin-top: 20px">
           <div ng-if="vm.ss.streams">
-            #sysid streams:
             <!--<pre>orderedStreams={{vm.ss.orderedStreams|json}}</pre>-->
             <ul>
               <li ng-repeat="str in vm.ss.orderedStreams">
