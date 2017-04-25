@@ -7,8 +7,8 @@
 
   var debug = window && window.location.toString().match(/.*\?debug/);
 
-  GpdvizController.$inject = ['$scope'];
-  function GpdvizController($scope) {
+  GpdvizController.$inject = ['$scope', '$window', '$timeout'];
+  function GpdvizController($scope, $window, $timeout) {
     var vm = this;
     vm.debug = debug;
 
@@ -285,6 +285,50 @@
         });
       });
     }
+
+    (function prepareAdjustMapUponWindowResize() {
+      var minHeight = 350;
+
+      var mapContainer = document.getElementById('mapid');
+      var marginBottom = 5;
+
+      updateWindowSize();
+      angular.element($window).bind('resize', function () {
+        updateWindowSize();
+        $scope.$digest();
+      });
+
+      function updateMapSize(windowHeight) {
+        if (windowHeight) {
+          $('#mapid').css("height", windowHeight);
+        }
+        L.Util.requestAnimFrame(function () {
+          map.invalidateSize({debounceMoveend: true}); }, map);
+      }
+
+      function updateWindowSize(force) {
+        var rect = mapContainer.getBoundingClientRect();
+        //console.log("getBoundingClientRect=", rect.top, rect.right, rect.bottom, rect.left);
+        //console.log("$window.innerHeight=", $window.innerHeight, " - rect.top=", rect.top);
+
+        var restWindowHeight = $window.innerHeight - rect.top - marginBottom;
+        //console.log("restWindowHeight=", restWindowHeight);
+
+        if (restWindowHeight < minHeight) {
+          restWindowHeight = minHeight;
+        }
+        updateMapSize(restWindowHeight);
+      }
+
+      function delayedUpdate(force, delay) {
+        $timeout(function () {
+          updateWindowSize(force);
+          $scope.$digest();
+        }, delay);
+      }
+
+      delayedUpdate(true, 2000);
+    })();
   }
 
   Highcharts.setOptions({
