@@ -356,7 +356,7 @@
           }, {
             count: 12,
             type: 'hour',
-            text: '2H'
+            text: '12H'
           }, {
             count: 1,
             type: 'day',
