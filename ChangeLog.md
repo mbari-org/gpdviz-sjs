@@ -1,5 +1,9 @@
 # gpdviz2
 
+2017-04-25
+
+- capture iso time of latest observation (still under revision) and other very sketchy display adjustments
+
 2017-04-24
 
 - add cfg.gpdviz.serverName as a way to specify particular instance (so UI subscribes

@@ -107,7 +107,29 @@
           if (obs.chartTsData)
             addObs(str, obs);
         });
+
+        str.numberObs = 0;
+        if (str.obs && str.obs.length) {
+          var latestTsd = str.obs[str.obs.length-1];
+          if (latestTsd.chartTsData && latestTsd.chartTsData.length) {
+            var timestamp = latestTsd.chartTsData[latestTsd.chartTsData.length - 1].timestamp;
+          }
+          else {
+            timestamp = latestTsd.timestamp;
+          }
+          str.latestIso = moment.utc(timestamp).format();
+
+          _.each(str.obs, function(obs) {
+            if (obs.chartTsData) {
+              str.numberObs += obs.chartTsData.length;
+            }
+            else {
+              str.numberObs += 1;
+            }
+          })
+        }
       });
+      vm.ss.orderedStreams = _.chain(streams).values().sortBy('strid').value();
     }
 
     channel.bind('my_event', function (payload) {
