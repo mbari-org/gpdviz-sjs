@@ -2,6 +2,7 @@
 
 2017-04-25
 
+- exploring new model for observations
 - capture position in timestamped data element; along with timestamp this allows to show it on mousemove on chart
 - preliminaries for handling of hovered mouse position on chart toward highlighting corresponding locations on map
 - dynamic adjustment of map height depending on window height (rather ad hoc for now) 

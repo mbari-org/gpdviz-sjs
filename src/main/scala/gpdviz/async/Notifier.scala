@@ -6,7 +6,7 @@ import spray.json._
 import com.typesafe.config.Config
 import com.pusher.rest.Pusher
 import gpdviz.JsonImplicits
-import gpdviz.model.{DataObs, DataStream, SensorSystem}
+import gpdviz.model.{DataObs, DataStream, ObsData, SensorSystem}
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
@@ -72,6 +72,33 @@ class Notifier(config: Config) extends JsonImplicits {
       }
       rec(0)
     }
+  }
+
+  def notifyObservations2Added(ss: SensorSystem, strid: String, observations: Map[String, List[ObsData]]): Unit = if (ss.pushEvents) {
+    println(s"notifyObservations2Added: strid=$strid observations=$observations")
+    val obs = observations mapValues { list =>
+      // NOTE: just passing the JSON result as a plain string.
+      // (We could probably do some pusher configuration, via Gson serializer,
+      // and pass the JsValue here.)
+      var map = Map[String, Any]()
+      list map { o ⇒
+        o.feature.foreach(x => map = map.updated("feature", x.toJson.compactPrint))
+        o.geometry.foreach(x => map = map.updated("geometry", x.toJson.compactPrint))
+        o.scalars.foreach(x => map = map.updated("scalars", x.toJson.compactPrint))
+        map.asJava
+      }
+    }
+    @tailrec
+    def rec(from: Int): Unit = {
+      if (from < obs.size) {
+        val next = Math.min(from + 15, obs.size)
+        val slice = obs.slice(from, next)
+        val map = Map("sysid" -> ss.sysid, "strid" -> strid, "obss" -> slice.asJava)
+        notifyEvent(ss.sysid, "observations2Added", map.asJava)
+        rec(next)
+      }
+    }
+    rec(0)
   }
 
   def notifyStreamRemoved(ss: SensorSystem, strid: String): Unit = {

@@ -9,10 +9,12 @@ function run() {
 	register
 
 	add_str1
+	add_str1_values
+	add_scalars str1
+
 	add_str2
 	add_str3
 
-	add_str1_values
 	add_str2_values
 	add_str3_values
 
@@ -34,7 +36,9 @@ function register() {
 
 function add_str1() {
     echo "add stream str1"
-	http post ${GPDVIZ}/api/ss/${SS} strid=str1 style:='{"color":"green", "dashArray": "5,5"}' > /dev/null
+	http post ${GPDVIZ}/api/ss/${SS} strid=str1 \
+	     variables:='[ "baz", "bam" ]' \
+	     style:='{"color":"green", "dashArray": "5,5"}' > /dev/null
 }
 
 function add_str2() {
@@ -163,6 +167,38 @@ function add_delayed_data() {
 	    echo "added value to ${strid}: ${val}"
         sleep 0.5
 	done
+}
+
+function add_observations() {
+	strid=$1
+	observations=$2
+	http post ${GPDVIZ}/api/ss/${SS}/${strid}/obs observations:="${observations}"
+}
+
+function add_scalars() {
+	strid=$1
+	echo "scalars: ${strid}"
+	timestamp="`date +%s`000"
+	secs=5
+	timestamp=$(( timestamp - secs * 1000 ))
+	observations='{'
+	comma=""
+	for i in `seq ${secs}`; do
+		val0=$(( (RANDOM % 100) + 1 ))
+		val1=$(( (RANDOM % 100) + 1 ))
+    	read -r -d '' element <<-EOF
+		  "${timestamp}": [{
+            "scalars": {
+              "vars": ["baz","bam"],
+              "vals": [${val0}, ${val1}]
+            }}]
+EOF
+		observations="${observations}${comma}${element}"
+		comma=", "
+		timestamp=$(( timestamp + 1000 ))
+	done
+	observations="${observations}}"
+	add_observations "${strid}" "${observations}"
 }
 
 if [ "$1" != "" ]; then

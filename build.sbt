@@ -1,4 +1,4 @@
-val gpdvizVersion = "0.0.4"
+val gpdvizVersion = "0.0.5"
 
 version := gpdvizVersion
 name := "gpdviz"

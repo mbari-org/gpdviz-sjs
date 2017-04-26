@@ -18,8 +18,18 @@ case class DataStream(strid:    String,
                       style:    Option[Map[String, JsValue]] = None,
                       zOrder:   Int = 0,
                       variables: Option[List[String]] = None,
+                      observations: Option[Map[String, List[ObsData]]] = None,
                       obs:      Option[List[DataObs]] = None
                       )
+
+case class ObsData(feature:     Option[Feature] = None,
+                   geometry:    Option[Geometry] = None,
+                   scalars:     Option[ScalarData] = None
+                   )
+
+case class ScalarData(vars:      List[String],
+                      vals:      List[Double],
+                      position:  Option[LatLon] = None)
 
 case class TimestampedData(timestamp: Long,
                            values:    List[Double],
