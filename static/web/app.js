@@ -33,6 +33,23 @@
 
     var overlayGroupByStreamId = {};
 
+    var positionsByTime = {};  // time -> [lat, lon]
+    function setPositionByTime(timeMs, position) {
+      positionsByTime[timeMs.toFixed(0)]           = position;
+      positionsByTime[(timeMs / 1000).toFixed(0)]           = position; // by second
+      positionsByTime[(timeMs / 1000 / 60).toFixed(0)]      = position; // by minute
+      positionsByTime[(timeMs / 1000 / 60 / 60).toFixed(0)] = position; // by hour
+    }
+    function getPositionByTime(timeMs) {
+      return positionsByTime[timeMs.toFixed(0)]
+          || positionsByTime[(timeMs / 1000).toFixed(0)]      // by minute
+          || positionsByTime[(timeMs / 1000 / 60).toFixed(0)]      // by minute
+          || positionsByTime[(timeMs / 1000 / 60 / 60).toFixed(0)] // by hour
+      ;
+    }
+
+    var selectionGroup = new L.LayerGroup().addTo(map);
+
     function addMarker(str, createMarker) {
       var strid = str.strid;
 
@@ -85,6 +102,17 @@
         }
       });
     })();
+
+    function addSelectionPoint(p) {
+      // console.debug("addSelectionPoint: p=", p);
+      selectionGroup.clearLayers();
+      if (!p) return;
+      var marker = L.marker([p[0], p[1]], {
+        keyboard: false,
+        opacity: 0.6
+      }).addTo(map);
+      selectionGroup.addLayer(marker);
+    }
 
     vm.ss = Gpdviz.initialSs;
 
@@ -222,6 +250,7 @@
       }
       $scope.$apply(function() {
         vm.hoveredPointIso = undefined;
+        addSelectionPoint();
       });
     });
 
@@ -241,6 +270,11 @@
               //console.debug("hovered point=", point.x, vm.hoveredPointIso);
               $scope.$apply(function() {
                 vm.hoveredPointIso = moment.utc(point.x).format();
+                var p = getPositionByTime(point.x);
+                if (p) {
+                  addSelectionPoint([p.lat, p.lon]);
+                }
+                //addSelectionPoint([36.857, -122.341 + Math.random()/10.0]);
               });
             }
           });
@@ -248,6 +282,9 @@
         _.each(obs.chartTsData, function(tsd) {
           _.each(tsd.values, function(v, index) {
             byStrId[str.strid].charter.addChartPoint(index, tsd.timestamp, v);
+            if (tsd.position) {
+              setPositionByTime(tsd.timestamp, tsd.position);
+            }
           });
         });
 
@@ -348,7 +385,11 @@
   });
 
   function Charter(strid, names, hoveredPoint) {
+    var title = "";
+    var sep = "";
     var initialSeriesData = _.map(names, function(name) {
+      title += sep + name;
+      sep = " | ";
       return {
         name: name,
         data: []
@@ -457,9 +498,9 @@
           selected: 0
         },
 
-        //title: {
-        //  text: 'title..'
-        //},
+        title: {
+         text: names[0]
+        },
 
         navigator: {
           enabled: true

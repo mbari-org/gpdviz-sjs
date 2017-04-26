@@ -21,7 +21,9 @@ case class DataStream(strid:    String,
                       obs:      Option[List[DataObs]] = None
                       )
 
-case class TimestampedData(timestamp: Long, values: List[Double])
+case class TimestampedData(timestamp: Long,
+                           values:    List[Double],
+                           position:  Option[LatLon] = None)
 
 case class DataObs(timestamp:   Long,
                    feature:     Option[Feature] = None,
