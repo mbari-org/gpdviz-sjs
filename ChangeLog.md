@@ -1,5 +1,9 @@
 # gpdviz2
 
+2017-04-27
+
+- set useUTC=true for the charts
+
 2017-04-25
 
 - exploring new model for observations

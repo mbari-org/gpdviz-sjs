@@ -211,6 +211,7 @@
       else if (what === 'streamRemoved') {
         $scope.$apply(function () {
           delete vm.ss.streams[data.strid];
+          delete byStrId[data.strid];
         });
       }
 
@@ -281,7 +282,11 @@
         }
         _.each(obs.chartTsData, function(tsd) {
           _.each(tsd.values, function(v, index) {
-            byStrId[str.strid].charter.addChartPoint(index, tsd.timestamp, v);
+            if (byStrId[str.strid].maxTimestamp === undefined
+              || byStrId[str.strid].maxTimestamp < tsd.timestamp) {
+              byStrId[str.strid].maxTimestamp = tsd.timestamp;
+              byStrId[str.strid].charter.addChartPoint(index, tsd.timestamp, v);
+            }
             if (tsd.position) {
               setPositionByTime(tsd.timestamp, tsd.position);
             }
@@ -380,7 +385,7 @@
 
   Highcharts.setOptions({
     global: {
-      useUTC: false
+      useUTC: true
     }
   });
 
@@ -495,7 +500,7 @@
             text: 'All'
           }],
           inputEnabled: false,
-          selected: 0
+          selected: 1
         },
 
         title: {
