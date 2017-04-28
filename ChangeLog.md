@@ -2,6 +2,7 @@
 
 2017-04-27
 
+- add some map layers
 - set useUTC=true for the charts
 
 2017-04-25

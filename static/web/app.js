@@ -16,7 +16,11 @@
 
     var center = [36.62, -122.04];
     var map = L.map('mapid', {maxZoom: 20}).setView(center, 11);
-    var layer = L.esri.basemapLayer('Oceans').addTo(map);
+    var esriOceansLayer = L.esri.basemapLayer('Oceans').addTo(map);
+    var osm = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    });
+
     L.control.mousePosition({position: 'topright', emptyString: ''}).addTo(map);
 
     var markersLayer = new L.LayerGroup();
@@ -25,11 +29,13 @@
 
     var controlLayers = L.control.layers(
       {
-        'ESRI Oceans': layer,
-        'Empty': L.tileLayer('')
-      },
-      {},
-      {hideSingleBase: true}).addTo(map);
+        'ESRI Oceans': esriOceansLayer,
+        'OpenStreetMap': osm,
+        'Google satellite': L.gridLayer.googleMutant({
+          type: 'satellite' // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
+        })
+      }
+    ).addTo(map);
 
     var overlayGroupByStreamId = {};
 

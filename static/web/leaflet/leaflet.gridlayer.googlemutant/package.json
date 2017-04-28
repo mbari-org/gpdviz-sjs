@@ -1,0 +1,90 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "leaflet.gridlayer.googlemutant",
+        "scope": null,
+        "escapedName": "leaflet.gridlayer.googlemutant",
+        "name": "leaflet.gridlayer.googlemutant",
+        "rawSpec": "",
+        "spec": "latest",
+        "type": "tag"
+      },
+      "/Users/carueda/github/carueda/gpdviz2/static/web"
+    ]
+  ],
+  "_from": "leaflet.gridlayer.googlemutant@latest",
+  "_id": "leaflet.gridlayer.googlemutant@0.6.0",
+  "_inCache": true,
+  "_location": "/leaflet.gridlayer.googlemutant",
+  "_npmOperationalInternal": {
+    "host": "packages-12-west.internal.npmjs.com",
+    "tmp": "tmp/leaflet.gridlayer.googlemutant-0.6.0.tgz_1491550665062_0.2913859752006829"
+  },
+  "_npmUser": {
+    "name": "ivansanchez",
+    "email": "ivan@sanchezortega.es"
+  },
+  "_npmVersion": "1.4.21",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "leaflet.gridlayer.googlemutant",
+    "scope": null,
+    "escapedName": "leaflet.gridlayer.googlemutant",
+    "name": "leaflet.gridlayer.googlemutant",
+    "rawSpec": "",
+    "spec": "latest",
+    "type": "tag"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "https://registry.npmjs.org/leaflet.gridlayer.googlemutant/-/leaflet.gridlayer.googlemutant-0.6.0.tgz",
+  "_shasum": "9dc03973c6b886680ad3dab2d8341e1a2fdec935",
+  "_shrinkwrap": null,
+  "_spec": "leaflet.gridlayer.googlemutant",
+  "_where": "/Users/carueda/github/carueda/gpdviz2/static/web",
+  "author": {
+    "name": "Iván Sánchez Ortega",
+    "email": "ivan@sanchezortega.es"
+  },
+  "bugs": {
+    "url": "https://gitlab.com/IvanSanchez/Leaflet.GridLayer.GoogleMutant/issues"
+  },
+  "dependencies": {},
+  "description": "A plugin for LeafletJS to use Google maps basemaps.",
+  "devDependencies": {
+    "eslint": "^3.8.1"
+  },
+  "directories": {},
+  "dist": {
+    "shasum": "9dc03973c6b886680ad3dab2d8341e1a2fdec935",
+    "tarball": "https://registry.npmjs.org/leaflet.gridlayer.googlemutant/-/leaflet.gridlayer.googlemutant-0.6.0.tgz"
+  },
+  "gitHead": "526d69812e2228d328c5ebce64a38ccf76080e14",
+  "homepage": "https://gitlab.com/IvanSanchez/Leaflet.GridLayer.GoogleMutant#README",
+  "keywords": [
+    "leaflet",
+    "google maps"
+  ],
+  "license": "Beerware",
+  "main": "Leaflet.GoogleMutant.js",
+  "maintainers": [
+    {
+      "name": "ivansanchez",
+      "email": "ivan@sanchezortega.es"
+    }
+  ],
+  "name": "leaflet.gridlayer.googlemutant",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/IvanSanchez/Leaflet.GridLayer.GoogleMutant.git"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "lintfix": "eslint . --fix"
+  },
+  "version": "0.6.0"
+}
