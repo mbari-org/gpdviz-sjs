@@ -473,7 +473,10 @@
           }
         },
         //title: { text: "TODO" },
-        xAxis: { type: 'datetime' },
+        xAxis: {
+          type: 'datetime',
+          ordinal: false
+        },
         legend: { enabled: false },
 
         series: initialSeriesData || [],

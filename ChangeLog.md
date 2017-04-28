@@ -2,6 +2,7 @@
 
 2017-04-27
 
+- set ordinal=false to better reflect points across (time) xAxis
 - add some map layers
 - set useUTC=true for the charts
 
