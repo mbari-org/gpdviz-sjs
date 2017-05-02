@@ -506,6 +506,10 @@
             type: 'hour',
             text: '1H'
           }, {
+            count: 6,
+            type: 'hour',
+            text: '6H'
+          }, {
             count: 12,
             type: 'hour',
             text: '12H'
