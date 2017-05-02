@@ -39,20 +39,30 @@
 
     var overlayGroupByStreamId = {};
 
-    var positionsByTime = {};  // time -> [lat, lon]
-    function setPositionByTime(timeMs, position) {
-      positionsByTime[timeMs.toFixed(0)]           = position;
-      positionsByTime[(timeMs / 1000).toFixed(0)]           = position; // by second
-      positionsByTime[(timeMs / 1000 / 60).toFixed(0)]      = position; // by minute
-      positionsByTime[(timeMs / 1000 / 60 / 60).toFixed(0)] = position; // by hour
-    }
-    function getPositionByTime(timeMs) {
-      return positionsByTime[timeMs.toFixed(0)]
-          || positionsByTime[(timeMs / 1000).toFixed(0)]      // by minute
-          || positionsByTime[(timeMs / 1000 / 60).toFixed(0)]      // by minute
-          || positionsByTime[(timeMs / 1000 / 60 / 60).toFixed(0)] // by hour
-      ;
-    }
+    var positionsByTime = (function() {
+      // time -> [lat, lon], for various quantized levels of given time per position
+      var posByTime = {};
+      var levels = 5;
+
+      return {
+        set: function (timeMs, position) {
+          var mm = Math.round(timeMs / 1000); // start at second level
+          for (var kk = 0; kk < levels; kk++) {
+            posByTime[mm] = position;
+            mm = Math.round(mm / 10);  // then
+          }
+        },
+
+        get: function (timeMs) {
+          var mm = Math.round(timeMs / 1000);
+          for (var kk = 0; kk < levels; kk++) {
+            var position = posByTime[mm];
+            if (position) return position;
+            mm = Math.round(mm / 10);
+          }
+        }
+      }
+    })();
 
     var selectionGroup = new L.LayerGroup().addTo(map);
 
@@ -277,11 +287,10 @@
               //console.debug("hovered point=", point.x, vm.hoveredPointIso);
               $scope.$apply(function() {
                 vm.hoveredPointIso = moment.utc(point.x).format();
-                var p = getPositionByTime(point.x);
+                var p = positionsByTime.get(point.x);
                 if (p) {
                   addSelectionPoint([p.lat, p.lon]);
                 }
-                //addSelectionPoint([36.857, -122.341 + Math.random()/10.0]);
               });
             }
           });
@@ -294,7 +303,7 @@
               byStrId[str.strid].charter.addChartPoint(index, tsd.timestamp, v);
             }
             if (tsd.position) {
-              setPositionByTime(tsd.timestamp, tsd.position);
+              positionsByTime.set(tsd.timestamp, tsd.position);
             }
           });
         });

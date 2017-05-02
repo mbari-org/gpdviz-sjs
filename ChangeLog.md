@@ -1,5 +1,9 @@
 # gpdviz2
 
+2017-05-01
+
+- positionsByTime mapping: capture various quantized levels of given time per position
+
 2017-04-27
 
 - set ordinal=false to better reflect points across (time) xAxis
