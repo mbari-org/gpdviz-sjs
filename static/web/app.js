@@ -14,7 +14,7 @@
 
     vm.hoveredPoint = {};
 
-    var byStrId = [];
+    var byStrId = {};
 
     var center = [36.62, -122.04];
     var map = L.map('mapid', {maxZoom: 20}).setView(center, 11);
@@ -42,12 +42,17 @@
     var overlayGroupByStreamId = {};
 
     var positionsByTime = (function() {
-      // time -> [lat, lon], for various quantized levels of given time per position
-      var posByTime = {};
       var levels = 5;
 
+      // strTimePoss = { strid -> { time -> [lat, lon] }, for various quantized levels of given time per position
+      var strTimePoss = {};
+
       return {
-        set: function (timeMs, position) {
+        set: function (strid, timeMs, position) {
+          if (strTimePoss[strid] === undefined) {
+            strTimePoss[strid] = {};
+          }
+          var posByTime = strTimePoss[strid];
           var mm = Math.round(timeMs / 1000); // start at second level
           for (var kk = 0; kk < levels; kk++) {
             posByTime[mm] = position;
@@ -55,12 +60,15 @@
           }
         },
 
-        get: function (timeMs) {
-          var mm = Math.round(timeMs / 1000);
-          for (var kk = 0; kk < levels; kk++) {
-            var position = posByTime[mm];
-            if (position) return position;
-            mm = Math.round(mm / 10);
+        get: function (strid, timeMs) {
+          var posByTime = strTimePoss[strid];
+          if (posByTime) {
+            var mm = Math.round(timeMs / 1000);
+            for (var kk = 0; kk < levels; kk++) {
+              var position = posByTime[mm];
+              if (position) return position;
+              mm = Math.round(mm / 10);
+            }
           }
         }
       }
@@ -325,7 +333,7 @@
               //console.debug("hovered point=", point.x, vm.hoveredPoint);
               $scope.$apply(function() {
                 vm.hoveredPoint.isoTime = moment.utc(point.x).format();
-                var p = positionsByTime.get(point.x);
+                var p = positionsByTime.get(str.strid, point.x);
                 if (p) {
                   vm.hoveredPoint.position = p;
                   addSelectionPoint([p.lat, p.lon]);
@@ -342,7 +350,7 @@
               byStrId[str.strid].charter.addChartPoint(index, tsd.timestamp, v);
             }
             if (tsd.position) {
-              positionsByTime.set(tsd.timestamp, tsd.position);
+              positionsByTime.set(str.strid, tsd.timestamp, tsd.position);
             }
           });
         });
@@ -413,7 +421,7 @@
               //console.debug("hovered point=", point.x, vm.hoveredPoint);
               $scope.$apply(function() {
                 vm.hoveredPoint.isoTime = moment.utc(point.x).format();
-                var p = positionsByTime.get(point.x);
+                var p = positionsByTime.get(str.strid, point.x);
                 if (p) {
                   vm.hoveredPoint.position = p;
                   addSelectionPoint([p.lat, p.lon]);
@@ -435,7 +443,7 @@
 
         //console.debug("obs.scalarData.position=", obs.scalarData.position);
         if (obs.scalarData.position) {
-          positionsByTime.set(timestamp, obs.scalarData.position);
+          positionsByTime.set(str.strid, timestamp, obs.scalarData.position);
         }
 
         if (byStrId[str.strid].marker && !byStrId[str.strid].popupInfo) {

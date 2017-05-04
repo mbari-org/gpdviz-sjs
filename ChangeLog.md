@@ -2,6 +2,7 @@
 
 2017-05-04
 
+- positionsByTime indexed by strid and time
 - more with scalarData (position)
 - add name and description to DataStream
 - preliminaries with scalarData
