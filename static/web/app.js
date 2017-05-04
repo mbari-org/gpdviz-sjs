@@ -371,13 +371,13 @@
         return;
       }
 
-      var style = str.style || {};
+      var mapStyle = str.mapStyle || {};
 
       if (obs.feature) {
         var geojson = angular.fromJson(obs.feature);
         var geometry = obs.feature.geometry;
         if (obs.feature.properties && obs.feature.properties.style) {
-          style = _.assign(style, obs.feature.properties.style);
+          mapStyle = _.assign(mapStyle, obs.feature.properties.style);
         }
       }
       else {
@@ -385,16 +385,16 @@
         geometry = obs.geometry;
       }
 
-      if (debug) console.debug("addObs: style=", style, "str=", str, "geojson=", geojson);
+      if (debug) console.debug("addObs: mapStyle=", mapStyle, "str=", str, "geojson=", geojson);
 
       addMarker(str, function() {
         return  L.geoJSON(geojson, {
-          style: style,
+          style: mapStyle,
           pointToLayer: function (feature, latlng) {
-            if (!style.radius) {
-              style.radius = 5;
+            if (!mapStyle.radius) {
+              mapStyle.radius = 5;
             }
-            return L.circleMarker(latlng, style);
+            return L.circleMarker(latlng, mapStyle);
           }
         });
       });
@@ -462,14 +462,14 @@
         return;
       }
 
-      var style = str.style || {};
+      var mapStyle = str.mapStyle || {};
 
       if (obs.feature) {
         console.debug("addObs2: str=", str, "obs.feature=", obs.feature);
         var geojson = angular.fromJson(obs.feature);
         var geometry = obs.feature.geometry;
         if (obs.feature.properties && obs.feature.properties.style) {
-          style = _.assign(style, obs.feature.properties.style);
+          mapStyle = _.assign(mapStyle, obs.feature.properties.style);
         }
       }
       else {
@@ -478,16 +478,16 @@
         geometry = obs.geometry;
       }
 
-      if (debug) console.debug("addObs: style=", style, "str=", str, "geojson=", geojson);
+      if (debug) console.debug("addObs: mapStyle=", mapStyle, "str=", str, "geojson=", geojson);
 
       addMarker(str, function() {
         return  L.geoJSON(geojson, {
-          style: style,
+          style: mapStyle,
           pointToLayer: function (feature, latlng) {
-            if (!style.radius) {
-              style.radius = 5;
+            if (!mapStyle.radius) {
+              mapStyle.radius = 5;
             }
-            return L.circleMarker(latlng, style);
+            return L.circleMarker(latlng, mapStyle);
           }
         });
       });

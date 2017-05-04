@@ -2,7 +2,7 @@ package gpdviz.model
 
 import com.cloudera.science.geojson.Feature
 import com.esri.core.geometry.Geometry
-import spray.json.JsValue
+import spray.json.{JsObject, JsValue}
 
 case class LatLon(lat: Double, lon: Double)
 
@@ -17,11 +17,12 @@ case class SensorSystem(sysid:        String,
 case class DataStream(strid:    String,
                       name:         Option[String] = None,
                       description:  Option[String] = None,
-                      style:    Option[Map[String, JsValue]] = None,
-                      zOrder:   Int = 0,
-                      variables: Option[List[String]] = None,
+                      mapStyle:     Option[Map[String, JsValue]] = None,
+                      zOrder:       Int = 0,
+                      variables:    Option[List[String]] = None,
+                      chartStyle:   Option[JsObject] = None,
                       observations: Option[Map[String, List[ObsData]]] = None,
-                      obs:      Option[List[DataObs]] = None
+                      obs:          Option[List[DataObs]] = None
                       )
 
 case class ObsData(feature:     Option[Feature] = None,

@@ -22,7 +22,7 @@
         }
       }],
       "name": "Stream one",
-      "style": {
+      "mapStyle": {
         "color": "green",
         "dashArray": "5,5"
       },
@@ -837,7 +837,7 @@
           "values": [16.0, 87.0]
         }]
       }],
-      "style": {
+      "mapStyle": {
         "color": "red",
         "radius": 14
       },
@@ -847,7 +847,7 @@
     },
     "str3": {
       "strid": "str3",
-      "style": {
+      "mapStyle": {
         "color": "blue"
       },
       "zOrder": 0,
@@ -1047,7 +1047,7 @@
           "values": [70.0]
         }]
       }],
-      "style": {
+      "mapStyle": {
         "color": "yellow",
         "radius": 10
       },

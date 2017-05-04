@@ -2,6 +2,7 @@
 
 2017-05-04
 
+- DataStream: rename style to mapStyle, and add chartStyle
 - positionsByTime indexed by strid and time
 - more with scalarData (position)
 - add name and description to DataStream

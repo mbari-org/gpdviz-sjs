@@ -10,7 +10,7 @@ import spray.http.StatusCodes._
 import spray.http._
 import spray.httpx.SprayJsonSupport
 import spray.httpx.marshalling.ToResponseMarshallable
-import spray.json.{DefaultJsonProtocol, JsValue}
+import spray.json.{DefaultJsonProtocol, JsObject, JsValue}
 import spray.routing.SimpleRoutingApp
 
 import scala.io.StdIn
@@ -38,9 +38,10 @@ case class SSUpdate(pushEvents: Option[Boolean] = None,
 case class StreamRegister(strid:        String,
                           name:         Option[String] = None,
                           description:  Option[String] = None,
-                          style:        Option[Map[String, JsValue]] = None,
+                          mapStyle:     Option[Map[String, JsValue]] = None,
                           zOrder:       Option[Int] = None,
-                          variables:    Option[List[String]] = None
+                          variables:    Option[List[String]] = None,
+                          chartStyle:   Option[JsObject] = None
                           )
 
 case class ObsRegister(values: List[DataObs]
@@ -53,14 +54,14 @@ trait JsonImplicits extends DefaultJsonProtocol with SprayJsonSupport with GeoJs
   implicit val llRegFormat  = jsonFormat2(LatLon)
   implicit val ssRegFormat  = jsonFormat5(SSRegister)
   implicit val ssUpdFormat  = jsonFormat3(SSUpdate)
-  implicit val strRegFormat = jsonFormat6(StreamRegister)
+  implicit val strRegFormat = jsonFormat7(StreamRegister)
   implicit val tsdFormat    = jsonFormat3(TimestampedData)
   implicit val obsFormat    = jsonFormat4(DataObs)
   implicit val obsRegFormat = jsonFormat1(ObsRegister)
 
   implicit val scalarDataFormat = jsonFormat3(ScalarData)
   implicit val obsDataFormat  = jsonFormat3(ObsData)
-  implicit val streamFormat  = jsonFormat8(DataStream)
+  implicit val streamFormat  = jsonFormat9(DataStream)
   implicit val obssRegFormat = jsonFormat1(ObservationsRegister)
   implicit val systemFormat  = jsonFormat6(SensorSystem)
 
@@ -212,9 +213,10 @@ trait MyService extends SimpleRoutingApp with JsonImplicits  {
           strid       = strr.strid,
           name        = strr.name,
           description = strr.description,
-          style       = strr.style,
+          mapStyle    = strr.mapStyle,
           zOrder      = strr.zOrder.getOrElse(0),
-          variables   = strr.variables
+          variables   = strr.variables,
+          chartStyle  = strr.chartStyle
         )
         val updated = ss.copy(streams = ss.streams.updated(strr.strid, ds))
         db.saveSensorSystem(updated) match {

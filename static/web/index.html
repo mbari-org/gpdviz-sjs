@@ -45,7 +45,7 @@
   <div style="color: gray; font-family: monospace; margin-left: 25%">
     <span ng-bind="vm.hoveredPoint.isoTime"></span>
     &nbsp;&nbsp;
-    <span ng-bind="vm.hoveredPoint.position.lat ? vm.hoveredPoint.position.lat + ' : ' + vm.hoveredPoint.position.lon : ''"></span>
+    <span ng-bind="vm.hoveredPoint.position.lat ? vm.hoveredPoint.position.lat.toFixed(5) + ' : ' + vm.hoveredPoint.position.lon.toFixed(5) : ''"></span>
   </div>
   <table style="width: 100%">
     <tbody>
