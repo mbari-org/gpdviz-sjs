@@ -24,7 +24,7 @@ case class DataStream(strid:    String,
 
 case class ObsData(feature:     Option[Feature] = None,
                    geometry:    Option[Geometry] = None,
-                   scalars:     Option[ScalarData] = None
+                   scalarData:  Option[ScalarData] = None
                    )
 
 case class ScalarData(vars:      List[String],

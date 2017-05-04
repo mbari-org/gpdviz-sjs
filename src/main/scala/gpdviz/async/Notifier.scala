@@ -81,12 +81,12 @@ class Notifier(config: Config) extends JsonImplicits {
       // (We could probably do some pusher configuration, via Gson serializer,
       // and pass the JsValue here.)
       var map = Map[String, Any]()
-      list map { o ⇒
+      list foreach  { o ⇒
         o.feature.foreach(x => map = map.updated("feature", x.toJson.compactPrint))
         o.geometry.foreach(x => map = map.updated("geometry", x.toJson.compactPrint))
-        o.scalars.foreach(x => map = map.updated("scalars", x.toJson.compactPrint))
-        map.asJava
+        o.scalarData.foreach(x => map = map.updated("scalarData", x.toJson.compactPrint))
       }
+      map.asJava
     }
     @tailrec
     def rec(from: Int): Unit = {

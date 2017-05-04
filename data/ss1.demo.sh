@@ -12,16 +12,16 @@ function run() {
 	add_str1_values
 	add_scalars str1
 
-	add_str2
-	add_str3
-
-	add_str2_values
-	add_str3_values
-
-	add_str2_data
-
-	add_str4_and_point
-	add_delayed_data str4
+#	add_str2
+#	add_str3
+#
+#	add_str2_values
+#	add_str3_values
+#
+#	add_str2_data
+#
+#	add_str4_and_point
+#	add_delayed_data str4
 }
 
 function unregister() {
@@ -31,7 +31,7 @@ function unregister() {
 
 function register() {
     echo "register ${SS}"
-	http post ${GPDVIZ}/api/ss sysid=${SS} name='Test sensor system' center:='{"lat":36.62, "lon":-122}' pushEvents:=true > /dev/null
+	http post ${GPDVIZ}/api/ss sysid=${SS} name='Test sensor system' center:='{"lat":36.82, "lon":-122}' pushEvents:=true > /dev/null
 }
 
 function add_str1() {
@@ -177,7 +177,7 @@ function add_observations() {
 
 function add_scalars() {
 	strid=$1
-	echo "scalars: ${strid}"
+	echo "scalarData: ${strid}"
 	timestamp="`date +%s`000"
 	secs=5
 	timestamp=$(( timestamp - secs * 1000 ))
@@ -188,7 +188,7 @@ function add_scalars() {
 		val1=$(( (RANDOM % 100) + 1 ))
     	read -r -d '' element <<-EOF
 		  "${timestamp}": [{
-            "scalars": {
+            "scalarData": {
               "vars": ["baz","bam"],
               "vals": [${val0}, ${val1}]
             }}]

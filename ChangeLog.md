@@ -1,5 +1,9 @@
 # gpdviz2
 
+2017-05-03
+
+- preliminaries with scalarData
+
 2017-05-01
 
 - positionsByTime mapping: capture various quantized levels of given time per position

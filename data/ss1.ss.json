@@ -1,7 +1,7 @@
 {
   "name": "Test sensor system",
   "center": {
-    "lat": 36.62,
+    "lat": 36.82,
     "lon": -122.0
   },
   "sysid": "ss1",
@@ -9,7 +9,7 @@
   "streams": {
     "str1": {
       "obs": [{
-        "timestamp": 1493183671000,
+        "timestamp": 1493875151000,
         "feature": {
           "type": "Feature",
           "properties": {
@@ -29,34 +29,34 @@
       "zOrder": 0,
       "strid": "str1",
       "observations": {
-        "1493183960000": [{
-          "scalars": {
+        "1493875148000": [{
+          "scalarData": {
             "vars": ["baz", "bam"],
-            "vals": [95.0, 90.0]
+            "vals": [18.0, 71.0]
           }
         }],
-        "1493183961000": [{
-          "scalars": {
+        "1493875150000": [{
+          "scalarData": {
             "vars": ["baz", "bam"],
-            "vals": [69.0, 35.0]
+            "vals": [68.0, 99.0]
           }
         }],
-        "1493183959000": [{
-          "scalars": {
+        "1493875147000": [{
+          "scalarData": {
             "vars": ["baz", "bam"],
-            "vals": [71.0, 90.0]
+            "vals": [47.0, 2.0]
           }
         }],
-        "1493183963000": [{
-          "scalars": {
+        "1493875149000": [{
+          "scalarData": {
             "vars": ["baz", "bam"],
-            "vals": [81.0, 21.0]
+            "vals": [62.0, 92.0]
           }
         }],
-        "1493183962000": [{
-          "scalars": {
+        "1493875146000": [{
+          "scalarData": {
             "vars": ["baz", "bam"],
-            "vals": [59.0, 72.0]
+            "vals": [80.0, 58.0]
           }
         }]
       }

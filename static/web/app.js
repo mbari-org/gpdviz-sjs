@@ -30,10 +30,10 @@
     var controlLayers = L.control.layers(
       {
         'ESRI Oceans': esriOceansLayer,
-        'OpenStreetMap': osm,
-        'Google satellite': L.gridLayer.googleMutant({
-          type: 'satellite' // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
-        })
+        'OpenStreetMap': osm
+        // ,'Google satellite': L.gridLayer.googleMutant({
+        //   type: 'satellite' // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
+        // })
       }
     ).addTo(map);
 
@@ -206,6 +206,25 @@
         });
       }
 
+      else if (what === 'observations2Added') {
+        str = vm.ss.streams[data.strid];
+        //if (debug)
+        console.debug("observations2Added: str=", str, "data.strid=", data.strid);
+        console.debug("observations2Added: data.obss=", _.cloneDeep(data.obss));
+        str.observations = str.observations || {};
+        $scope.$apply(function () {
+          _.each(data.obss, function (obsData, timestamp) {
+            var obs = {};
+            if (obsData.feature)  obs.feature  = angular.fromJson(obsData.feature);
+            if (obsData.geometry) obs.geometry = angular.fromJson(obsData.geometry);
+            if (obsData.scalarData) obs.scalarData  = angular.fromJson(obsData.scalarData);
+            console.debug("&& timestamp=", timestamp, "obs=", obs);
+            str.observations[+timestamp] = obs;
+            addObs2(str, timestamp, obs);
+          });
+        });
+      }
+
       else if (what === 'observationsAdded') {
         str = vm.ss.streams[data.strid];
         if (debug) console.debug("str=", str, "data.strid=", data.strid, "data.obss=", data.obss);
@@ -353,6 +372,90 @@
       });
     }
 
+    function addObs2(str, timestamp, obs) {
+
+      if (byStrId[str.strid].maxTimestamp === undefined
+        || byStrId[str.strid].maxTimestamp < timestamp) {
+        byStrId[str.strid].maxTimestamp = timestamp;
+      }
+
+      var popupInfo;
+
+      if (obs.scalarData) {
+        console.debug("str=", str, "obs.scalarData=", obs.scalarData);
+        if (!byStrId[str.strid].charter) {
+          byStrId[str.strid].charter = Charter(str.strid, str.variables, function(point) {
+            if (point) {
+              //console.debug("hovered point=", point.x, vm.hoveredPointIso);
+              $scope.$apply(function() {
+                vm.hoveredPointIso = moment.utc(point.x).format();
+                var p = positionsByTime.get(point.x);
+                if (p) {
+                  addSelectionPoint([p.lat, p.lon]);
+                }
+              });
+            }
+          });
+        }
+
+        var indexes = _.map(obs.scalarData.vars, function(varName) {
+          return _.indexOf(str.variables, varName);
+        });
+        console.debug("& indexes=", indexes);
+        _.each(obs.scalarData.vals, function(v, valIndex) {
+          var varIndex = indexes[valIndex];
+          byStrId[str.strid].charter.addChartPoint(varIndex, timestamp, v);
+
+          if (obs.scalarData.position) {
+            positionsByTime.set(timestamp, obs.scalarData.position);
+          }
+        });
+
+        if (byStrId[str.strid].marker && !byStrId[str.strid].popupInfo) {
+          if (debug) console.debug("setting popup for stream ", str.strid);
+          popupInfo = L.popup({
+            //autoClose: false, closeOnClick: false
+            minWidth: 550
+          });
+          popupInfo._strid = str.strid;
+          popupInfo.setContent('<div id="' +"chart-container-" + str.strid +
+            '" style="min-width:500px;height:300px;margin:0 auto"></div>');
+
+          byStrId[str.strid].marker.bindPopup(popupInfo);
+          byStrId[str.strid].popupInfo = popupInfo;
+        }
+        return;
+      }
+
+      var style = str.style || {};
+
+      if (obs.feature) {
+        var geojson = angular.fromJson(obs.feature);
+        var geometry = obs.feature.geometry;
+        if (obs.feature.properties && obs.feature.properties.style) {
+          style = _.assign(style, obs.feature.properties.style);
+        }
+      }
+      else {
+        geojson = angular.fromJson(obs.geometry);
+        geometry = obs.geometry;
+      }
+
+      if (debug) console.debug("addObs: style=", style, "str=", str, "geojson=", geojson);
+
+      addMarker(str, function() {
+        return  L.geoJSON(geojson, {
+          style: style,
+          pointToLayer: function (feature, latlng) {
+            if (!style.radius) {
+              style.radius = 5;
+            }
+            return L.circleMarker(latlng, style);
+          }
+        });
+      });
+    }
+
     (function prepareAdjustMapUponWindowResize() {
       var minHeight = 350;
 
@@ -436,7 +539,7 @@
     };
 
     function addChartPoint(seriesIndex, x, y) {
-      //console.debug("addChartPoint: strid=", strid);
+      console.debug("addChartPoint: strid=", strid, "x=", x, "y=", y);
       initialSeriesData[seriesIndex].data.push([x, y]);
       if (serieses) {
         serieses[seriesIndex].addPoint([x, y], true, true);
