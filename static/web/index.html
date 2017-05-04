@@ -34,19 +34,26 @@
   </style>
 </head>
 <body>
-  <div style="text-align: center; background-color: #ebfaf5">
-    <span style="font-weight: bold">
-      <code>#sysid</code> - <span ng-bind="vm.ss.name"></span>
-    </span>
-    <span ng-bind="vm.ss.description"></span>
+  <div style="text-align: center">
+    <div style="background-color: #ebfaf5">
+      <span style="font-weight: bold">
+        <code>#sysid</code> - <span ng-bind="vm.ss.name"></span>
+      </span>
+      <span ng-bind="vm.ss.description"></span>
+    </div>
+  </div>
+  <div style="color: gray; font-family: monospace; margin-left: 25%">
+    <span ng-bind="vm.hoveredPoint.isoTime"></span>
+    &nbsp;&nbsp;
+    <span ng-bind="vm.hoveredPoint.position.lat ? vm.hoveredPoint.position.lat + ' : ' + vm.hoveredPoint.position.lon : ''"></span>
   </div>
   <table style="width: 100%">
     <tbody>
     <tr>
+      <td style="vertical-align: top">
+        <div id="mapid" style="height:800px"></div>
+      </td>
       <td style="width: 300px; vertical-align: top">
-        <code style="color: gray; font-size: small; float: right"
-             ng-bind="vm.hoveredPointIso">
-        </code>
         <div ng-if="vm.ss" style="margin-top: 20px">
           <div ng-if="vm.ss.streams">
             <!--<pre>orderedStreams={{vm.ss.orderedStreams|json}}</pre>-->
@@ -54,15 +61,14 @@
               <li ng-repeat="str in vm.ss.orderedStreams">
                 <div>
                   <span style="font-weight:bold" ng-bind="str.strid"></span>
-                  <span ng-if="str.name" ng-bind="'name: ' + str.name"></span>
-                  <span ng-if="str.description" ng-bind="'description: ' + str.description"></span>
+                  <span ng-if="str.name" ng-bind="' - ' + str.name"></span>
+                  <br>
+                  <span style="color: gray" ng-bind="str.description"></span>
                 </div>
                 <div>
                   <span ng-bind="'Obs: ' + str.numberObs"></span>
-<!--
                   <br>
-                  <span ng-bind="'Latest: ' + str.latestIso"></span>
--->
+                  <span ng-bind="str.latestIso"></span>
                 </div>
                 <!--ul>
                   <li ng-repeat="obs in str.obs">
@@ -78,9 +84,6 @@
             Waiting for registration event...
           </span>
         </div>
-      </td>
-      <td style="vertical-align: top">
-        <div id="mapid" style="height:800px"></div>
       </td>
     </tr>
     </tbody>

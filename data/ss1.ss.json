@@ -9,7 +9,7 @@
   "streams": {
     "str1": {
       "obs": [{
-        "timestamp": 1493875151000,
+        "timestamp": 1493933138000,
         "feature": {
           "type": "Feature",
           "properties": {
@@ -21,45 +21,1039 @@
           }
         }
       }],
+      "name": "Stream one",
       "style": {
         "color": "green",
         "dashArray": "5,5"
       },
+      "description": "Description of Stream one",
       "variables": ["baz", "bam"],
       "zOrder": 0,
       "strid": "str1",
       "observations": {
-        "1493875148000": [{
+        "1493933099000": [{
           "scalarData": {
             "vars": ["baz", "bam"],
-            "vals": [18.0, 71.0]
+            "vals": [3.0, 58.0],
+            "position": {
+              "lat": 36.7232,
+              "lon": -122.286
+            }
           }
         }],
-        "1493875150000": [{
+        "1493933093000": [{
           "scalarData": {
             "vars": ["baz", "bam"],
-            "vals": [68.0, 99.0]
+            "vals": [93.0, 45.0],
+            "position": {
+              "lat": 36.742,
+              "lon": -122.2892
+            }
           }
         }],
-        "1493875147000": [{
+        "1493933089000": [{
           "scalarData": {
             "vars": ["baz", "bam"],
-            "vals": [47.0, 2.0]
+            "vals": [84.0, 71.0],
+            "position": {
+              "lat": 36.7754,
+              "lon": -122.2652
+            }
           }
         }],
-        "1493875149000": [{
+        "1493933114000": [{
           "scalarData": {
             "vars": ["baz", "bam"],
-            "vals": [62.0, 92.0]
+            "vals": [32.0, 81.0],
+            "position": {
+              "lat": 36.7476,
+              "lon": -122.2303
+            }
           }
         }],
-        "1493875146000": [{
+        "1493933117000": [{
           "scalarData": {
             "vars": ["baz", "bam"],
-            "vals": [80.0, 58.0]
+            "vals": [99.0, 92.0],
+            "position": {
+              "lat": 36.7366,
+              "lon": -122.2316
+            }
+          }
+        }],
+        "1493933126000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [40.0, 72.0],
+            "position": {
+              "lat": 36.7275,
+              "lon": -122.2759
+            }
+          }
+        }],
+        "1493933119000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [68.0, 83.0],
+            "position": {
+              "lat": 36.7925,
+              "lon": -122.235
+            }
+          }
+        }],
+        "1493933109000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [48.0, 58.0],
+            "position": {
+              "lat": 36.7901,
+              "lon": -122.2979
+            }
+          }
+        }],
+        "1493933082000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [100.0, 27.0],
+            "position": {
+              "lat": 36.766,
+              "lon": -122.2647
+            }
+          }
+        }],
+        "1493933133000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [45.0, 19.0],
+            "position": {
+              "lat": 36.7627,
+              "lon": -122.2182
+            }
+          }
+        }],
+        "1493933094000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [43.0, 87.0],
+            "position": {
+              "lat": 36.7432,
+              "lon": -122.2499
+            }
+          }
+        }],
+        "1493933116000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [81.0, 15.0],
+            "position": {
+              "lat": 36.7485,
+              "lon": -122.2579
+            }
+          }
+        }],
+        "1493933108000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [75.0, 75.0],
+            "position": {
+              "lat": 36.7754,
+              "lon": -122.2293
+            }
+          }
+        }],
+        "1493933137000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [66.0, 89.0],
+            "position": {
+              "lat": 36.7943,
+              "lon": -122.2447
+            }
+          }
+        }],
+        "1493933125000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [95.0, 46.0],
+            "position": {
+              "lat": 36.7742,
+              "lon": -122.244
+            }
+          }
+        }],
+        "1493933128000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [100.0, 48.0],
+            "position": {
+              "lat": 36.7572,
+              "lon": -122.231
+            }
+          }
+        }],
+        "1493933135000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [44.0, 3.0],
+            "position": {
+              "lat": 36.7756,
+              "lon": -122.2606
+            }
+          }
+        }],
+        "1493933104000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [87.0, 84.0],
+            "position": {
+              "lat": 36.7374,
+              "lon": -122.275
+            }
+          }
+        }],
+        "1493933115000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [70.0, 62.0],
+            "position": {
+              "lat": 36.7482,
+              "lon": -122.2414
+            }
+          }
+        }],
+        "1493933087000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [71.0, 11.0],
+            "position": {
+              "lat": 36.7172,
+              "lon": -122.2669
+            }
+          }
+        }],
+        "1493933110000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [46.0, 99.0],
+            "position": {
+              "lat": 36.7172,
+              "lon": -122.2244
+            }
+          }
+        }],
+        "1493933085000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [77.0, 82.0],
+            "position": {
+              "lat": 36.7301,
+              "lon": -122.254
+            }
+          }
+        }],
+        "1493933111000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [7.0, 52.0],
+            "position": {
+              "lat": 36.7395,
+              "lon": -122.293
+            }
+          }
+        }],
+        "1493933101000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [60.0, 18.0],
+            "position": {
+              "lat": 36.7843,
+              "lon": -122.2586
+            }
+          }
+        }],
+        "1493933097000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [29.0, 4.0],
+            "position": {
+              "lat": 36.7978,
+              "lon": -122.2745
+            }
+          }
+        }],
+        "1493933131000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [14.0, 48.0],
+            "position": {
+              "lat": 36.741,
+              "lon": -122.2316
+            }
+          }
+        }],
+        "1493933078000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [76.0, 20.0],
+            "position": {
+              "lat": 36.73,
+              "lon": -122.27
+            }
+          }
+        }],
+        "1493933120000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [50.0, 83.0],
+            "position": {
+              "lat": 36.7352,
+              "lon": -122.2739
+            }
+          }
+        }],
+        "1493933088000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [94.0, 33.0],
+            "position": {
+              "lat": 36.7913,
+              "lon": -122.2858
+            }
+          }
+        }],
+        "1493933107000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [76.0, 74.0],
+            "position": {
+              "lat": 36.7104,
+              "lon": -122.2235
+            }
+          }
+        }],
+        "1493933090000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [45.0, 13.0],
+            "position": {
+              "lat": 36.794,
+              "lon": -122.2611
+            }
+          }
+        }],
+        "1493933129000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [96.0, 67.0],
+            "position": {
+              "lat": 36.7698,
+              "lon": -122.2207
+            }
+          }
+        }],
+        "1493933124000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [22.0, 97.0],
+            "position": {
+              "lat": 36.757,
+              "lon": -122.2523
+            }
+          }
+        }],
+        "1493933079000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [98.0, 46.0],
+            "position": {
+              "lat": 36.7354,
+              "lon": -122.2893
+            }
+          }
+        }],
+        "1493933113000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [15.0, 52.0],
+            "position": {
+              "lat": 36.7824,
+              "lon": -122.2883
+            }
+          }
+        }],
+        "1493933103000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [4.0, 61.0],
+            "position": {
+              "lat": 36.7962,
+              "lon": -122.2247
+            }
+          }
+        }],
+        "1493933121000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [57.0, 73.0],
+            "position": {
+              "lat": 36.7649,
+              "lon": -122.2159
+            }
+          }
+        }],
+        "1493933084000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [1.0, 30.0],
+            "position": {
+              "lat": 36.7211,
+              "lon": -122.2451
+            }
+          }
+        }],
+        "1493933098000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [43.0, 69.0],
+            "position": {
+              "lat": 36.7118,
+              "lon": -122.219
+            }
+          }
+        }],
+        "1493933096000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [19.0, 58.0],
+            "position": {
+              "lat": 36.7884,
+              "lon": -122.2232
+            }
+          }
+        }],
+        "1493933136000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [14.0, 100.0],
+            "position": {
+              "lat": 36.7826,
+              "lon": -122.2994
+            }
+          }
+        }],
+        "1493933132000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [17.0, 71.0],
+            "position": {
+              "lat": 36.7103,
+              "lon": -122.2978
+            }
+          }
+        }],
+        "1493933100000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [28.0, 100.0],
+            "position": {
+              "lat": 36.7485,
+              "lon": -122.2244
+            }
+          }
+        }],
+        "1493933122000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [5.0, 22.0],
+            "position": {
+              "lat": 36.7269,
+              "lon": -122.2879
+            }
+          }
+        }],
+        "1493933112000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [88.0, 40.0],
+            "position": {
+              "lat": 36.7833,
+              "lon": -122.289
+            }
+          }
+        }],
+        "1493933102000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [22.0, 93.0],
+            "position": {
+              "lat": 36.729,
+              "lon": -122.2206
+            }
+          }
+        }],
+        "1493933092000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [30.0, 78.0],
+            "position": {
+              "lat": 36.7593,
+              "lon": -122.2273
+            }
+          }
+        }],
+        "1493933118000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [39.0, 85.0],
+            "position": {
+              "lat": 36.7165,
+              "lon": -122.2809
+            }
+          }
+        }],
+        "1493933086000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [80.0, 50.0],
+            "position": {
+              "lat": 36.7654,
+              "lon": -122.295
+            }
+          }
+        }],
+        "1493933080000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [11.0, 21.0],
+            "position": {
+              "lat": 36.7786,
+              "lon": -122.235
+            }
+          }
+        }],
+        "1493933105000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [78.0, 32.0],
+            "position": {
+              "lat": 36.7969,
+              "lon": -122.2751
+            }
+          }
+        }],
+        "1493933134000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [12.0, 85.0],
+            "position": {
+              "lat": 36.797,
+              "lon": -122.2908
+            }
+          }
+        }],
+        "1493933106000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [29.0, 37.0],
+            "position": {
+              "lat": 36.7199,
+              "lon": -122.2329
+            }
+          }
+        }],
+        "1493933130000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [71.0, 5.0],
+            "position": {
+              "lat": 36.7716,
+              "lon": -122.2938
+            }
+          }
+        }],
+        "1493933083000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [45.0, 41.0],
+            "position": {
+              "lat": 36.7613,
+              "lon": -122.2824
+            }
+          }
+        }],
+        "1493933095000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [23.0, 38.0],
+            "position": {
+              "lat": 36.744,
+              "lon": -122.2174
+            }
+          }
+        }],
+        "1493933081000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [73.0, 7.0],
+            "position": {
+              "lat": 36.7527,
+              "lon": -122.2855
+            }
+          }
+        }],
+        "1493933123000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [7.0, 63.0],
+            "position": {
+              "lat": 36.733,
+              "lon": -122.2476
+            }
+          }
+        }],
+        "1493933091000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [15.0, 44.0],
+            "position": {
+              "lat": 36.7541,
+              "lon": -122.2215
+            }
+          }
+        }],
+        "1493933127000": [{
+          "scalarData": {
+            "vars": ["baz", "bam"],
+            "vals": [16.0, 48.0],
+            "position": {
+              "lat": 36.7314,
+              "lon": -122.2253
+            }
           }
         }]
       }
+    },
+    "str2": {
+      "obs": [{
+        "timestamp": 1493933111000,
+        "chartTsData": [{
+          "timestamp": 1493933111000,
+          "values": [97.0, 29.0]
+        }]
+      }, {
+        "timestamp": 1493933112000,
+        "chartTsData": [{
+          "timestamp": 1493933112000,
+          "values": [42.0, 50.0]
+        }]
+      }, {
+        "timestamp": 1493933113000,
+        "chartTsData": [{
+          "timestamp": 1493933113000,
+          "values": [53.0, 25.0]
+        }]
+      }, {
+        "timestamp": 1493933114000,
+        "chartTsData": [{
+          "timestamp": 1493933114000,
+          "values": [69.0, 50.0]
+        }]
+      }, {
+        "timestamp": 1493933115000,
+        "chartTsData": [{
+          "timestamp": 1493933115000,
+          "values": [2.0, 47.0]
+        }]
+      }, {
+        "timestamp": 1493933116000,
+        "chartTsData": [{
+          "timestamp": 1493933116000,
+          "values": [3.0, 80.0]
+        }]
+      }, {
+        "timestamp": 1493933117000,
+        "chartTsData": [{
+          "timestamp": 1493933117000,
+          "values": [25.0, 29.0]
+        }]
+      }, {
+        "timestamp": 1493933118000,
+        "chartTsData": [{
+          "timestamp": 1493933118000,
+          "values": [9.0, 39.0]
+        }]
+      }, {
+        "timestamp": 1493933119000,
+        "chartTsData": [{
+          "timestamp": 1493933119000,
+          "values": [79.0, 49.0]
+        }]
+      }, {
+        "timestamp": 1493933120000,
+        "chartTsData": [{
+          "timestamp": 1493933120000,
+          "values": [53.0, 81.0]
+        }]
+      }, {
+        "timestamp": 1493933121000,
+        "chartTsData": [{
+          "timestamp": 1493933121000,
+          "values": [15.0, 67.0]
+        }]
+      }, {
+        "timestamp": 1493933122000,
+        "chartTsData": [{
+          "timestamp": 1493933122000,
+          "values": [32.0, 41.0]
+        }]
+      }, {
+        "timestamp": 1493933123000,
+        "chartTsData": [{
+          "timestamp": 1493933123000,
+          "values": [24.0, 29.0]
+        }]
+      }, {
+        "timestamp": 1493933124000,
+        "chartTsData": [{
+          "timestamp": 1493933124000,
+          "values": [27.0, 66.0]
+        }]
+      }, {
+        "timestamp": 1493933125000,
+        "chartTsData": [{
+          "timestamp": 1493933125000,
+          "values": [53.0, 58.0]
+        }]
+      }, {
+        "timestamp": 1493933126000,
+        "chartTsData": [{
+          "timestamp": 1493933126000,
+          "values": [82.0, 78.0]
+        }]
+      }, {
+        "timestamp": 1493933127000,
+        "chartTsData": [{
+          "timestamp": 1493933127000,
+          "values": [95.0, 29.0]
+        }]
+      }, {
+        "timestamp": 1493933128000,
+        "chartTsData": [{
+          "timestamp": 1493933128000,
+          "values": [38.0, 16.0]
+        }]
+      }, {
+        "timestamp": 1493933129000,
+        "chartTsData": [{
+          "timestamp": 1493933129000,
+          "values": [7.0, 21.0]
+        }]
+      }, {
+        "timestamp": 1493933130000,
+        "chartTsData": [{
+          "timestamp": 1493933130000,
+          "values": [23.0, 64.0]
+        }]
+      }, {
+        "timestamp": 1493933131000,
+        "chartTsData": [{
+          "timestamp": 1493933131000,
+          "values": [59.0, 57.0]
+        }]
+      }, {
+        "timestamp": 1493933132000,
+        "chartTsData": [{
+          "timestamp": 1493933132000,
+          "values": [5.0, 95.0]
+        }]
+      }, {
+        "timestamp": 1493933133000,
+        "chartTsData": [{
+          "timestamp": 1493933133000,
+          "values": [87.0, 40.0]
+        }]
+      }, {
+        "timestamp": 1493933134000,
+        "chartTsData": [{
+          "timestamp": 1493933134000,
+          "values": [43.0, 73.0]
+        }]
+      }, {
+        "timestamp": 1493933135000,
+        "chartTsData": [{
+          "timestamp": 1493933135000,
+          "values": [76.0, 11.0]
+        }]
+      }, {
+        "timestamp": 1493933136000,
+        "chartTsData": [{
+          "timestamp": 1493933136000,
+          "values": [82.0, 94.0]
+        }]
+      }, {
+        "timestamp": 1493933137000,
+        "chartTsData": [{
+          "timestamp": 1493933137000,
+          "values": [40.0, 91.0]
+        }]
+      }, {
+        "timestamp": 1493933138000,
+        "chartTsData": [{
+          "timestamp": 1493933138000,
+          "values": [74.0, 52.0]
+        }]
+      }, {
+        "timestamp": 1493933139000,
+        "chartTsData": [{
+          "timestamp": 1493933139000,
+          "values": [84.0, 69.0]
+        }]
+      }, {
+        "timestamp": 1493933140000,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-121.906, 36.882]
+        }
+      }, {
+        "timestamp": 1493933140000,
+        "feature": {
+          "type": "Feature",
+          "properties": {
+            "style": {
+              "color": "cyan",
+              "radius": 20,
+              "dashArray": "5,5"
+            }
+          },
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-121.965, 36.81]
+          }
+        }
+      }, {
+        "timestamp": 1493933140000,
+        "chartTsData": [{
+          "timestamp": 1493933140000,
+          "values": [57.0, 92.0]
+        }]
+      }],
+      "style": {
+        "color": "red",
+        "radius": 14
+      },
+      "variables": ["foo", "bar"],
+      "zOrder": 10,
+      "strid": "str2"
+    },
+    "str3": {
+      "strid": "str3",
+      "style": {
+        "color": "blue"
+      },
+      "zOrder": 0,
+      "obs": [{
+        "timestamp": 1493933140000,
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [[-122.123, 36.92], [-122.186, 36.774], [-121.9, 36.7]]
+        }
+      }]
+    },
+    "str4": {
+      "obs": [{
+        "timestamp": 1493933142000,
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-122.09, 36.865]
+        }
+      }, {
+        "timestamp": 1493933142000,
+        "chartTsData": [{
+          "timestamp": 1493933142000,
+          "values": [16.0]
+        }]
+      }, {
+        "timestamp": 1493933144000,
+        "chartTsData": [{
+          "timestamp": 1493933144000,
+          "values": [12.0]
+        }]
+      }, {
+        "timestamp": 1493933145000,
+        "chartTsData": [{
+          "timestamp": 1493933145000,
+          "values": [96.0]
+        }]
+      }, {
+        "timestamp": 1493933147000,
+        "chartTsData": [{
+          "timestamp": 1493933147000,
+          "values": [61.0]
+        }]
+      }, {
+        "timestamp": 1493933148000,
+        "chartTsData": [{
+          "timestamp": 1493933148000,
+          "values": [91.0]
+        }]
+      }, {
+        "timestamp": 1493933150000,
+        "chartTsData": [{
+          "timestamp": 1493933150000,
+          "values": [29.0]
+        }]
+      }, {
+        "timestamp": 1493933151000,
+        "chartTsData": [{
+          "timestamp": 1493933151000,
+          "values": [35.0]
+        }]
+      }, {
+        "timestamp": 1493933153000,
+        "chartTsData": [{
+          "timestamp": 1493933153000,
+          "values": [97.0]
+        }]
+      }, {
+        "timestamp": 1493933154000,
+        "chartTsData": [{
+          "timestamp": 1493933154000,
+          "values": [98.0]
+        }]
+      }, {
+        "timestamp": 1493933156000,
+        "chartTsData": [{
+          "timestamp": 1493933156000,
+          "values": [7.0]
+        }]
+      }, {
+        "timestamp": 1493933157000,
+        "chartTsData": [{
+          "timestamp": 1493933157000,
+          "values": [34.0]
+        }]
+      }, {
+        "timestamp": 1493933159000,
+        "chartTsData": [{
+          "timestamp": 1493933159000,
+          "values": [24.0]
+        }]
+      }, {
+        "timestamp": 1493933160000,
+        "chartTsData": [{
+          "timestamp": 1493933160000,
+          "values": [47.0]
+        }]
+      }, {
+        "timestamp": 1493933162000,
+        "chartTsData": [{
+          "timestamp": 1493933162000,
+          "values": [13.0]
+        }]
+      }, {
+        "timestamp": 1493933163000,
+        "chartTsData": [{
+          "timestamp": 1493933163000,
+          "values": [41.0]
+        }]
+      }, {
+        "timestamp": 1493933165000,
+        "chartTsData": [{
+          "timestamp": 1493933165000,
+          "values": [43.0]
+        }]
+      }, {
+        "timestamp": 1493933166000,
+        "chartTsData": [{
+          "timestamp": 1493933166000,
+          "values": [43.0]
+        }]
+      }, {
+        "timestamp": 1493933168000,
+        "chartTsData": [{
+          "timestamp": 1493933168000,
+          "values": [58.0]
+        }]
+      }, {
+        "timestamp": 1493933170000,
+        "chartTsData": [{
+          "timestamp": 1493933170000,
+          "values": [86.0]
+        }]
+      }, {
+        "timestamp": 1493933171000,
+        "chartTsData": [{
+          "timestamp": 1493933171000,
+          "values": [50.0]
+        }]
+      }, {
+        "timestamp": 1493933173000,
+        "chartTsData": [{
+          "timestamp": 1493933173000,
+          "values": [71.0]
+        }]
+      }, {
+        "timestamp": 1493933174000,
+        "chartTsData": [{
+          "timestamp": 1493933174000,
+          "values": [21.0]
+        }]
+      }, {
+        "timestamp": 1493933176000,
+        "chartTsData": [{
+          "timestamp": 1493933176000,
+          "values": [89.0]
+        }]
+      }, {
+        "timestamp": 1493933177000,
+        "chartTsData": [{
+          "timestamp": 1493933177000,
+          "values": [9.0]
+        }]
+      }, {
+        "timestamp": 1493933179000,
+        "chartTsData": [{
+          "timestamp": 1493933179000,
+          "values": [52.0]
+        }]
+      }, {
+        "timestamp": 1493933180000,
+        "chartTsData": [{
+          "timestamp": 1493933180000,
+          "values": [10.0]
+        }]
+      }, {
+        "timestamp": 1493933182000,
+        "chartTsData": [{
+          "timestamp": 1493933182000,
+          "values": [16.0]
+        }]
+      }, {
+        "timestamp": 1493933183000,
+        "chartTsData": [{
+          "timestamp": 1493933183000,
+          "values": [94.0]
+        }]
+      }, {
+        "timestamp": 1493933185000,
+        "chartTsData": [{
+          "timestamp": 1493933185000,
+          "values": [48.0]
+        }]
+      }, {
+        "timestamp": 1493933187000,
+        "chartTsData": [{
+          "timestamp": 1493933187000,
+          "values": [83.0]
+        }]
+      }],
+      "style": {
+        "color": "yellow",
+        "radius": 10
+      },
+      "variables": ["temperature"],
+      "zOrder": 10,
+      "strid": "str4"
     }
   }
 }

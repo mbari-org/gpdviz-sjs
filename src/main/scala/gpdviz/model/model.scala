@@ -15,6 +15,8 @@ case class SensorSystem(sysid:        String,
                         )
 
 case class DataStream(strid:    String,
+                      name:         Option[String] = None,
+                      description:  Option[String] = None,
                       style:    Option[Map[String, JsValue]] = None,
                       zOrder:   Int = 0,
                       variables: Option[List[String]] = None,

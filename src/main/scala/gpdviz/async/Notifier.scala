@@ -75,7 +75,7 @@ class Notifier(config: Config) extends JsonImplicits {
   }
 
   def notifyObservations2Added(ss: SensorSystem, strid: String, observations: Map[String, List[ObsData]]): Unit = if (ss.pushEvents) {
-    println(s"notifyObservations2Added: strid=$strid observations=$observations")
+    println(s"notifyObservations2Added: strid=$strid observations=${observations.size}")
     val obs = observations mapValues { list =>
       // NOTE: just passing the JSON result as a plain string.
       // (We could probably do some pusher configuration, via Gson serializer,

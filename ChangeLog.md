@@ -1,7 +1,9 @@
 # gpdviz2
 
-2017-05-03
+2017-05-04
 
+- more with scalarData (position)
+- add name and description to DataStream
 - preliminaries with scalarData
 
 2017-05-01

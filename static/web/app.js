@@ -12,6 +12,8 @@
     var vm = this;
     vm.debug = debug;
 
+    vm.hoveredPoint = {};
+
     var byStrId = [];
 
     var center = [36.62, -122.04];
@@ -141,12 +143,25 @@
       _.each(streams, function (str) {
         byStrId[str.strid] = {str: str};
 
-        // little hack: add non-charData observations first...
+        // little hack: add non-scalarData observations first...
+        _.each(str.observations, function (obss, timestamp) {
+          _.each(obss, function(obs) {
+            if (!obs.scalarData)
+              addObs2(str, timestamp, obs);
+          });
+        });
         _.each(str.obs, function (obs) {
           if (!obs.chartTsData)
             addObs(str, obs);
         });
+
         // ... so the marker has already been associated to the relevant streams:
+        _.each(str.observations, function (obss, timestamp) {
+          _.each(obss, function(obs) {
+            if (obs.scalarData)
+              addObs2(str, timestamp, obs);
+          });
+        });
         _.each(str.obs, function (obs) {
           if (obs.chartTsData)
             addObs(str, obs);
@@ -209,8 +224,8 @@
       else if (what === 'observations2Added') {
         str = vm.ss.streams[data.strid];
         //if (debug)
-        console.debug("observations2Added: str=", str, "data.strid=", data.strid);
-        console.debug("observations2Added: data.obss=", _.cloneDeep(data.obss));
+        //console.debug("observations2Added: str=", str, "data.strid=", data.strid);
+        //console.debug("observations2Added: data.obss=", _.cloneDeep(data.obss));
         str.observations = str.observations || {};
         $scope.$apply(function () {
           _.each(data.obss, function (obsData, timestamp) {
@@ -218,9 +233,9 @@
             if (obsData.feature)  obs.feature  = angular.fromJson(obsData.feature);
             if (obsData.geometry) obs.geometry = angular.fromJson(obsData.geometry);
             if (obsData.scalarData) obs.scalarData  = angular.fromJson(obsData.scalarData);
-            console.debug("&& timestamp=", timestamp, "obs=", obs);
+            //console.debug("&& timestamp=", +timestamp, moment.utc(+timestamp).format(), "obs=", obs);
             str.observations[+timestamp] = obs;
-            addObs2(str, timestamp, obs);
+            addObs2(str, +timestamp, obs);
           });
         });
       }
@@ -285,7 +300,7 @@
         charter.deactivate();
       }
       $scope.$apply(function() {
-        vm.hoveredPointIso = undefined;
+        vm.hoveredPoint = {};
         addSelectionPoint();
       });
     });
@@ -301,13 +316,18 @@
       if (obs.chartTsData) {
         //console.debug("str=", str, "obs.chartTsData=", obs.chartTsData);
         if (!byStrId[str.strid].charter) {
-          byStrId[str.strid].charter = Charter(str.strid, str.variables, function(point) {
+          var info = {
+            title:   str.strid + (str.name ? ' - ' + str.name : ''),
+            subtitle: str.description
+          };
+          byStrId[str.strid].charter = Charter(str.strid, info, str.variables, function(point) {
             if (point) {
-              //console.debug("hovered point=", point.x, vm.hoveredPointIso);
+              //console.debug("hovered point=", point.x, vm.hoveredPoint);
               $scope.$apply(function() {
-                vm.hoveredPointIso = moment.utc(point.x).format();
+                vm.hoveredPoint.isoTime = moment.utc(point.x).format();
                 var p = positionsByTime.get(point.x);
                 if (p) {
+                  vm.hoveredPoint.position = p;
                   addSelectionPoint([p.lat, p.lon]);
                 }
               });
@@ -382,15 +402,20 @@
       var popupInfo;
 
       if (obs.scalarData) {
-        console.debug("str=", str, "obs.scalarData=", obs.scalarData);
+        //console.debug("addObs2: str=", str, "obs.scalarData=", obs.scalarData);
         if (!byStrId[str.strid].charter) {
-          byStrId[str.strid].charter = Charter(str.strid, str.variables, function(point) {
+          var info = {
+            title:   str.strid + (str.name ? ' - ' + str.name : '')
+            ,subtitle: str.description
+          };
+          byStrId[str.strid].charter = Charter(str.strid, info, str.variables, function(point) {
             if (point) {
-              //console.debug("hovered point=", point.x, vm.hoveredPointIso);
+              //console.debug("hovered point=", point.x, vm.hoveredPoint);
               $scope.$apply(function() {
-                vm.hoveredPointIso = moment.utc(point.x).format();
+                vm.hoveredPoint.isoTime = moment.utc(point.x).format();
                 var p = positionsByTime.get(point.x);
                 if (p) {
+                  vm.hoveredPoint.position = p;
                   addSelectionPoint([p.lat, p.lon]);
                 }
               });
@@ -401,15 +426,17 @@
         var indexes = _.map(obs.scalarData.vars, function(varName) {
           return _.indexOf(str.variables, varName);
         });
-        console.debug("& indexes=", indexes);
+        //console.debug("& indexes=", indexes);
         _.each(obs.scalarData.vals, function(v, valIndex) {
           var varIndex = indexes[valIndex];
           byStrId[str.strid].charter.addChartPoint(varIndex, timestamp, v);
 
-          if (obs.scalarData.position) {
-            positionsByTime.set(timestamp, obs.scalarData.position);
-          }
         });
+
+        //console.debug("obs.scalarData.position=", obs.scalarData.position);
+        if (obs.scalarData.position) {
+          positionsByTime.set(timestamp, obs.scalarData.position);
+        }
 
         if (byStrId[str.strid].marker && !byStrId[str.strid].popupInfo) {
           if (debug) console.debug("setting popup for stream ", str.strid);
@@ -430,6 +457,7 @@
       var style = str.style || {};
 
       if (obs.feature) {
+        console.debug("addObs2: str=", str, "obs.feature=", obs.feature);
         var geojson = angular.fromJson(obs.feature);
         var geometry = obs.feature.geometry;
         if (obs.feature.properties && obs.feature.properties.style) {
@@ -437,6 +465,7 @@
         }
       }
       else {
+        console.debug("addObs2: str=", str, "obs.geometry=", obs.geometry);
         geojson = angular.fromJson(obs.geometry);
         geometry = obs.geometry;
       }
@@ -507,12 +536,9 @@
     }
   });
 
-  function Charter(strid, names, hoveredPoint) {
-    var title = "";
-    var sep = "";
+  function Charter(strid, info, names, hoveredPoint) {
+    var title = '<span style="font-size: small">' + info.title + '</span>';
     var initialSeriesData = _.map(names, function(name) {
-      title += sep + name;
-      sep = " | ";
       return {
         name: name,
         data: []
@@ -539,10 +565,10 @@
     };
 
     function addChartPoint(seriesIndex, x, y) {
-      console.debug("addChartPoint: strid=", strid, "x=", x, "y=", y);
-      initialSeriesData[seriesIndex].data.push([x, y]);
+      //console.debug("addChartPoint: strid=", strid, "x=", x, "y=", y);
+      initialSeriesData[seriesIndex].data.push([+x, y]);
       if (serieses) {
-        serieses[seriesIndex].addPoint([x, y], true, true);
+        serieses[seriesIndex].addPoint([+x, y], true, true);
       }
     }
 
@@ -584,7 +610,6 @@
             zoomType: 'x'
           }
         },
-        //title: { text: "TODO" },
         xAxis: {
           type: 'datetime',
           ordinal: false
@@ -596,7 +621,14 @@
         tooltip: {
           pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>',
           valueDecimals: 4,
-          split: true
+          shared: true
+
+          // why is not the <table> working?
+          // ,useHTML: true
+          // ,headerFormat: '<small>{point.key}</small><table>'
+          // ,pointFormat: '<tr><td style="color: {series.color}">{series.name}:</td>' +
+          //   '<td style="text-align: right"><b>{point.y}</b></td></tr>'
+          // ,footerFormat: '</table>'
         },
 
         rangeSelector: {
@@ -621,6 +653,10 @@
             type: 'day',
             text: '1D'
           }, {
+            count: 7,
+            type: 'day',
+            text: '1W'
+          }, {
             type: 'all',
             text: 'All'
           }],
@@ -628,9 +664,8 @@
           selected: 1
         },
 
-        title: {
-         text: names[0]
-        },
+        title: { text: title },
+        //subtitle: { text: info.subtitle },
 
         navigator: {
           enabled: true

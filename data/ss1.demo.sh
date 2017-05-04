@@ -12,16 +12,16 @@ function run() {
 	add_str1_values
 	add_scalars str1
 
-#	add_str2
-#	add_str3
-#
-#	add_str2_values
-#	add_str3_values
-#
-#	add_str2_data
-#
-#	add_str4_and_point
-#	add_delayed_data str4
+	add_str2
+	add_str3
+
+	add_str2_values
+	add_str3_values
+
+	add_str2_data
+
+	add_str4_and_point
+	add_delayed_data str4
 }
 
 function unregister() {
@@ -31,12 +31,17 @@ function unregister() {
 
 function register() {
     echo "register ${SS}"
-	http post ${GPDVIZ}/api/ss sysid=${SS} name='Test sensor system' center:='{"lat":36.82, "lon":-122}' pushEvents:=true > /dev/null
+	http post ${GPDVIZ}/api/ss sysid=${SS} \
+	     name='Test sensor system' \
+	     center:='{"lat":36.82, "lon":-122}' \
+	     pushEvents:=true > /dev/null
 }
 
 function add_str1() {
     echo "add stream str1"
 	http post ${GPDVIZ}/api/ss/${SS} strid=str1 \
+	     name="Stream one" \
+	     description="Description of Stream one" \
 	     variables:='[ "baz", "bam" ]' \
 	     style:='{"color":"green", "dashArray": "5,5"}' > /dev/null
 }
@@ -44,13 +49,14 @@ function add_str1() {
 function add_str2() {
     echo "add stream str2"
 	http post ${GPDVIZ}/api/ss/${SS} strid=str2 \
-	    variables:='[ "foo", "bar" ]' \
-	    style:='{"color":"red", "radius": 14}' zOrder:=10 > /dev/null
+	     variables:='[ "foo", "bar" ]' \
+	     style:='{"color":"red", "radius": 14}' zOrder:=10 > /dev/null
 }
 
 function add_str3() {
     echo "add stream str3"
-	http post ${GPDVIZ}/api/ss/${SS} strid=str3 style:='{"color":"blue"}' > /dev/null
+	http post ${GPDVIZ}/api/ss/${SS} strid=str3 \
+	     style:='{"color":"blue"}' > /dev/null
 }
 
 function add_str1_values() {
@@ -115,7 +121,8 @@ EOF
 function add_values() {
 	strid=$1
 	values=$2
-	http post ${GPDVIZ}/api/ss/${SS}/${strid} values:="${values}" > /dev/null
+	http post ${GPDVIZ}/api/ss/${SS}/${strid} \
+	     values:="${values}" > /dev/null
 }
 
 function add_str2_data() {
@@ -153,44 +160,49 @@ function add_str4_and_point() {
 		  }
 		}]
 EOF
-	http post ${GPDVIZ}/api/ss/${SS}/${strid} values:="${values}" > /dev/null
+	http post ${GPDVIZ}/api/ss/${SS}/${strid} \
+	     values:="${values}" > /dev/null
 	
 }
 function add_delayed_data() {
     strid=$1
-	secs=60
+	secs=30
 	for i in `seq ${secs}`; do
 	    timestamp="`date +%s`000"
 		val=$(( (RANDOM % 100) + 1 ))
 		element='{ "timestamp": '${timestamp}', "chartTsData": [ { "timestamp": '${timestamp}', "values": ['${val}'] } ] }'
         add_values "${strid}" "[${element}]"
-	    echo "added value to ${strid}: ${val}"
-        sleep 0.5
+	    echo "added value to ${strid}: ${val}  timestamp=${timestamp}"
+        sleep 1
 	done
 }
 
 function add_observations() {
 	strid=$1
 	observations=$2
-	http post ${GPDVIZ}/api/ss/${SS}/${strid}/obs observations:="${observations}"
+	http post ${GPDVIZ}/api/ss/${SS}/${strid}/obs \
+	     observations:="${observations}"
 }
 
 function add_scalars() {
 	strid=$1
 	echo "scalarData: ${strid}"
 	timestamp="`date +%s`000"
-	secs=5
+	secs=60
 	timestamp=$(( timestamp - secs * 1000 ))
 	observations='{'
 	comma=""
 	for i in `seq ${secs}`; do
 		val0=$(( (RANDOM % 100) + 1 ))
 		val1=$(( (RANDOM % 100) + 1 ))
+		lat="36.7$((   RANDOM % 1000 ))"
+		lon="-122.2$(( RANDOM % 1000 ))"
     	read -r -d '' element <<-EOF
 		  "${timestamp}": [{
             "scalarData": {
               "vars": ["baz","bam"],
-              "vals": [${val0}, ${val1}]
+              "vals": [${val0}, ${val1}],
+              "position": {"lat": ${lat}, "lon": ${lon}}
             }}]
 EOF
 		observations="${observations}${comma}${element}"
@@ -202,7 +214,7 @@ EOF
 }
 
 if [ "$1" != "" ]; then
-    $1
+    $1 $2 $3 $4 $5
 else
     run
 fi
