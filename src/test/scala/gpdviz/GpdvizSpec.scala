@@ -8,6 +8,7 @@ import spray.http.StatusCodes._
 import spray.http.ContentTypes._
 import spray.testkit.ScalatestRouteTest
 import org.scalatest._
+import spray.json.JsObject
 
 
 class GpdvizSpec extends FlatSpec with Matchers with ScalatestRouteTest with MyService {
@@ -71,7 +72,7 @@ class GpdvizSpec extends FlatSpec with Matchers with ScalatestRouteTest with MyS
   }
 
   it should "add a stream" in {
-    val variables = Some(List("temperature"))
+    val variables = Some(JsObject("temperature" → JsObject.empty))
     val streamRegister = StreamRegister(strid = strid, variables = variables)
     Post(s"/api/ss/${sysid.get}", streamRegister) ~> routes ~> check {
       status shouldBe OK

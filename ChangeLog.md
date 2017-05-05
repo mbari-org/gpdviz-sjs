@@ -2,6 +2,7 @@
 
 2017-05-04
 
+- DataStream: 'variables' as an JsObject to be able to associate properties per variable definition
 - DataStream: rename style to mapStyle, and add chartStyle
 - positionsByTime indexed by strid and time
 - more with scalarData (position)

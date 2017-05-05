@@ -42,14 +42,14 @@ function add_str1() {
 	http post ${GPDVIZ}/api/ss/${SS} strid=str1 \
 	     name="Stream one" \
 	     description="Description of Stream one" \
-	     variables:='[ "baz", "bam" ]' \
+	     variables:='{ "baz": {"units":"m"}, "bam": {"units":"Ω", "chartStyle": {"yAxis": {"lineWidth": 2} }} }' \
 	     mapStyle:='{"color":"green", "dashArray": "5,5"}' > /dev/null
 }
 
 function add_str2() {
     echo "add stream str2"
 	http post ${GPDVIZ}/api/ss/${SS} strid=str2 \
-	     variables:='[ "foo", "bar" ]' \
+	     variables:='{ "foo": {}, "bar": {} }' \
 	     mapStyle:='{"color":"red", "radius": 14}' zOrder:=10 > /dev/null
 }
 
@@ -148,7 +148,7 @@ function add_str2_data() {
 function add_str4_and_point() {
     strid=str4
 	http post ${GPDVIZ}/api/ss/${SS} strid=${strid} \
-	    variables:='[ "temperature" ]' \
+	    variables:='{ "temperature": {"units":"°C"} }' \
 	    mapStyle:='{"color":"yellow", "radius": 10}' zOrder:=10 > /dev/null
 	timestamp="`date +%s`000"
 	read -r -d '' values <<-EOF

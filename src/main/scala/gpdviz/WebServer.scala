@@ -40,7 +40,7 @@ case class StreamRegister(strid:        String,
                           description:  Option[String] = None,
                           mapStyle:     Option[Map[String, JsValue]] = None,
                           zOrder:       Option[Int] = None,
-                          variables:    Option[List[String]] = None,
+                          variables:    Option[JsObject] = None,
                           chartStyle:   Option[JsObject] = None
                           )
 

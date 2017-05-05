@@ -324,11 +324,11 @@
       if (obs.chartTsData) {
         //console.debug("str=", str, "obs.chartTsData=", obs.chartTsData);
         if (!byStrId[str.strid].charter) {
-          var info = {
+          var chartInfo = {
             title:   str.strid + (str.name ? ' - ' + str.name : ''),
             subtitle: str.description
           };
-          byStrId[str.strid].charter = Charter(str.strid, info, str.variables, function(point) {
+          byStrId[str.strid].charter = Charter(str.strid, chartInfo, str.variables, function(point) {
             if (point) {
               //console.debug("hovered point=", point.x, vm.hoveredPoint);
               $scope.$apply(function() {
@@ -412,11 +412,11 @@
       if (obs.scalarData) {
         //console.debug("addObs2: str=", str, "obs.scalarData=", obs.scalarData);
         if (!byStrId[str.strid].charter) {
-          var info = {
+          var chartInfo = {
             title:   str.strid + (str.name ? ' - ' + str.name : '')
             ,subtitle: str.description
           };
-          byStrId[str.strid].charter = Charter(str.strid, info, str.variables, function(point) {
+          byStrId[str.strid].charter = Charter(str.strid, chartInfo, str.variables, function(point) {
             if (point) {
               //console.debug("hovered point=", point.x, vm.hoveredPoint);
               $scope.$apply(function() {
@@ -432,7 +432,7 @@
         }
 
         var indexes = _.map(obs.scalarData.vars, function(varName) {
-          return _.indexOf(str.variables, varName);
+          return _.indexOf(_.keys(str.variables), varName);
         });
         //console.debug("& indexes=", indexes);
         _.each(obs.scalarData.vals, function(v, valIndex) {
@@ -544,17 +544,20 @@
     }
   });
 
-  function Charter(strid, info, names, hoveredPoint) {
-    var title = '<span style="font-size: small">' + info.title + '</span>';
-    var initialSeriesData = _.map(names, function(name) {
+  function Charter(strid, chartInfo, variables, hoveredPoint) {
+    var title = '<span style="font-size: small">' + chartInfo.title + '</span>';
+    var initialSeriesData = _.map(variables, function(varProps, varName) {
+      console.debug("varName=", varName, "varProps=", varProps);
+      var chartStyle = varProps.chartStyle || {};
+      var yAxis = chartStyle.yAxis || {};
       return {
-        name: name,
+        name: varName + (varProps.units ? ' (' +varProps.units+ ')' : ''),
         data: []
         ,marker: {
           enabled: true,
           radius: 2
         }
-        ,lineWidth: 1
+        ,lineWidth: yAxis.lineWidth || 1
         //,states: {
         //  hover: {
         //    lineWidthPlus: 0
