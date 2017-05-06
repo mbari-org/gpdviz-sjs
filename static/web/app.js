@@ -324,11 +324,7 @@
       if (obs.chartTsData) {
         //console.debug("str=", str, "obs.chartTsData=", obs.chartTsData);
         if (!byStrId[str.strid].charter) {
-          var chartInfo = {
-            title:   str.strid + (str.name ? ' - ' + str.name : ''),
-            subtitle: str.description
-          };
-          byStrId[str.strid].charter = Charter(str.strid, chartInfo, str.variables, function(point) {
+          byStrId[str.strid].charter = Charter(str, function(point) {
             if (point) {
               //console.debug("hovered point=", point.x, vm.hoveredPoint);
               $scope.$apply(function() {
@@ -362,8 +358,10 @@
             minWidth: 550
           });
           popupInfo._strid = str.strid;
+
+          var height = str.chartStyle && str.chartStyle.height || '300px';
           popupInfo.setContent('<div id="' +"chart-container-" + str.strid +
-            '" style="min-width:500px;height:300px;margin:0 auto"></div>');
+            '" style="min-width:500px;height:' +height+ ';margin:0 auto"></div>');
 
           byStrId[str.strid].marker.bindPopup(popupInfo);
           byStrId[str.strid].popupInfo = popupInfo;
@@ -412,11 +410,7 @@
       if (obs.scalarData) {
         //console.debug("addObs2: str=", str, "obs.scalarData=", obs.scalarData);
         if (!byStrId[str.strid].charter) {
-          var chartInfo = {
-            title:   str.strid + (str.name ? ' - ' + str.name : '')
-            ,subtitle: str.description
-          };
-          byStrId[str.strid].charter = Charter(str.strid, chartInfo, str.variables, function(point) {
+          byStrId[str.strid].charter = Charter(str, function(point) {
             if (point) {
               //console.debug("hovered point=", point.x, vm.hoveredPoint);
               $scope.$apply(function() {
@@ -453,8 +447,10 @@
             minWidth: 550
           });
           popupInfo._strid = str.strid;
+
+          var height = str.chartStyle && str.chartStyle.height || '300px';
           popupInfo.setContent('<div id="' +"chart-container-" + str.strid +
-            '" style="min-width:500px;height:300px;margin:0 auto"></div>');
+            '" style="min-width:500px;height:' +height+ ';margin:0 auto"></div>');
 
           byStrId[str.strid].marker.bindPopup(popupInfo);
           byStrId[str.strid].popupInfo = popupInfo;
@@ -544,27 +540,41 @@
     }
   });
 
-  function Charter(strid, chartInfo, variables, hoveredPoint) {
-    var title = '<span style="font-size: small">' + chartInfo.title + '</span>';
+  function Charter(str, hoveredPoint) {
+    var strid = str.strid;
+    var variables = str.variables;
+
+    var title = '<span style="font-size: small">' + str.strid + (str.name ? ' - ' + str.name : '') + '</span>';
+
+    var yAxisList = str.chartStyle && str.chartStyle.yAxis;
+
     var initialSeriesData = _.map(variables, function(varProps, varName) {
       console.debug("varName=", varName, "varProps=", varProps);
       var chartStyle = varProps.chartStyle || {};
-      var yAxis = chartStyle.yAxis || {};
-      return {
+
+      var options = {
+        yAxis: chartStyle.yAxis,
         name: varName + (varProps.units ? ' (' +varProps.units+ ')' : ''),
         data: []
         ,marker: {
           enabled: true,
           radius: 2
         }
-        ,lineWidth: yAxis.lineWidth || 1
+        ,lineWidth: chartStyle.lineWidth || 1
+        ,type: chartStyle.type
+        ,dataGrouping: chartStyle.dataGrouping || { enabled: true, approximation: 'open'}
+
         //,states: {
         //  hover: {
         //    lineWidthPlus: 0
         //  }
         //}
       };
+      console.debug("varName=", varName, "options=", _.cloneDeep(options));
+
+      return options;
     });
+
     var chart = undefined;
     var serieses = undefined;
 
@@ -627,12 +637,14 @@
         },
         legend: { enabled: false },
 
-        series: initialSeriesData || [],
+        series: initialSeriesData,
+
+        yAxis: yAxisList,
 
         tooltip: {
-          pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>',
-          valueDecimals: 4,
-          shared: true
+          // pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>',
+          valueDecimals: 4
+          // ,shared: true
 
           // why is not the <table> working?
           // ,useHTML: true
@@ -676,7 +688,7 @@
         },
 
         title: { text: title },
-        //subtitle: { text: info.subtitle },
+        //subtitle: { text: str.description },
 
         navigator: {
           enabled: true

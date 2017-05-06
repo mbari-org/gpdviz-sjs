@@ -42,7 +42,36 @@ function add_str1() {
 	http post ${GPDVIZ}/api/ss/${SS} strid=str1 \
 	     name="Stream one" \
 	     description="Description of Stream one" \
-	     variables:='{ "baz": {"units":"m"}, "bam": {"units":"Ω", "chartStyle": {"yAxis": {"lineWidth": 2} }} }' \
+	     chartStyle:='{
+	       "height": "500px",
+            "yAxis": [{
+	             "height": "50%",
+	             "title": {"text": "baz (m)"},
+	             "opposite": false,
+	             "offset": -10
+	           }, {
+	             "top": "55%",
+	             "height": "45%",
+	             "title": {"text": "bam (Ω)"},
+	             "opposite": false,
+	             "offset": -10
+            }]
+	     }' \
+	     variables:='{
+	       "baz": {
+	         "units": "m",
+	         "chartStyle": {
+	           "yAxis": 0,
+	           "type": "column"
+	         }
+	       },
+	       "bam": {
+	         "units": "Ω",
+	         "chartStyle": {
+	           "yAxis": 1
+	         }
+	       }
+	     }' \
 	     mapStyle:='{"color":"green", "dashArray": "5,5"}' > /dev/null
 }
 
@@ -193,8 +222,8 @@ function add_scalars() {
 	observations='{'
 	comma=""
 	for i in `seq ${secs}`; do
-		val0=$(( (RANDOM % 100) + 1 ))
-		val1=$(( (RANDOM % 100) + 1 ))
+		val0=$(( RANDOM % 1000 - 500 ))
+		val1=$(( RANDOM % 100 ))
 		lat="36.7$((   RANDOM % 1000 ))"
 		lon="-122.2$(( RANDOM % 1000 ))"
     	read -r -d '' element <<-EOF
