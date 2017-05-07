@@ -236,8 +236,8 @@ function add_scalars() {
 	for i in `seq ${secs}`; do
 		val0=$(( RANDOM % 1000 - 500 ))
 		val1=$(( RANDOM % 100 ))
-		lat="36.7$((   RANDOM % 1000 ))"
-		lon="-122.2$(( RANDOM % 1000 ))"
+		lat="36.8$((   RANDOM % 1000 ))"
+		lon="-122.1$(( RANDOM % 1000 ))"
     	read -r -d '' element <<-EOF
 		  "${timestamp}": [{
             "scalarData": {
