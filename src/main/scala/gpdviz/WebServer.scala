@@ -44,9 +44,6 @@ case class StreamRegister(strid:        String,
                           chartStyle:   Option[JsObject] = None
                           )
 
-case class ObsRegister(values: List[DataObs]
-                       )
-
 case class ObservationsRegister(observations: Map[String, List[ObsData]])
 
 
@@ -55,13 +52,10 @@ trait JsonImplicits extends DefaultJsonProtocol with SprayJsonSupport with GeoJs
   implicit val ssRegFormat  = jsonFormat5(SSRegister)
   implicit val ssUpdFormat  = jsonFormat3(SSUpdate)
   implicit val strRegFormat = jsonFormat7(StreamRegister)
-  implicit val tsdFormat    = jsonFormat3(TimestampedData)
-  implicit val obsFormat    = jsonFormat4(DataObs)
-  implicit val obsRegFormat = jsonFormat1(ObsRegister)
 
   implicit val scalarDataFormat = jsonFormat3(ScalarData)
   implicit val obsDataFormat  = jsonFormat3(ObsData)
-  implicit val streamFormat  = jsonFormat9(DataStream)
+  implicit val streamFormat  = jsonFormat8(DataStream)
   implicit val obssRegFormat = jsonFormat1(ObservationsRegister)
   implicit val systemFormat  = jsonFormat6(SensorSystem)
 
@@ -112,12 +106,7 @@ trait MyService extends SimpleRoutingApp with JsonImplicits  {
     }
 
     val oneStrRoute = pathPrefix("api" / "ss" / Segment / Segment) { case (sysid, strid) =>
-      (post & entity(as[ObsRegister])) { obsr =>
-        complete {
-          addObservation(sysid, strid, obsr)
-        }
-      } ~
-        get {
+      get {
           complete {
             getStream(sysid, strid)
           }
@@ -230,26 +219,6 @@ trait MyService extends SimpleRoutingApp with JsonImplicits  {
     }
   }
 
-  private def addObservation(sysid: String, strid: String, obsr: ObsRegister): ToResponseMarshallable = withSensorSystem(sysid) { ss =>
-    //println(s"addObservation: sysid=$sysid, strid=$strid, obsr=$obsr")
-    ss.streams.get(strid) match {
-      case Some(str) =>
-        val newObs = obsr.values
-        val obsUpdated: List[DataObs] = str.obs.getOrElse(List.empty) ++ newObs
-        val strUpdated = str.copy(obs = Some(obsUpdated))
-        val ssUpdated = ss.copy(streams = ss.streams.updated(strid, strUpdated))
-        db.saveSensorSystem(ssUpdated) match {
-          case Right(uss) =>
-            notifier.notifyObservationsAdded(uss, strid, newObs)
-            newObs
-
-          case Left(error) => InternalServerError -> error
-        }
-
-      case None => streamUndefined(sysid, strid)
-    }
-  }
-
   private def addObservations(sysid: String, strid: String, obssr: ObservationsRegister): ToResponseMarshallable = withSensorSystem(sysid) { ss =>
     println(s"addObservations: sysid=$sysid, strid=$strid, obssr=${obssr.observations.size}")
     ss.streams.get(strid) match {
@@ -257,7 +226,12 @@ trait MyService extends SimpleRoutingApp with JsonImplicits  {
         val newObs = obssr.observations
         val previous = str.observations.getOrElse(Map.empty)
         var obsUpdated = previous
-        newObs foreach { case (k, v) ⇒ obsUpdated = obsUpdated.updated(k, v) }
+        newObs foreach { case (k, v) ⇒
+          //v.map(_.geometry).filter(_.isDefined).map(_.get) foreach {geometry ⇒
+          //  println(s"::: geometry: type=${geometry.getType}: $geometry")
+          //}
+          obsUpdated = obsUpdated.updated(k, v)
+        }
         val strUpdated = str.copy(observations = Some(obsUpdated))
         val ssUpdated = ss.copy(streams = ss.streams.updated(strid, strUpdated))
         db.saveSensorSystem(ssUpdated) match {

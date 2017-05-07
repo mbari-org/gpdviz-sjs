@@ -1,7 +1,8 @@
 # gpdviz2
 
-2017-05-05
+2017-05-06
 
+- removal of previous "chart_ts_data" stuff 
 - yAxis indicated by client
 - DataStream: 'variables' as an JsObject to be able to associate properties per variable definition
 - DataStream: rename style to mapStyle, and add chartStyle

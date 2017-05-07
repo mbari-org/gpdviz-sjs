@@ -26,12 +26,7 @@ class Db(dataDir: String) extends JsonImplicits {
   }
 
   def saveSensorSystem(ss: SensorSystem): Either[GnError, SensorSystem] = {
-    // make sure the data in each stream are sorted in increasing timestamp
-    val ordered = ss.streams.mapValues { dataStream =>
-      val orderedObs = dataStream.obs.map { _.sortBy(_.timestamp) }
-      dataStream.copy(obs = orderedObs)
-    }
-    doSave(ss.copy(streams = ordered))
+    doSave(ss)
   }
 
   def deleteSensorSystem(sysid: String): Either[GnError, SensorSystem] = {

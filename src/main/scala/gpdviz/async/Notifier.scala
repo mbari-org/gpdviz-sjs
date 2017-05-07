@@ -6,7 +6,7 @@ import spray.json._
 import com.typesafe.config.Config
 import com.pusher.rest.Pusher
 import gpdviz.JsonImplicits
-import gpdviz.model.{DataObs, DataStream, ObsData, SensorSystem}
+import gpdviz.model.{DataStream, ObsData, SensorSystem}
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
@@ -47,35 +47,8 @@ class Notifier(config: Config) extends JsonImplicits {
     }
   }
 
-  def notifyObservationsAdded(ss: SensorSystem, strid: String, obss: List[DataObs]): Unit = {
-    if (ss.pushEvents) {
-      //println(s"notifyObservationsAdded: strid=$strid obss=$obss")
-      val obs = obss map { o =>
-        // NOTE: just passing the JSON result as a plain string.
-        // (We could probably do some pusher configuration, via Gson serializer,
-        // and pass the JsValue here.)
-        var map = Map[String, Any]("timestamp" -> o.timestamp)
-        o.feature.foreach(x => map = map.updated("feature", x.toJson.compactPrint))
-        o.geometry.foreach(x => map = map.updated("geometry", x.toJson.compactPrint))
-        o.chartTsData.foreach(x => map = map.updated("chartTsData", x.toJson.compactPrint))
-        map.asJava
-      }
-      @tailrec
-      def rec(from: Int): Unit = {
-        if (from < obs.length) {
-          val next = Math.min(from + 15, obs.length)
-          val slice = obs.slice(from, next)
-          val map = Map("sysid" -> ss.sysid, "strid" -> strid, "obss" -> slice.asJava)
-          notifyEvent(ss.sysid, "observationsAdded", map.asJava)
-          rec(next)
-        }
-      }
-      rec(0)
-    }
-  }
-
   def notifyObservations2Added(ss: SensorSystem, strid: String, observations: Map[String, List[ObsData]]): Unit = if (ss.pushEvents) {
-    println(s"notifyObservations2Added: strid=$strid observations=${observations.size}")
+    //println(s"notifyObservations2Added: strid=$strid observations=${observations.size}")
     val obs = observations mapValues { list =>
       // NOTE: just passing the JSON result as a plain string.
       // (We could probably do some pusher configuration, via Gson serializer,

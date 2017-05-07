@@ -8,20 +8,10 @@ function run() {
 	unregister
 	register
 
-	add_str1
-	add_str1_values
-	add_scalars str1
-
-	add_str2
-	add_str3
-
-	add_str2_values
-	add_str3_values
-
-	add_str2_data
-
-	add_str4_and_point
-	add_delayed_data str4
+    generate_str1
+    generate_str2
+    generate_str3
+    generate_str4
 }
 
 function unregister() {
@@ -35,6 +25,110 @@ function register() {
 	     name='Test sensor system' \
 	     center:='{"lat":36.82, "lon":-122}' \
 	     pushEvents:=true > /dev/null
+}
+
+function generate_str1() {
+	add_str1
+	now="`date +%s`000"
+	secs=60
+	timestamp=$(( now - secs * 1000 ))
+	add_str1_polygon ${timestamp}
+	add_scalars str1 $(( timestamp + 1000 )) $(( secs - 1 ))
+}
+
+function generate_str2() {
+	add_str2
+	
+	secs=30
+	timestamp=$(( timestamp - secs * 1000 ))
+	
+	# geometries:
+	read -r -d '' geometry <<-EOF
+	  "${timestamp}": [
+	    {
+		  "geometry": {
+			"type": "Point",
+			"coordinates": [-121.906,36.882]
+		  }
+		}, {
+		  "feature": {
+			"properties": {
+			  "style": {"color":"cyan", "radius": 20, "dashArray": "5,5"}
+			},
+			"geometry": {
+			  "type": "Point",
+			  "coordinates": [-121.965,36.81]
+			}
+		  }
+		}]
+EOF
+    observations="{${geometry}}"
+    add_observations str2 "${observations}"
+	
+	# data:
+	echo "chart data: str2"
+	observations='{'
+	comma=""
+	for i in `seq ${secs}`; do
+		timestamp=$(( timestamp + 1000 ))
+		val0=$(( (RANDOM % 100) + 1 ))
+		val1=$(( (RANDOM % 100) + 1 ))
+		
+		# element='{ "timestamp": '${timestamp}', "chartTsData": [ { "timestamp": '${timestamp}', "values": [ '${val0}', '${val1}' ] } ]}'
+		
+        read -r -d '' element <<-EOF
+          "${timestamp}": [{
+            "scalarData": {
+              "vars": ["foo", "bar"],
+              "vals": [${val0}, ${val1}]
+            }}]
+EOF
+		observations="${observations}${comma}${element}"
+		comma=","
+	done
+	observations="${observations}}"
+	add_observations str2 "${observations}"
+}
+
+function generate_str3() {
+	add_str3
+
+	timestamp="`date +%s`000"
+    read -r -d '' geometry <<-EOF
+      "${timestamp}": [{
+        "geometry": {
+			"type": "LineString",
+			"coordinates": [
+			    [-122.123,36.92], [-122.186,36.774], [-121.9,36.7]
+			]
+        }
+      }]
+EOF
+    observations="{${geometry}}"
+    add_observations str3 "${observations}"
+}
+
+function generate_str4() {
+    strid=str4
+	http post ${GPDVIZ}/api/ss/${SS} strid=${strid} \
+	    name="${strid}_name" \
+	    variables:='{ "temperature": {"units":"°C"} }' \
+	    mapStyle:='{"color":"yellow", "radius": 10}' zOrder:=10 > /dev/null
+
+	timestamp="`date +%s`000"
+    read -r -d '' geometry <<-EOF
+      "${timestamp}": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.09,36.865]
+          }
+      }]
+EOF
+    observations="{${geometry}}"
+    add_observations "${strid}" "${observations}"
+    echo "added ${strid} point: timestamp=${timestamp}"
+	
+	add_delayed_data ${strid} temperature 10
 }
 
 function add_str1() {
@@ -88,121 +182,40 @@ function add_str3() {
 	     mapStyle:='{"color":"blue"}' > /dev/null
 }
 
-function add_str1_values() {
-	timestamp="`date +%s`000"
-	read -r -d '' values <<-EOF
-		[{
-		  "timestamp": ${timestamp},
-		  "feature": {
-			"properties": {},
-			"geometry": {
-			  "type": "Polygon",
-			  "coordinates": [
-				[[-121.8564,36.9], [-122.2217,36.9574], [-122.0945,36.6486], [-121.8674,36.6858]]
-			  ]
-			}
-		  }
-		}]
+function add_str1_polygon() {
+	timestamp=$1
+    read -r -d '' geometry <<-EOF
+      "${timestamp}": [{
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [[-121.8564,36.9], [-122.2217,36.9574], [-122.0945,36.6486], [-121.8674,36.6858]]
+          ]
+        }
+      }]
 EOF
-	add_values str1 "${values}"
+    observations="{${geometry}}"
+    add_observations str1 "${observations}"
 }
 
-function add_str2_values() {
-	timestamp="`date +%s`000"
-	read -r -d '' values <<-EOF
-		[{
-		  "timestamp": ${timestamp},
-		  "geometry": {
-			"type": "Point",
-			"coordinates": [-121.906,36.882]
-		  }
-		 },{
-		  "timestamp": ${timestamp},
-		  "feature": {
-			"properties": {
-			  "style": {"color":"cyan", "radius": 20, "dashArray": "5,5"}
-			},
-			"geometry": {
-			  "type": "Point",
-			  "coordinates": [-121.965,36.81]
-			}
-		  }
-		}]
-EOF
-	add_values str2 "${values}"
-}
-
-function add_str3_values() {
-	timestamp="`date +%s`000"
-	read -r -d '' values <<-EOF
-		[{"timestamp": ${timestamp},
-		  "geometry": {
-			"type": "LineString",
-			"coordinates": [
-			[-122.123,36.92], [-122.186,36.774], [-121.9,36.7]
-			]
-		  }
-		}]
-EOF
-	add_values str3 "${values}"
-}
-
-function add_values() {
-	strid=$1
-	values=$2
-	http post ${GPDVIZ}/api/ss/${SS}/${strid} \
-	     values:="${values}" > /dev/null
-}
-
-function add_str2_data() {
-	strid=str2
-	echo "chart data: ${strid}"
-	timestamp="`date +%s`000"
-	secs=30
-	timestamp=$(( timestamp - secs * 1000 ))
-	values='['
-	comma=""
-	for i in `seq ${secs}`; do
-		val0=$(( (RANDOM % 100) + 1 ))
-		val1=$(( (RANDOM % 100) + 1 ))
-		element='{ "timestamp": '${timestamp}', "chartTsData": [ { "timestamp": '${timestamp}', "values": [ '${val0}', '${val1}' ] } ]}'
-		values="${values}${comma}${element}"
-		comma=","
-		timestamp=$(( timestamp + 1000 ))
-	done
-	values="${values}]"
-	add_values "${strid}" "${values}"
-}
-
-function add_str4_and_point() {
-    strid=str4
-	http post ${GPDVIZ}/api/ss/${SS} strid=${strid} \
-	    variables:='{ "temperature": {"units":"°C"} }' \
-	    mapStyle:='{"color":"yellow", "radius": 10}' zOrder:=10 > /dev/null
-	timestamp="`date +%s`000"
-	read -r -d '' values <<-EOF
-		[{
-		  "timestamp": ${timestamp},
-		  "geometry": {
-			"type": "Point",
-			"coordinates": [-122.09,36.865]
-		  }
-		}]
-EOF
-	http post ${GPDVIZ}/api/ss/${SS}/${strid} \
-	     values:="${values}" > /dev/null
-	
-}
 function add_delayed_data() {
     strid=$1
-	secs=30
+    varName=$2
+	secs=$3
 	for i in `seq ${secs}`; do
+        sleep 1
 	    timestamp="`date +%s`000"
 		val=$(( (RANDOM % 100) + 1 ))
-		element='{ "timestamp": '${timestamp}', "chartTsData": [ { "timestamp": '${timestamp}', "values": ['${val}'] } ] }'
-        add_values "${strid}" "[${element}]"
-	    echo "added value to ${strid}: ${val}  timestamp=${timestamp}"
-        sleep 1
+        read -r -d '' element <<-EOF
+          "${timestamp}": [{
+            "scalarData": {
+              "vars": ["${varName}"],
+              "vals": [${val}]
+            }}]
+EOF
+        observations="{${element}}"
+        add_observations "${strid}" "${observations}"
+	    echo "added observation to ${strid}: timestamp=${timestamp}"  # ${observations}"
 	done
 }
 
@@ -210,15 +223,14 @@ function add_observations() {
 	strid=$1
 	observations=$2
 	http post ${GPDVIZ}/api/ss/${SS}/${strid}/obs \
-	     observations:="${observations}"
+	     observations:="${observations}" > /dev/null
 }
 
 function add_scalars() {
 	strid=$1
-	echo "scalarData: ${strid}"
-	timestamp="`date +%s`000"
-	secs=60
-	timestamp=$(( timestamp - secs * 1000 ))
+	timestamp=$2
+	secs=$3
+	echo "scalarData: ${strid} timestamp=${timestamp}  secs=${secs}"
 	observations='{'
 	comma=""
 	for i in `seq ${secs}`; do

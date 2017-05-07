@@ -71,8 +71,8 @@
                   <span ng-bind="str.latestIso"></span>
                 </div>
                 <!--ul>
-                  <li ng-repeat="obs in str.obs">
-                    <span ng-bind="obs.timestamp + ': ' + (obs.chartTsData|json)"></span>
+                  <li ng-repeat="(timestamp, obs) in str.observations">
+                    <span ng-bind="timestamp + ': ' + (obs|json)"></span>
                   </li>
                 </ul-->
               </li>

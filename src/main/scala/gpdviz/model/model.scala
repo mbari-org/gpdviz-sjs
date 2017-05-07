@@ -21,8 +21,7 @@ case class DataStream(strid:    String,
                       zOrder:       Int = 0,
                       variables:    Option[JsObject] = None,
                       chartStyle:   Option[JsObject] = None,
-                      observations: Option[Map[String, List[ObsData]]] = None,
-                      obs:          Option[List[DataObs]] = None
+                      observations: Option[Map[String, List[ObsData]]] = None
                       )
 
 case class ObsData(feature:     Option[Feature] = None,
@@ -33,13 +32,3 @@ case class ObsData(feature:     Option[Feature] = None,
 case class ScalarData(vars:      List[String],
                       vals:      List[Double],
                       position:  Option[LatLon] = None)
-
-case class TimestampedData(timestamp: Long,
-                           values:    List[Double],
-                           position:  Option[LatLon] = None)
-
-case class DataObs(timestamp:   Long,
-                   feature:     Option[Feature] = None,
-                   geometry:    Option[Geometry] = None,
-                   chartTsData: Option[List[TimestampedData]] = None
-                   )

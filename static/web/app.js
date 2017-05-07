@@ -160,7 +160,7 @@
 
       var streams = _.sortBy(_.values(vm.ss.streams), 'zOrder');
       _.each(streams, function (str) {
-        byStrId[str.strid] = {str: str};
+        byStrId[str.strid] = {str: str, charter: createCharter(str)};
 
         // little hack: add non-scalarData observations first...
         _.each(str.observations, function (obss, timestamp) {
@@ -169,43 +169,20 @@
               addObs2(str, timestamp, obs);
           });
         });
-        _.each(str.obs, function (obs) {
-          if (!obs.chartTsData)
-            addObs(str, obs);
-        });
+
+        str.numberObs = 0;
 
         // ... so the marker has already been associated to the relevant streams:
         _.each(str.observations, function (obss, timestamp) {
+          // TODO refine the following for numberObs, latestIso
+          str.numberObs += 1;
+          str.latestIso = moment.utc(timestamp).format();
+
           _.each(obss, function(obs) {
             if (obs.scalarData)
               addObs2(str, timestamp, obs);
           });
         });
-        _.each(str.obs, function (obs) {
-          if (obs.chartTsData)
-            addObs(str, obs);
-        });
-
-        str.numberObs = 0;
-        if (str.obs && str.obs.length) {
-          var latestTsd = str.obs[str.obs.length-1];
-          if (latestTsd.chartTsData && latestTsd.chartTsData.length) {
-            var timestamp = latestTsd.chartTsData[latestTsd.chartTsData.length - 1].timestamp;
-          }
-          else {
-            timestamp = latestTsd.timestamp;
-          }
-          str.latestIso = moment.utc(timestamp).format();
-
-          _.each(str.obs, function(obs) {
-            if (obs.chartTsData) {
-              str.numberObs += obs.chartTsData.length;
-            }
-            else {
-              str.numberObs += 1;
-            }
-          })
-        }
       });
       vm.ss.orderedStreams = _.chain(streams).values().sortBy('strid').value();
     }
@@ -233,10 +210,10 @@
 
       else if (what === 'streamAdded') {
         str = angular.fromJson(data.str);
-        str.obs = [];
+        str.observations = {};
         $scope.$apply(function () {
           vm.ss.streams[str.strid] = str;
-          byStrId[str.strid] = {str: str};
+          byStrId[str.strid] = {str: str, charter: createCharter(str)};
         });
       }
 
@@ -244,7 +221,7 @@
         str = vm.ss.streams[data.strid];
         //if (debug)
         //console.debug("observations2Added: str=", str, "data.strid=", data.strid);
-        //console.debug("observations2Added: data.obss=", _.cloneDeep(data.obss));
+        console.debug("observations2Added: data.obss=", _.cloneDeep(data.obss));
         str.observations = str.observations || {};
         $scope.$apply(function () {
           _.each(data.obss, function (obsData, timestamp) {
@@ -255,24 +232,6 @@
             //console.debug("&& timestamp=", +timestamp, moment.utc(+timestamp).format(), "obs=", obs);
             str.observations[+timestamp] = obs;
             addObs2(str, +timestamp, obs);
-          });
-        });
-      }
-
-      else if (what === 'observationsAdded') {
-        str = vm.ss.streams[data.strid];
-        if (debug) console.debug("str=", str, "data.strid=", data.strid, "data.obss=", data.obss);
-        str.obs = str.obs || [];
-        $scope.$apply(function () {
-          _.each(data.obss, function (data_obs) {
-            var obs = {
-              timestamp: data_obs.timestamp,
-              feature:   data_obs.feature ? angular.fromJson(data_obs.feature) : undefined,
-              geometry:  data_obs.geometry? angular.fromJson(data_obs.geometry) : undefined,
-              chartTsData: data_obs.chartTsData ? angular.fromJson(data_obs.chartTsData) : undefined
-            };
-            str.obs.push(obs);
-            addObs(str, obs);
           });
         });
       }
@@ -296,17 +255,17 @@
       }
 
       else {
-        console.warn("Unexpected notification: payload=", payload)
+        console.error("Unexpected notification: payload=", payload)
       }
     }
 
     map.on('popupopen', function(e) {
       var strid = e.popup && e.popup._strid;
       var str = strid && byStrId[strid].str;
-      //console.debug("popupopen: str=", str);
-      if (str && byStrId[strid].charter) {
-        //console.debug("popupopen: charter=", byStrId[str.strid].charter);
-        byStrId[str.strid].charter.activate();
+      var charter = str && byStrId[strid].charter;
+      // console.debug("popupopen: str=", str, "has-charter=", !!charter);
+      if (charter) {
+        charter.activate();
       }
     });
     map.on('popupclose', function(e) {
@@ -324,116 +283,28 @@
       });
     });
 
-    function addObs(str, obs) {
-      if (!obs.chartTsData && !obs.feature && !obs.geometry) {
-        console.error("expecting observation with feature, geometry, or chartTsData");
-        return;
-      }
-
-      var popupInfo;
-
-      if (obs.chartTsData) {
-        //console.debug("str=", str, "obs.chartTsData=", obs.chartTsData);
-        if (!byStrId[str.strid].charter) {
-          byStrId[str.strid].charter = Charter(str, function(point) {
-            if (point) {
-              //console.debug("hovered point=", point.x, vm.hoveredPoint);
-              $scope.$apply(function() {
-                vm.hoveredPoint.isoTime = moment.utc(point.x).format();
-                var p = positionsByTime.get(str.strid, point.x);
-                if (p) {
-                  vm.hoveredPoint.position = p;
-                  addSelectionPoint([p.lat, p.lon]);
-                }
-              });
+    function createCharter(str) {
+      return Charter(str, function(point) {
+        if (point) {
+          //console.debug("hovered point=", point.x, vm.hoveredPoint);
+          $scope.$apply(function() {
+            vm.hoveredPoint.isoTime = moment.utc(point.x).format();
+            var p = positionsByTime.get(str.strid, point.x);
+            if (p) {
+              vm.hoveredPoint.position = p;
+              addSelectionPoint([p.lat, p.lon]);
             }
           });
         }
-        _.each(obs.chartTsData, function(tsd) {
-          _.each(tsd.values, function(v, index) {
-            if (byStrId[str.strid].maxTimestamp === undefined
-              || byStrId[str.strid].maxTimestamp < tsd.timestamp) {
-              byStrId[str.strid].maxTimestamp = tsd.timestamp;
-              byStrId[str.strid].charter.addChartPoint(index, tsd.timestamp, v);
-            }
-            if (tsd.position) {
-              positionsByTime.set(str.strid, tsd.timestamp, tsd.position);
-            }
-          });
-        });
-
-        if (byStrId[str.strid].marker && !byStrId[str.strid].popupInfo) {
-          if (debug) console.debug("setting popup for stream ", str.strid);
-          popupInfo = L.popup({
-            //autoClose: false, closeOnClick: false
-            minWidth: 550
-          });
-          popupInfo._strid = str.strid;
-
-          var height = str.chartStyle && str.chartStyle.height || '300px';
-          popupInfo.setContent('<div id="' +"chart-container-" + str.strid +
-            '" style="min-width:500px;height:' +height+ ';margin:0 auto"></div>');
-
-          byStrId[str.strid].marker.bindPopup(popupInfo);
-          byStrId[str.strid].popupInfo = popupInfo;
-        }
-        return;
-      }
-
-      var mapStyle = str.mapStyle || {};
-
-      if (obs.feature) {
-        var geojson = angular.fromJson(obs.feature);
-        var geometry = obs.feature.geometry;
-        if (obs.feature.properties && obs.feature.properties.style) {
-          mapStyle = _.assign(mapStyle, obs.feature.properties.style);
-        }
-      }
-      else {
-        geojson = angular.fromJson(obs.geometry);
-        geometry = obs.geometry;
-      }
-
-      if (debug) console.debug("addObs: mapStyle=", mapStyle, "str=", str, "geojson=", geojson);
-
-      addMarker(str, function() {
-        return  L.geoJSON(geojson, {
-          style: mapStyle,
-          pointToLayer: function (feature, latlng) {
-            if (!mapStyle.radius) {
-              mapStyle.radius = 5;
-            }
-            return L.circleMarker(latlng, mapStyle);
-          }
-        });
       });
     }
-
     function addObs2(str, timestamp, obs) {
-
-      if (byStrId[str.strid].maxTimestamp === undefined
-        || byStrId[str.strid].maxTimestamp < timestamp) {
-        byStrId[str.strid].maxTimestamp = timestamp;
-      }
-
       var popupInfo;
 
       if (obs.scalarData) {
         //console.debug("addObs2: str=", str, "obs.scalarData=", obs.scalarData);
         if (!byStrId[str.strid].charter) {
-          byStrId[str.strid].charter = Charter(str, function(point) {
-            if (point) {
-              //console.debug("hovered point=", point.x, vm.hoveredPoint);
-              $scope.$apply(function() {
-                vm.hoveredPoint.isoTime = moment.utc(point.x).format();
-                var p = positionsByTime.get(str.strid, point.x);
-                if (p) {
-                  vm.hoveredPoint.position = p;
-                  addSelectionPoint([p.lat, p.lon]);
-                }
-              });
-            }
-          });
+          byStrId[str.strid].charter = createCharter(str);
         }
 
         var indexes = _.map(obs.scalarData.vars, function(varName) {
@@ -469,35 +340,39 @@
         return;
       }
 
-      var mapStyle = str.mapStyle || {};
+      function markerCreator(geojson, mapStyle) {
+        return function() {
+          return L.geoJSON(geojson, {
+            style: mapStyle,
+            pointToLayer: function (feature, latlng) {
+              if (!mapStyle.radius) {
+                mapStyle.radius = 5;
+              }
+              return L.circleMarker(latlng, mapStyle);
+            }
+          });
+        }
+      }
 
       if (obs.feature) {
-        console.debug("addObs2: str=", str, "obs.feature=", obs.feature);
+        var mapStyle = str.mapStyle ? _.cloneDeep(str.mapStyle) : {};
+        // console.debug("addObs2: str=", str, "obs.feature=", obs.feature);
         var geojson = angular.fromJson(obs.feature);
-        var geometry = obs.feature.geometry;
         if (obs.feature.properties && obs.feature.properties.style) {
           mapStyle = _.assign(mapStyle, obs.feature.properties.style);
         }
+        addMarker(str, markerCreator(geojson, mapStyle));
       }
-      else {
-        console.debug("addObs2: str=", str, "obs.geometry=", obs.geometry);
+
+      if (obs.geometry) {
+        console.debug("addObs2: obs.geometry=", obs.geometry);
+        mapStyle = str.mapStyle ? _.cloneDeep(str.mapStyle) : {};
+        // console.debug("addObs2: str=", str, "obs.geometry=", obs.geometry);
         geojson = angular.fromJson(obs.geometry);
-        geometry = obs.geometry;
+        addMarker(str, markerCreator(geojson, mapStyle));
       }
 
-      if (debug) console.debug("addObs: mapStyle=", mapStyle, "str=", str, "geojson=", geojson);
-
-      addMarker(str, function() {
-        return  L.geoJSON(geojson, {
-          style: mapStyle,
-          pointToLayer: function (feature, latlng) {
-            if (!mapStyle.radius) {
-              mapStyle.radius = 5;
-            }
-            return L.circleMarker(latlng, mapStyle);
-          }
-        });
-      });
+      if (debug) console.debug("addObs2: mapStyle=", mapStyle, "str=", str, "geojson=", geojson);
     }
 
     (function prepareAdjustMapUponWindowResize() {
@@ -560,7 +435,7 @@
     var yAxisList = str.chartStyle && str.chartStyle.yAxis;
 
     var initialSeriesData = _.map(variables, function(varProps, varName) {
-      console.debug("varName=", varName, "varProps=", varProps);
+      // console.debug("varName=", varName, "varProps=", varProps);
       var chartStyle = varProps.chartStyle || {};
 
       var options = {
@@ -581,13 +456,15 @@
         //  }
         //}
       };
-      console.debug("varName=", varName, "options=", _.cloneDeep(options));
+      // console.debug("varName=", varName, "options=", _.cloneDeep(options));
 
       return options;
     });
 
     var chart = undefined;
     var serieses = undefined;
+
+    var lastAddedX = {};  // {seriesIndex -> x}
 
     return {
       strid: strid,
@@ -598,10 +475,27 @@
 
     function addChartPoint(seriesIndex, x, y) {
       //console.debug("addChartPoint: strid=", strid, "x=", x, "y=", y);
-      initialSeriesData[seriesIndex].data.push([+x, y]);
+      x = +x;
+
+      initialSeriesData[seriesIndex].data.push([x, y]);
+
       if (serieses) {
-        serieses[seriesIndex].addPoint([+x, y], true, true);
+        var lastX = lastAddedX[seriesIndex];
+        if (lastX === undefined) {
+          lastAddedX[seriesIndex] = x;
+          console.error("strid=" +strid+ " seriesIndex=" +seriesIndex+": FIRST x(" +x+ ")");
+        }
+        else if (x <= lastX) {
+          console.error("strid=" +strid+ " seriesIndex=" +seriesIndex+": x(" +x+ ") <= lastX(" +lastX+ ") diff=" + (lastX - x));
+        }
+        else {
+          lastAddedX[seriesIndex] = x;
+        }
+
+        // addPoint (Object options, [Boolean redraw], [Boolean shift], [Mixed animation])
+        serieses[seriesIndex].addPoint([x, y], true);
       }
+      // else console.error("!!! no serieses !!!!!");
     }
 
     function activate() {
@@ -622,6 +516,7 @@
     }
 
     function deactivate() {
+      lastAddedX = {};
       if (chart) chart.destroy();
       chart = undefined;
       serieses = undefined;
