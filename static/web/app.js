@@ -500,7 +500,7 @@
         var lastX = lastAddedX[seriesIndex];
         if (lastX === undefined) {
           lastAddedX[seriesIndex] = x;
-          console.error("strid=" +strid+ " seriesIndex=" +seriesIndex+": FIRST x(" +x+ ")");
+          // console.error("strid=" +strid+ " seriesIndex=" +seriesIndex+": FIRST x(" +x+ ")");
         }
         else if (x <= lastX) {
           console.error("strid=" +strid+ " seriesIndex=" +seriesIndex+": x(" +x+ ") <= lastX(" +lastX+ ") diff=" + (lastX - x));
