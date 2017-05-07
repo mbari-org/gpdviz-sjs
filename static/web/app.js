@@ -162,11 +162,12 @@
       _.each(streams, function (str) {
         byStrId[str.strid] = {str: str, charter: createCharter(str)};
 
-        // little hack: add non-scalarData observations first...
+        // TODO improve the following.  Little hack: add non-scalarData observations first...
         _.each(str.observations, function (obss, timestamp) {
           _.each(obss, function(obs) {
-            if (!obs.scalarData)
+            if (!obs.scalarData) {
               addObs2(str, timestamp, obs);
+            }
           });
         });
 
@@ -175,12 +176,13 @@
         // ... so the marker has already been associated to the relevant streams:
         _.each(str.observations, function (obss, timestamp) {
           // TODO refine the following for numberObs, latestIso
-          str.numberObs += 1;
-          str.latestIso = moment.utc(timestamp).format();
+          str.latestIso = moment.utc(+timestamp).format();
 
           _.each(obss, function(obs) {
-            if (obs.scalarData)
+            str.numberObs += 1;
+            if (obs.scalarData) {
               addObs2(str, timestamp, obs);
+            }
           });
         });
       });
@@ -208,6 +210,17 @@
         window.location.reload(true);
       }
 
+      else if (what === 'sensorSystemUnregistered') {
+        $scope.$apply(function () {
+          vm.ss = undefined;
+        });
+        clearMarkers();
+      }
+
+      else if (!vm.ss) {
+        console.warn("handleNotification: vm.ss is undefined! Ignoring:", what);
+      }
+
       else if (what === 'streamAdded') {
         str = angular.fromJson(data.str);
         str.observations = {};
@@ -221,7 +234,7 @@
         str = vm.ss.streams[data.strid];
         //if (debug)
         //console.debug("observations2Added: str=", str, "data.strid=", data.strid);
-        console.debug("observations2Added: data.obss=", _.cloneDeep(data.obss));
+        // console.debug("observations2Added: data.obss=", _.cloneDeep(data.obss));
         str.observations = str.observations || {};
         $scope.$apply(function () {
           _.each(data.obss, function (obsData, timestamp) {
@@ -231,6 +244,8 @@
             if (obsData.scalarData) obs.scalarData  = angular.fromJson(obsData.scalarData);
             //console.debug("&& timestamp=", +timestamp, moment.utc(+timestamp).format(), "obs=", obs);
             str.observations[+timestamp] = obs;
+            str.numberObs += 1;
+            str.latestIso = moment.utc(+timestamp).format();
             addObs2(str, +timestamp, obs);
           });
         });
@@ -245,13 +260,6 @@
 
       else if (what === 'sensorSystemUpdated') {
 
-      }
-
-      else if (what === 'sensorSystemUnregistered') {
-        $scope.$apply(function () {
-          vm.ss = undefined;
-        });
-        clearMarkers();
       }
 
       else {
@@ -365,7 +373,7 @@
       }
 
       if (obs.geometry) {
-        console.debug("addObs2: obs.geometry=", obs.geometry);
+        // console.debug("addObs2: obs.geometry=", obs.geometry);
         mapStyle = str.mapStyle ? _.cloneDeep(str.mapStyle) : {};
         // console.debug("addObs2: str=", str, "obs.geometry=", obs.geometry);
         geojson = angular.fromJson(obs.geometry);

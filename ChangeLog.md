@@ -2,6 +2,7 @@
 
 2017-05-06
 
+- update numberObs and latestIso per stream 
 - removal of previous "chart_ts_data" stuff 
 - yAxis indicated by client
 - DataStream: 'variables' as an JsObject to be able to associate properties per variable definition
