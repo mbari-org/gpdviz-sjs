@@ -474,6 +474,15 @@
 
     var lastAddedX = {};  // {seriesIndex -> x}
 
+    setInterval(function() {
+      if (serieses && serieses.length) {
+        // console.debug("redrawing " +serieses.length+ " series elements");
+        _.each(serieses, function(series) {
+          series.redraw();
+        })
+      }
+    }, 2000);
+
     return {
       strid: strid,
       addChartPoint: addChartPoint,
@@ -501,7 +510,7 @@
         }
 
         // addPoint (Object options, [Boolean redraw], [Boolean shift], [Mixed animation])
-        serieses[seriesIndex].addPoint([x, y], true);
+        serieses[seriesIndex].addPoint([x, y], false);
       }
       // else console.error("!!! no serieses !!!!!");
     }

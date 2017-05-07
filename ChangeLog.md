@@ -2,6 +2,7 @@
 
 2017-05-06
 
+- chart: addPoint with no redraw, and set timer for redraw 
 - update numberObs and latestIso per stream 
 - removal of previous "chart_ts_data" stuff 
 - yAxis indicated by client
