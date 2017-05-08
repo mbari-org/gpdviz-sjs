@@ -1,8 +1,9 @@
 package gpdviz
 
-import com.typesafe.config.ConfigFactory
+import akka.actor.ActorSystem
+import com.typesafe.config.{Config, ConfigFactory}
 import gpdviz.async.Notifier
-import gpdviz.data.Db
+import gpdviz.data.FileDb
 import gpdviz.model._
 import spray.http.StatusCodes._
 import spray.http.ContentTypes._
@@ -12,12 +13,12 @@ import spray.json.JsObject
 
 
 class GpdvizSpec extends FlatSpec with Matchers with ScalatestRouteTest with MyService {
-  val config = ConfigFactory.load().resolve()
+  val config: Config = ConfigFactory.load().resolve()
   val notifier = new Notifier(config)
 
-  override def actorRefFactory = system // connect the DSL to the test ActorSystem
+  override def actorRefFactory: ActorSystem = system // connect the DSL to the test ActorSystem
 
-  val db = new Db("data_test")
+  val db = new FileDb("data_test")
 
   var sysid: Option[String] = None
   val strid = "aStrId"

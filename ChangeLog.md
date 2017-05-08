@@ -1,5 +1,9 @@
 # gpdviz2
 
+2017-05-07
+
+- extract Db trait to prepare for use of actual database system 
+
 2017-05-06
 
 - chart: addPoint with no redraw, and set timer for redraw 

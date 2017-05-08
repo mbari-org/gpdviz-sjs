@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import com.cloudera.science.geojson.GeoJsonProtocol
 import com.typesafe.config.{Config, ConfigFactory}
 import gpdviz.async.Notifier
-import gpdviz.data.Db
+import gpdviz.data.{DbInterface, FileDb, PostgresDb}
 import gpdviz.model._
 import spray.http.StatusCodes._
 import spray.http._
@@ -65,7 +65,7 @@ trait JsonImplicits extends DefaultJsonProtocol with SprayJsonSupport with GeoJs
 
 trait MyService extends SimpleRoutingApp with JsonImplicits  {
   def config: Config
-  def db: Db
+  def db: DbInterface
   def notifier: Notifier
 
   def routes = {
@@ -290,11 +290,17 @@ trait MyService extends SimpleRoutingApp with JsonImplicits  {
 
 object WebServer extends MyService {
   val config: Config = ConfigFactory.load().resolve()
-  val db: Db = new Db("data")
+  val db: DbInterface = {
+    if (config.hasPath("gpdviz.postgres.connection.url"))
+      new PostgresDb(config.getConfig("gpdviz.postgres"))
+    else new FileDb("data")
+  }
   val notifier: Notifier = new Notifier(config)
 
   def main(args: Array[String]) {
     implicit val system = ActorSystem()
+
+    println(s"Gpdviz using: ${db.details}")
 
     val interface = config.getString("gpdviz.http.interface")
     val port = config.getInt("gpdviz.http.port")

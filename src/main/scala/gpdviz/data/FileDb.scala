@@ -11,7 +11,9 @@ import gpdviz.JsonImplicits
 import scala.util.control.NonFatal
 
 
-class Db(dataDir: String) extends JsonImplicits {
+class FileDb(dataDir: String) extends JsonImplicits with DbInterface {
+
+  val details: String = s"File-based database.  dataDir: $dataDir"
 
   def listSensorSystems(): Map[String, SensorSystem] = {
     val files = dataPath.toFile.listFiles.filter(_.getName.endsWith(".ss.json"))
