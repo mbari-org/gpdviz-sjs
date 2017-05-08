@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
 
 import gpdviz.GnError
-import gpdviz.model.SensorSystem
+import gpdviz.model.{SensorSystem, SensorSystemSummary}
 import spray.json._
 import gpdviz.JsonImplicits
 
@@ -13,14 +13,16 @@ import scala.util.control.NonFatal
 
 class FileDb(dataDir: String) extends JsonImplicits with DbInterface {
 
-  val details: String = s"File-based database.  dataDir: $dataDir"
+  val details: String = s"File-based database (dir: $dataDir)"
 
-  def listSensorSystems(): Map[String, SensorSystem] = {
+  def listSensorSystems(): Seq[SensorSystemSummary] = {
     val files = dataPath.toFile.listFiles.filter(_.getName.endsWith(".ss.json"))
-    files.toSeq.map { f =>
-      val sysid = f.getName.replaceAll(""".ss.json$""", "")
-      sysid -> getSensorSystem(sysid).get
-    }.toMap
+    val systems: Seq[Option[SensorSystem]] = files.toSeq.map { f =>
+      getSensorSystemByFilename(f.getName)
+    }
+    systems.flatten.map { sys ⇒
+      SensorSystemSummary(sys.sysid, sys.name, sys.description, sys.streams.keySet)
+    }
   }
 
   def getSensorSystem(sysid: String): Option[SensorSystem] = {

@@ -6,6 +6,13 @@ import spray.json.{JsObject, JsValue}
 
 case class LatLon(lat: Double, lon: Double)
 
+case class SensorSystemSummary(sysid:        String,
+                               name:         Option[String] = None,
+                               description:  Option[String] = None,
+                               streamIds:    Set[String] = Set.empty
+                              )
+
+
 case class SensorSystem(sysid:        String,
                         name:         Option[String] = None,
                         description:  Option[String] = None,

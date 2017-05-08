@@ -1,5 +1,25 @@
 # gpdviz2
 
+2017-05-08
+
+- experimenting with doobie/postgres.
+  define config property `gpdviz.postgres.connection.url` to exercise it.
+  db setup:
+
+        psql -c 'create user postgres createdb'
+        psql -c 'create database gpdviz;' -U postgres
+        
+        psql -d gpdviz -U postgres
+        
+        gpdviz=# CREATE EXTENSION Postgis;
+        CREATE EXTENSION
+        gpdviz=# \dT geography
+                                List of data types
+         Schema |   Name    |                 Description
+        --------+-----------+----------------------------------------------
+         public | geography | postgis type: Ellipsoidal spatial data type.
+        (1 row)
+        
 2017-05-07
 
 - extract Db trait to prepare for use of actual database system 

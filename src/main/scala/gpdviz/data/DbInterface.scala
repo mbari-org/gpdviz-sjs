@@ -1,14 +1,14 @@
 package gpdviz.data
 
 import gpdviz.GnError
-import gpdviz.model.SensorSystem
+import gpdviz.model.{SensorSystem, SensorSystemSummary}
 
 
 trait DbInterface {
 
   def details: String
 
-  def listSensorSystems(): Map[String, SensorSystem]
+  def listSensorSystems(): Seq[SensorSystemSummary]
 
   def getSensorSystem(sysid: String): Option[SensorSystem]
 

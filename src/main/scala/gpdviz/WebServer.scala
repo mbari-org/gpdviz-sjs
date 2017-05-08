@@ -49,6 +49,7 @@ case class ObservationsRegister(observations: Map[String, List[ObsData]])
 
 trait JsonImplicits extends DefaultJsonProtocol with SprayJsonSupport with GeoJsonProtocol {
   implicit val llRegFormat  = jsonFormat2(LatLon)
+  implicit val sssRegFormat = jsonFormat4(SensorSystemSummary)
   implicit val ssRegFormat  = jsonFormat5(SSRegister)
   implicit val ssUpdFormat  = jsonFormat3(SSUpdate)
   implicit val strRegFormat = jsonFormat7(StreamRegister)

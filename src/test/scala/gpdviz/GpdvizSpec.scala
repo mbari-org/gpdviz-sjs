@@ -5,11 +5,11 @@ import com.typesafe.config.{Config, ConfigFactory}
 import gpdviz.async.Notifier
 import gpdviz.data.FileDb
 import gpdviz.model._
-import spray.http.StatusCodes._
-import spray.http.ContentTypes._
-import spray.testkit.ScalatestRouteTest
 import org.scalatest._
+import spray.http.ContentTypes._
+import spray.http.StatusCodes._
 import spray.json.JsObject
+import spray.testkit.ScalatestRouteTest
 
 
 class GpdvizSpec extends FlatSpec with Matchers with ScalatestRouteTest with MyService {
@@ -26,7 +26,7 @@ class GpdvizSpec extends FlatSpec with Matchers with ScalatestRouteTest with MyS
   "sensor system service " should "respond with all sensor systems" in {
     Get("/api/ss") ~> routes ~> check {
       status shouldBe OK
-      val systems = responseAs[Map[String, SensorSystem]]
+      val systems = responseAs[Seq[SensorSystemSummary]]
       sysid = Some(s"test_sys${systems.size}")
     }
   }
