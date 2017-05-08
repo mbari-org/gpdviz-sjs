@@ -2,6 +2,7 @@
 
 2017-05-08
 
+- skip the doobie/postgres code for now (issues with assembly duplicates...)
 - experimenting with doobie/postgres.
   define config property `gpdviz.postgres.connection.url` to exercise it.
   db setup:

@@ -3,12 +3,14 @@ package gpdviz.data
 import com.typesafe.config.Config
 import gpdviz.GnError
 import gpdviz.model.{SensorSystem, SensorSystemSummary}
+/*
 import doobie.imports._
 import doobie.postgres.imports._
 import org.postgresql.geometric.PGpoint
 
 import scalaz._
 import Scalaz._
+*/
 
 /**
   * experimenting with doobie/postgres...
@@ -17,6 +19,8 @@ class PostgresDb(config: Config) extends DbInterface {
 
   val details: String = s"PostgreSQL-based database (url: ${config.getString("connection.url")})"
 
+  def listSensorSystems(): Seq[SensorSystemSummary] = ???
+/*
   def listSensorSystems(): Seq[SensorSystemSummary] = {
     val q = sql"""
       select sysid, name, description from sensorsystem
@@ -26,6 +30,7 @@ class PostgresDb(config: Config) extends DbInterface {
       SensorSystemSummary(sysid, name, description)
     }
   }
+*/
 
   def getSensorSystem(sysid: String): Option[SensorSystem] = ???
 
@@ -33,6 +38,7 @@ class PostgresDb(config: Config) extends DbInterface {
 
   def deleteSensorSystem(sysid: String): Either[GnError, SensorSystem] = ???
 
+/*
   createTables()
   insertSomeStuff()
 
@@ -92,4 +98,5 @@ class PostgresDb(config: Config) extends DbInterface {
     user   = config.getString("connection.userName"),
     pass   = config.getString("connection.password")
   )
+*/
 }

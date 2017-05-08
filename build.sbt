@@ -31,6 +31,7 @@ libraryDependencies ++= {
 
     "com.pusher"            % "pusher-http-java" % pusherV
 
+/*
     ,"org.tpolecat" %% "doobie-core"       % doobieVersion
     ,"org.tpolecat" %% "doobie-postgres"   % doobieVersion
     ,"org.tpolecat" %% "doobie-contrib-postgresql" % "0.3.0a"
@@ -41,6 +42,7 @@ libraryDependencies ++= {
     //    java.lang.IncompatibleClassChangeError: Found class scalaz.Memo, but interface was expected
     // Based on https://github.com/etorreborre/specs2/issues/268#issuecomment-47043143
     // but searching maven for a more recent version
+*/
 
   )
 }
