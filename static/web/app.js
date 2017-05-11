@@ -13,6 +13,7 @@
     vm.debug = debug;
 
     vm.hoveredPoint = {};
+    vm.absoluteCharts = {};
 
     var byStrId = {};
 
@@ -279,7 +280,7 @@
       var charter = str && byStrId[strid].charter;
       // console.debug("popupopen: str=", str, "has-charter=", !!charter);
       if (charter) {
-        charter.activate();
+        charter.activateChart();
       }
     });
     map.on('popupclose', function(e) {
@@ -289,7 +290,7 @@
       if (str && byStrId[strid].charter) {
         var charter = byStrId[str.strid].charter;
         //console.debug("popupclose: charter=", charter);
-        charter.deactivate();
+        charter.deactivateChart();
       }
       $scope.$apply(function() {
         vm.hoveredPoint = {};
@@ -317,8 +318,9 @@
 
       if (obs.scalarData) {
         //console.debug("addObs2: str=", str, "obs.scalarData=", obs.scalarData);
-        if (!byStrId[str.strid].charter) {
-          byStrId[str.strid].charter = createCharter(str);
+        var charter = byStrId[str.strid].charter;
+        if (!charter) {
+          charter = byStrId[str.strid].charter = createCharter(str);
         }
 
         var indexes = _.map(obs.scalarData.vars, function(varName) {
@@ -327,7 +329,7 @@
         //console.debug("& indexes=", indexes);
         _.each(obs.scalarData.vals, function(v, valIndex) {
           var varIndex = indexes[valIndex];
-          byStrId[str.strid].charter.addChartPoint(varIndex, timestamp, v);
+          charter.addChartPoint(varIndex, timestamp, v);
 
         });
 
@@ -336,20 +338,71 @@
           positionsByTime.set(str.strid, timestamp, obs.scalarData.position);
         }
 
-        if (byStrId[str.strid].marker && !byStrId[str.strid].popupInfo) {
+        if (!byStrId[str.strid].marker) {
+          return;
+        }
+
+        var chartId = "chart-container-" + str.strid;
+
+        var useChartPopup = false;//str.chartStyle && str.chartStyle.useChartPopup;
+
+        if (useChartPopup) {
+          if (byStrId[str.strid].popupInfo) return;
+        }
+        else if (vm.absoluteCharts[chartId]) return;
+
+        if (str.chartHeight === undefined) {
+          str.chartHeight = 400;
+          if (str.chartStyle && str.chartStyle.height) {
+            str.chartHeight = str.chartStyle.height;
+          }
+        }
+        var chartHeightStr = getSizeStr(str.chartHeight);
+        var minWidthPx = str.chartStyle && str.chartStyle.minWidthPx || 600;
+        var minWidthStr = minWidthPx + 'px';
+
+        if (useChartPopup) {
           if (debug) console.debug("setting popup for stream ", str.strid);
+          var chartContainer = '<div id="' +chartId +
+            '" style="min-width:' +minWidthStr+ ';height:' +chartHeightStr+ ';margin:0 auto"></div>';
+
           popupInfo = L.popup({
             //autoClose: false, closeOnClick: false
-            minWidth: 550
+            minWidth: minWidthPx + 50
           });
           popupInfo._strid = str.strid;
 
-          var height = str.chartStyle && str.chartStyle.height || '300px';
-          popupInfo.setContent('<div id="' +"chart-container-" + str.strid +
-            '" style="min-width:500px;height:' +height+ ';margin:0 auto"></div>');
+          popupInfo.setContent(chartContainer);
 
           byStrId[str.strid].marker.bindPopup(popupInfo);
           byStrId[str.strid].popupInfo = popupInfo;
+        }
+        else {
+          vm.absoluteCharts[chartId] = {
+            id:       chartId,
+            heightStr:   chartHeightStr,
+            minWidthStr: minWidthStr
+          };
+          // console.debug("ADDED absoluteChart=", vm.absoluteCharts[chartId]);
+          byStrId[str.strid].marker.on('click', function (e) {
+            var idElm = $("#" +chartId);
+            idElm.stop();
+            if (idElm.is(":visible")) {
+              idElm.fadeOut(700);
+              $timeout(charter.deactivateChart, 700);
+            }
+            else {
+              charter.activateChart();
+              idElm.fadeIn('fast');
+            }
+          });
+          $(document).keyup(function (e) {
+            if (e.keyCode === 27) {
+              var idElm = $("#" +chartId);
+              idElm.fadeOut(700);
+              $timeout(charter.deactivateChart, 700);
+            }
+          });
         }
         return;
       }
@@ -505,8 +558,8 @@
     return {
       strid: strid,
       addChartPoint: addChartPoint,
-      activate: activate,
-      deactivate: deactivate
+      activateChart: activateChart,
+      deactivateChart: deactivateChart
     };
 
     function addChartPoint(seriesIndex, x, y) {
@@ -536,8 +589,8 @@
       // else console.error("!!! no serieses !!!!!");
     }
 
-    function activate() {
-      deactivate();
+    function activateChart() {
+      deactivateChart();
       needRedraw = true;
       _.each(initialSeriesData, function(s) {
         s.data = _.sortBy(s.data, function(xy) { return xy[0] });
@@ -549,7 +602,7 @@
       }
 
       function mousemove(e) {
-        if (seriesIndexTemperature !== undefined) {
+        if (seriesIndexTemperature !== undefined && chart) {
           var event = chart.pointer.normalize(e.originalEvent);
           var point = chart.series[seriesIndexTemperature].searchPoint(event, true);
           // console.debug("strid=", strid, "normalizedEvent=", event, "point=", point);
@@ -558,7 +611,7 @@
       }
     }
 
-    function deactivate() {
+    function deactivateChart() {
       needRedraw = false;
       lastAddedX = {};
       if (chart) chart.destroy();
@@ -574,6 +627,7 @@
       return new Highcharts.StockChart({
         chart: {
           renderTo: "chart-container-" + strid,
+          height: str.chartHeight - 4,
           events: {
             load: function () {
               serieses = this.series;
@@ -658,6 +712,10 @@
         }
       });
     }
+  }
+
+  function getSizeStr(size) {
+    return typeof size === 'number' ? size + 'px' : size;
   }
 
 })();

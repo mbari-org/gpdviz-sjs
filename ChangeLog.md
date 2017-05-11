@@ -2,6 +2,8 @@
 
 2017-05-11
 
+- now use absolute-positioned chart unless str.chartStyle.useChartPopup
+  (TODO handling of multiple absolute chars)
 - use leaflet@1.0.0
 
 2017-05-10

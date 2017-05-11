@@ -2,3 +2,13 @@
   font-family: monospace !important;
 }
 
+.absoluteChart {
+  z-index: 999999;
+  background: rgba(255, 255, 255, 0.7);
+  position: absolute;
+  top:80px;
+  left:0px;
+  padding:5px;
+  border:1px solid grey;
+  display:none;
+}

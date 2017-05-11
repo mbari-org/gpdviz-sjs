@@ -51,7 +51,14 @@
     <tbody>
     <tr>
       <td style="vertical-align: top">
-        <div id="mapid" style="height:800px"></div>
+        <div id="mapid" style="height:800px">
+          <div ng-repeat="(id, c) in vm.absoluteCharts">
+            <div ng-attr-id="{{ id }}"
+                 class="absoluteChart"
+                 ng-style="{'min-width': c.minWidthStr, height: c.heightStr}"
+            ></div>
+          </div>
+        </div>
       </td>
       <td style="width: 300px; vertical-align: top">
         <div ng-if="vm.ss" style="margin-top: 20px">
