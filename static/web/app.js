@@ -447,7 +447,11 @@
     // FIXME should be indicated which series to use for map location
     var seriesIndexTemperature = undefined;
 
-    var title = '<span style="font-size: small">' + str.strid + (str.name ? ' - ' + str.name : '') + '</span>';
+    var title = (function() {
+      var t = str.chartStyle && str.chartStyle.title || (str.strid + (str.name ? ' - ' + str.name : ''));
+      return '<span style="font-size: small">' + t + '</span>';
+    })();
+    var subtitle = str.chartStyle && str.chartStyle.subtitle;
 
     var yAxisList = str.chartStyle && str.chartStyle.yAxis;
 
@@ -634,7 +638,7 @@
         },
 
         title: { text: title },
-        //subtitle: { text: str.description },
+        subtitle: { text: subtitle },
 
         navigator: {
           enabled: true
