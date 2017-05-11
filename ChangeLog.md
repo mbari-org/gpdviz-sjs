@@ -1,5 +1,9 @@
 # gpdviz2
 
+2017-05-11
+
+- use leaflet@1.0.0
+
 2017-05-10
 
 - improved chart redrawing logic
