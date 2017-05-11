@@ -488,12 +488,13 @@
 
     var lastAddedX = {};  // {seriesIndex -> x}
 
+    var needRedraw = true;
+
     setInterval(function() {
-      if (serieses && serieses.length) {
-        // console.debug("redrawing " +serieses.length+ " series elements");
-        _.each(serieses, function(series) {
-          series.redraw();
-        })
+      if (chart && needRedraw) {
+        // console.debug("redrawing chart ", strid);
+        chart.redraw();
+        needRedraw = false;
       }
     }, 2000);
 
@@ -507,6 +508,8 @@
     function addChartPoint(seriesIndex, x, y) {
       //console.debug("addChartPoint: strid=", strid, "x=", x, "y=", y);
       x = +x;
+
+      needRedraw = true;
 
       initialSeriesData[seriesIndex].data.push([x, y]);
 
@@ -531,6 +534,7 @@
 
     function activate() {
       deactivate();
+      needRedraw = true;
       _.each(initialSeriesData, function(s) {
         s.data = _.sortBy(s.data, function(xy) { return xy[0] });
       });
@@ -551,6 +555,7 @@
     }
 
     function deactivate() {
+      needRedraw = false;
       lastAddedX = {};
       if (chart) chart.destroy();
       chart = undefined;

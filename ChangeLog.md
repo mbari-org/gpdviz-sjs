@@ -2,6 +2,7 @@
 
 2017-05-10
 
+- improved chart redrawing logic
 - improved handling of mouse-hover to highlight position on map
 
 2017-05-08
