@@ -1,5 +1,9 @@
 # gpdviz2
 
+2017-05-10
+
+- improved handling of mouse-hover to highlight position on map
+
 2017-05-08
 
 - skip the doobie/postgres code for now (issues with assembly duplicates...)

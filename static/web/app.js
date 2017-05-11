@@ -16,8 +16,10 @@
 
     var byStrId = {};
 
+    // TODO capture center and zoom from sensor system properties
     var center = [36.62, -122.04];
-    var map = L.map('mapid', {maxZoom: 20}).setView(center, 11);
+    var zoom = 12;
+    var map = L.map('mapid', {maxZoom: 20}).setView(center, zoom);
     var esriOceansLayer = L.esri.basemapLayer('Oceans').addTo(map);
     var osm = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -42,34 +44,36 @@
     var overlayGroupByStreamId = {};
 
     var positionsByTime = (function() {
-      var levels = 5;
-
-      // strTimePoss = { strid -> { time -> [lat, lon] }, for various quantized levels of given time per position
       var strTimePoss = {};
 
       return {
         set: function (strid, timeMs, position) {
           if (strTimePoss[strid] === undefined) {
-            strTimePoss[strid] = {};
+            strTimePoss[strid] = {list: [], sorted: true};
           }
-          var posByTime = strTimePoss[strid];
-          var mm = Math.round(timeMs / 1000); // start at second level
-          for (var kk = 0; kk < levels; kk++) {
-            posByTime[mm] = position;
-            mm = Math.round(mm / 10);  // then
-          }
+          strTimePoss[strid].list.push({timeMs: timeMs, position:position});
+          strTimePoss[strid].sorted = false;
         },
 
         get: function (strid, timeMs) {
-          var posByTime = strTimePoss[strid];
-          if (posByTime) {
-            var mm = Math.round(timeMs / 1000);
-            for (var kk = 0; kk < levels; kk++) {
-              var position = posByTime[mm];
-              if (position) return position;
-              mm = Math.round(mm / 10);
-            }
+          if (!strTimePoss[strid].sorted) {
+            strTimePoss[strid].list = _.sortBy(strTimePoss[strid].list, "timeMs");
+            strTimePoss[strid].sorted = true;
           }
+          var list = strTimePoss[strid].list;
+          var ii = 0, mid = 0, kk = list.length - 1;
+          while (ii < kk) {
+            mid = Math.floor((ii + kk) / 2);
+            var mid_timeMs = list[mid].timeMs;
+            if (timeMs < mid_timeMs) {
+              kk = mid;
+            }
+            else if (timeMs > mid_timeMs) {
+              ii = mid + 1
+            }
+            else break;
+          }
+          return list[mid].position;
         }
       }
     })();
@@ -155,12 +159,14 @@
 
     if (vm.ss) {
       if (vm.ss.center && vm.ss.center.lat && vm.ss.center.lon) {
-        map.setView([vm.ss.center.lat, vm.ss.center.lon], 11)
+        map.setView([vm.ss.center.lat, vm.ss.center.lon], 12)
       }
 
       var streams = _.sortBy(_.values(vm.ss.streams), 'zOrder');
       _.each(streams, function (str) {
         byStrId[str.strid] = {str: str, charter: createCharter(str)};
+
+        // console.debug("stream", str.strid, "has", _.size(str.observations), "observations");
 
         // TODO improve the following.  Little hack: add non-scalarData observations first...
         _.each(str.observations, function (obss, timestamp) {
@@ -325,7 +331,7 @@
 
         });
 
-        //console.debug("obs.scalarData.position=", obs.scalarData.position);
+        // console.debug(str.strid, "obs.scalarData.position=", obs.scalarData.position);
         if (obs.scalarData.position) {
           positionsByTime.set(str.strid, timestamp, obs.scalarData.position);
         }
@@ -438,12 +444,20 @@
     var strid = str.strid;
     var variables = str.variables;
 
+    // FIXME should be indicated which series to use for map location
+    var seriesIndexTemperature = undefined;
+
     var title = '<span style="font-size: small">' + str.strid + (str.name ? ' - ' + str.name : '') + '</span>';
 
     var yAxisList = str.chartStyle && str.chartStyle.yAxis;
 
-    var initialSeriesData = _.map(variables, function(varProps, varName) {
+    var initialSeriesData = [];
+    _.each(variables, function(varProps, varName) {
       // console.debug("varName=", varName, "varProps=", varProps);
+
+      if (varName === 'temperature') {
+        seriesIndexTemperature = initialSeriesData.length;
+      }
       var chartStyle = varProps.chartStyle || {};
 
       var options = {
@@ -466,7 +480,7 @@
       };
       // console.debug("varName=", varName, "options=", _.cloneDeep(options));
 
-      return options;
+      initialSeriesData.push(options);
     });
 
     var chart = undefined;
@@ -523,12 +537,16 @@
       chart = createChart();
 
       if (hoveredPoint) {
-        $(chart.container).mousemove(function(e) {
+        $(chart.container).on('mousemove', _.throttle(mousemove, 250) )
+      }
+
+      function mousemove(e) {
+        if (seriesIndexTemperature !== undefined) {
           var event = chart.pointer.normalize(e.originalEvent);
-          // console.debug("normalizedEvent=", event);
-          var point = chart.series[0].searchPoint(event, true);
+          var point = chart.series[seriesIndexTemperature].searchPoint(event, true);
+          // console.debug("strid=", strid, "normalizedEvent=", event, "point=", point);
           hoveredPoint(point);
-        });
+        }
       }
     }
 
@@ -537,8 +555,8 @@
       if (chart) chart.destroy();
       chart = undefined;
       serieses = undefined;
-      if (hoveredPoint) {
-        // TODO remove mousemove event handler
+      if (hoveredPoint && chart && chart.container) {
+        $(chart.container).off('mousemove', mousemove);
       }
     }
 
