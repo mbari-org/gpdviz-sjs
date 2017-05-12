@@ -20,11 +20,25 @@
     // TODO capture center and zoom from sensor system properties
     var center = [36.62, -122.04];
     var zoom = 12;
-    var map = L.map('mapid', {maxZoom: 20}).setView(center, zoom);
-    var esriOceansLayer = L.esri.basemapLayer('Oceans').addTo(map);
+
+    var esriOceansLayer = L.esri.basemapLayer('Oceans');
     var osm = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors'
     });
+
+    var baseLayers = {
+      'ESRI Oceans': esriOceansLayer,
+      'OpenStreetMap': osm
+      ,'Empty': L.tileLayer('', {opacity:0})
+      // ,'Google satellite': L.gridLayer.googleMutant({
+      //   type: 'satellite' // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
+      // })
+    };
+
+    var map = L.map('mapid', {
+      maxZoom: 20,
+      layers: [baseLayers['ESRI Oceans']]
+    }).setView(center, zoom);
 
     L.control.mousePosition({position: 'topright', emptyString: ''}).addTo(map);
 
@@ -32,15 +46,7 @@
     var markersLayerMG = new L.LayerGroup();
     markersLayer.addTo(map);
 
-    var controlLayers = L.control.layers(
-      {
-        'ESRI Oceans': esriOceansLayer,
-        'OpenStreetMap': osm
-        // ,'Google satellite': L.gridLayer.googleMutant({
-        //   type: 'satellite' // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
-        // })
-      }
-    ).addTo(map);
+    var controlLayers = L.control.layers(baseLayers).addTo(map);
 
     var overlayGroupByStreamId = {};
 
@@ -173,7 +179,7 @@
         _.each(str.observations, function (obss, timestamp) {
           _.each(obss, function(obs) {
             if (!obs.scalarData) {
-              addObs2(str, timestamp, obs);
+              addObservation(str, timestamp, obs);
             }
           });
         });
@@ -188,7 +194,7 @@
           _.each(obss, function(obs) {
             str.numberObs += 1;
             if (obs.scalarData) {
-              addObs2(str, timestamp, obs);
+              addObservation(str, timestamp, obs);
             }
           });
         });
@@ -253,7 +259,7 @@
             str.observations[+timestamp] = obs;
             str.numberObs += 1;
             str.latestIso = moment.utc(+timestamp).format();
-            addObs2(str, +timestamp, obs);
+            addObservation(str, +timestamp, obs);
           });
         });
       }
@@ -313,100 +319,108 @@
         }
       });
     }
-    function addObs2(str, timestamp, obs) {
-      var popupInfo;
 
+    function addObservation(str, timestamp, obs) {
       if (obs.scalarData) {
-        //console.debug("addObs2: str=", str, "obs.scalarData=", obs.scalarData);
-        var charter = byStrId[str.strid].charter;
-        if (!charter) {
-          charter = byStrId[str.strid].charter = createCharter(str);
-        }
+        addObsScalarData(str, timestamp, obs);
+      }
+      else {
+        addObsFeatureOrGeometry(str, timestamp, obs);
+      }
+    }
 
-        var indexes = _.map(obs.scalarData.vars, function(varName) {
-          return _.indexOf(_.keys(str.variables), varName);
-        });
-        //console.debug("& indexes=", indexes);
-        _.each(obs.scalarData.vals, function(v, valIndex) {
-          var varIndex = indexes[valIndex];
-          charter.addChartPoint(varIndex, timestamp, v);
+    function addObsScalarData(str, timestamp, obs) {
+      //console.debug("addObsScalarData: str=", str, "obs.scalarData=", obs.scalarData);
+      var charter = byStrId[str.strid].charter;
+      if (!charter) {
+        charter = byStrId[str.strid].charter = createCharter(str);
+      }
 
-        });
+      var indexes = _.map(obs.scalarData.vars, function (varName) {
+        return _.indexOf(_.keys(str.variables), varName);
+      });
+      //console.debug("& indexes=", indexes);
+      _.each(obs.scalarData.vals, function (v, valIndex) {
+        var varIndex = indexes[valIndex];
+        charter.addChartPoint(varIndex, timestamp, v);
 
-        // console.debug(str.strid, "obs.scalarData.position=", obs.scalarData.position);
-        if (obs.scalarData.position) {
-          positionsByTime.set(str.strid, timestamp, obs.scalarData.position);
-        }
+      });
 
-        if (!byStrId[str.strid].marker) {
-          return;
-        }
+      // console.debug(str.strid, "obs.scalarData.position=", obs.scalarData.position);
+      if (obs.scalarData.position) {
+        positionsByTime.set(str.strid, timestamp, obs.scalarData.position);
+      }
 
-        var chartId = "chart-container-" + str.strid;
-
-        var useChartPopup = false;//str.chartStyle && str.chartStyle.useChartPopup;
-
-        if (useChartPopup) {
-          if (byStrId[str.strid].popupInfo) return;
-        }
-        else if (vm.absoluteCharts[chartId]) return;
-
-        if (str.chartHeight === undefined) {
-          str.chartHeight = 400;
-          if (str.chartStyle && str.chartStyle.height) {
-            str.chartHeight = str.chartStyle.height;
-          }
-        }
-        var chartHeightStr = getSizeStr(str.chartHeight);
-        var minWidthPx = str.chartStyle && str.chartStyle.minWidthPx || 600;
-        var minWidthStr = minWidthPx + 'px';
-
-        if (useChartPopup) {
-          if (debug) console.debug("setting popup for stream ", str.strid);
-          var chartContainer = '<div id="' +chartId +
-            '" style="min-width:' +minWidthStr+ ';height:' +chartHeightStr+ ';margin:0 auto"></div>';
-
-          popupInfo = L.popup({
-            //autoClose: false, closeOnClick: false
-            minWidth: minWidthPx + 50
-          });
-          popupInfo._strid = str.strid;
-
-          popupInfo.setContent(chartContainer);
-
-          byStrId[str.strid].marker.bindPopup(popupInfo);
-          byStrId[str.strid].popupInfo = popupInfo;
-        }
-        else {
-          vm.absoluteCharts[chartId] = {
-            id:       chartId,
-            heightStr:   chartHeightStr,
-            minWidthStr: minWidthStr
-          };
-          // console.debug("ADDED absoluteChart=", vm.absoluteCharts[chartId]);
-          byStrId[str.strid].marker.on('click', function (e) {
-            var idElm = $("#" +chartId);
-            idElm.stop();
-            if (idElm.is(":visible")) {
-              idElm.fadeOut(700);
-              $timeout(charter.deactivateChart, 700);
-            }
-            else {
-              charter.activateChart();
-              idElm.fadeIn('fast');
-            }
-          });
-          $(document).keyup(function (e) {
-            if (e.keyCode === 27) {
-              var idElm = $("#" +chartId);
-              idElm.fadeOut(700);
-              $timeout(charter.deactivateChart, 700);
-            }
-          });
-        }
+      if (!byStrId[str.strid].marker) {
         return;
       }
 
+      var chartId = "chart-container-" + str.strid;
+
+      var useChartPopup = false;//str.chartStyle && str.chartStyle.useChartPopup;
+
+      if (useChartPopup) {
+        if (byStrId[str.strid].popupInfo) return;
+      }
+      else if (vm.absoluteCharts[chartId]) return;
+
+      if (str.chartHeight === undefined) {
+        str.chartHeight = 400;
+        if (str.chartStyle && str.chartStyle.height) {
+          str.chartHeight = str.chartStyle.height;
+        }
+      }
+      var chartHeightStr = getSizeStr(str.chartHeight);
+      var minWidthPx = str.chartStyle && str.chartStyle.minWidthPx || 600;
+      var minWidthStr = minWidthPx + 'px';
+
+      if (useChartPopup) {
+        if (debug) console.debug("setting popup for stream ", str.strid);
+        var chartContainer = '<div id="' + chartId +
+          '" style="min-width:' + minWidthStr + ';height:' + chartHeightStr + ';margin:0 auto"></div>';
+
+        var popupInfo = L.popup({
+          //autoClose: false, closeOnClick: false
+          minWidth: minWidthPx + 50
+        });
+        popupInfo._strid = str.strid;
+
+        popupInfo.setContent(chartContainer);
+
+        byStrId[str.strid].marker.bindPopup(popupInfo);
+        byStrId[str.strid].popupInfo = popupInfo;
+      }
+
+      else {
+        vm.absoluteCharts[chartId] = {
+          id: chartId,
+          heightStr: chartHeightStr,
+          minWidthStr: minWidthStr
+        };
+        // console.debug("ADDED absoluteChart=", vm.absoluteCharts[chartId]);
+        byStrId[str.strid].marker.on('click', function (e) {
+          var idElm = $("#" + chartId);
+          idElm.stop();
+          if (idElm.is(":visible")) {
+            idElm.fadeOut(700);
+            $timeout(charter.deactivateChart, 700);
+          }
+          else {
+            charter.activateChart();
+            idElm.fadeIn('fast');
+          }
+        });
+        $(document).keyup(function (e) {
+          if (e.keyCode === 27) {
+            var idElm = $("#" + chartId);
+            idElm.fadeOut(700);
+            $timeout(charter.deactivateChart, 700);
+          }
+        });
+      }
+    }
+
+    function addObsFeatureOrGeometry(str, timestamp, obs) {
       function markerCreator(geojson, mapStyle) {
         return function() {
           return L.geoJSON(geojson, {
@@ -423,7 +437,7 @@
 
       if (obs.feature) {
         var mapStyle = str.mapStyle ? _.cloneDeep(str.mapStyle) : {};
-        // console.debug("addObs2: str=", str, "obs.feature=", obs.feature);
+        // console.debug("addObsFeatureOrGeometry: str=", str, "obs.feature=", obs.feature);
         var geojson = angular.fromJson(obs.feature);
         if (obs.feature.properties && obs.feature.properties.style) {
           mapStyle = _.assign(mapStyle, obs.feature.properties.style);
@@ -432,14 +446,14 @@
       }
 
       if (obs.geometry) {
-        // console.debug("addObs2: obs.geometry=", obs.geometry);
+        // console.debug("addObsFeatureOrGeometry: obs.geometry=", obs.geometry);
         mapStyle = str.mapStyle ? _.cloneDeep(str.mapStyle) : {};
-        // console.debug("addObs2: str=", str, "obs.geometry=", obs.geometry);
+        // console.debug("addObsFeatureOrGeometry: str=", str, "obs.geometry=", obs.geometry);
         geojson = angular.fromJson(obs.geometry);
         addMarker(str, markerCreator(geojson, mapStyle));
       }
 
-      if (debug) console.debug("addObs2: mapStyle=", mapStyle, "str=", str, "geojson=", geojson);
+      if (debug) console.debug("addObsFeatureOrGeometry: mapStyle=", mapStyle, "str=", str, "geojson=", geojson);
     }
 
     (function prepareAdjustMapUponWindowResize() {
