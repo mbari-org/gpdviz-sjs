@@ -317,13 +317,10 @@
       //   ,"metaKey=",  metaKey
       // );
       if (shiftKey || altKey || metaKey) {
-        var params = {
-          lat:      e.latlng.lat,
-          lon:      e.latlng.lng,
-          shiftKey: shiftKey,
-          altKey:   altKey,
-          metaKey:  metaKey
-        };
+        var params = { lat: e.latlng.lat, lon: e.latlng.lng};
+        if (shiftKey) params.shiftKey = true;
+        if (altKey)   params.altKey = true;
+        if (metaKey)  params.metaKey = true;
         $http({ method: "POST", url: vm.ss.clickListener, params: params}
         ).then(function (response) {
           // console.debug("url=", vm.ss.clickListener, "response=", response)
