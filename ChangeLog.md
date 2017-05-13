@@ -1,5 +1,10 @@
 # gpdviz2
 
+2017-05-12
+
+- sensor system can now have a clickListener, a URL that will be called with information about 
+  clicks on the map but only those with at least one of the shiftKey/altKey/metaKey modifiers.
+
 2017-05-11
 
 - now use absolute-positioned chart unless str.chartStyle.useChartPopup

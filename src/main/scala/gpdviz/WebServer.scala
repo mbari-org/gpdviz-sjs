@@ -27,7 +27,8 @@ case class SSRegister(sysid: String,
                       name: Option[String] = None,
                       description: Option[String] = None,
                       pushEvents: Option[Boolean] = None,
-                      center: Option[LatLon] = None
+                      center: Option[LatLon] = None,
+                      clickListener: Option[String] = None
                       )
 
 case class SSUpdate(pushEvents: Option[Boolean] = None,
@@ -50,7 +51,7 @@ case class ObservationsRegister(observations: Map[String, List[ObsData]])
 trait JsonImplicits extends DefaultJsonProtocol with SprayJsonSupport with GeoJsonProtocol {
   implicit val llRegFormat  = jsonFormat2(LatLon)
   implicit val sssRegFormat = jsonFormat4(SensorSystemSummary)
-  implicit val ssRegFormat  = jsonFormat5(SSRegister)
+  implicit val ssRegFormat  = jsonFormat6(SSRegister)
   implicit val ssUpdFormat  = jsonFormat3(SSUpdate)
   implicit val strRegFormat = jsonFormat7(StreamRegister)
 
@@ -58,7 +59,7 @@ trait JsonImplicits extends DefaultJsonProtocol with SprayJsonSupport with GeoJs
   implicit val obsDataFormat  = jsonFormat3(ObsData)
   implicit val streamFormat  = jsonFormat8(DataStream)
   implicit val obssRegFormat = jsonFormat1(ObservationsRegister)
-  implicit val systemFormat  = jsonFormat6(SensorSystem)
+  implicit val systemFormat  = jsonFormat7(SensorSystem)
 
   implicit val dbErrorFormat = jsonFormat4(GnError)
 }
@@ -150,7 +151,8 @@ trait MyService extends SimpleRoutingApp with JsonImplicits  {
           name = ssr.name,
           description = ssr.description,
           pushEvents = ssr.pushEvents.getOrElse(true),
-          center = ssr.center
+          center = ssr.center,
+          clickListener = ssr.clickListener
         )
         db.saveSensorSystem(ss) match {
           case Right(rss) =>

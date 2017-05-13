@@ -18,7 +18,8 @@ case class SensorSystem(sysid:        String,
                         description:  Option[String] = None,
                         streams:      Map[String, DataStream] = Map.empty,
                         pushEvents:   Boolean = true,
-                        center:       Option[LatLon] = None
+                        center:       Option[LatLon] = None,
+                        clickListener: Option[String] = None
                         )
 
 case class DataStream(strid:    String,

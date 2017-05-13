@@ -33,6 +33,7 @@ class Notifier(config: Config) extends JsonImplicits {
       var map = Map("sysid" -> ss.sysid)
       ss.name foreach        { v ⇒ map = map + ("name" → v) }
       ss.description foreach { v ⇒ map = map + ("description" → v) }
+      ss.clickListener foreach { v ⇒ map = map + ("clickListener" → v) }
       notifyEvent(ss.sysid, "sensorSystemRegistered", map.asJava)
     }
   }
