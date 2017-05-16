@@ -10,7 +10,7 @@ import spray.http.StatusCodes._
 import spray.http._
 import spray.httpx.SprayJsonSupport
 import spray.httpx.marshalling.ToResponseMarshallable
-import spray.json.{DefaultJsonProtocol, JsObject, JsValue}
+import spray.json.{DefaultJsonProtocol, JsObject}
 import spray.routing.SimpleRoutingApp
 
 import scala.io.StdIn
@@ -39,7 +39,7 @@ case class SSUpdate(pushEvents: Option[Boolean] = None,
 case class StreamRegister(strid:        String,
                           name:         Option[String] = None,
                           description:  Option[String] = None,
-                          mapStyle:     Option[Map[String, JsValue]] = None,
+                          mapStyle:     Option[JsObject] = None,
                           zOrder:       Option[Int] = None,
                           variables:    Option[JsObject] = None,
                           chartStyle:   Option[JsObject] = None
