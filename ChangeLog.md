@@ -1,5 +1,9 @@
 # gpdviz2
 
+2017-05-16
+
+- reflect updates upon sensor system unregistration and stream removal
+
 2017-05-12
 
 - sensor system can now have a clickListener, a URL that will be called with information about 

@@ -108,6 +108,7 @@
     }
 
     function clearMarkers() {
+      selectionGroup.clearLayers();
       markersLayer.clearLayers();
       markersLayerMG.clearLayers();
       _.each(overlayGroupByStreamId, function(group) {
@@ -225,6 +226,17 @@
 
       else if (what === 'sensorSystemUnregistered') {
         $scope.$apply(function () {
+          _.each(vm.ss.streams, function(str, strid) {
+            var charter = byStrId[strid] && byStrId[strid].charter;
+            var chartId = "chart-container-" + strid;
+            if (vm.absoluteCharts[chartId]) {
+              var idElm = $("#" + chartId);
+              idElm.hide();
+              if (charter) charter.deactivateChart();
+            }
+          });
+          byStrId = {};
+          vm.absoluteCharts = {};
           vm.ss = undefined;
         });
         clearMarkers();
@@ -266,8 +278,18 @@
 
       else if (what === 'streamRemoved') {
         $scope.$apply(function () {
-          delete vm.ss.streams[data.strid];
-          delete byStrId[data.strid];
+          var strid = data.strid;
+          delete vm.ss.streams[strid];
+          var charter = byStrId[strid] && byStrId[strid].charter;
+          delete byStrId[strid];
+
+          var chartId = "chart-container-" + strid;
+          if (vm.absoluteCharts[chartId]) {
+            var idElm = $("#" + chartId);
+            idElm.hide();
+            if (charter) charter.deactivateChart();
+            delete vm.absoluteCharts[chartId];
+          }
         });
       }
 
