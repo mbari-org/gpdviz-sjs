@@ -383,7 +383,7 @@
 
       var chartId = "chart-container-" + str.strid;
 
-      var useChartPopup = false;//str.chartStyle && str.chartStyle.useChartPopup;
+      var useChartPopup = str.chartStyle && str.chartStyle.useChartPopup;
 
       if (useChartPopup) {
         if (byStrId[str.strid].popupInfo) return;
