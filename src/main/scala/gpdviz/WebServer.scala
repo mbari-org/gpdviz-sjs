@@ -75,17 +75,17 @@ trait MyService extends Directives with JsonImplicits  {
 
   def routes = {
     val ssRoute = path("api" / "ss" ) {
+      (post & entity(as[SSRegister])) { ssr ⇒
+        complete {
+          registerSensorSystem(ssr)
+        }
+      } ~
       cors() {
-        (post & entity(as[SSRegister])) { ssr ⇒
+        get {
           complete {
-            registerSensorSystem(ssr)
+            db.listSensorSystems()
           }
-        } ~
-          get {
-            complete {
-              db.listSensorSystems()
-            }
-          }
+        }
       }
     }
 
@@ -95,29 +95,33 @@ trait MyService extends Directives with JsonImplicits  {
           addStream(sysid, strr)
         }
       } ~
-        get {
-          complete {
-            getSensorSystem(sysid)
-          }
-      } ~
-        (put & entity(as[SSUpdate])) { ssu ⇒
-          complete {
-            updateSensorSystem(sysid, ssu)
+        cors() {
+          get {
+            complete {
+              getSensorSystem(sysid)
+            }
           }
         } ~
-        delete {
-          complete {
-            unregisterSensorSystem(sysid)
+          (put & entity(as[SSUpdate])) { ssu ⇒
+            complete {
+              updateSensorSystem(sysid, ssu)
+            }
+          } ~
+          delete {
+            complete {
+              unregisterSensorSystem(sysid)
+            }
           }
-        }
     }
 
     val oneStrRoute = pathPrefix("api" / "ss" / Segment / Segment) { case (sysid, strid) ⇒
-      get {
+      cors() {
+        get {
           complete {
             getStream(sysid, strid)
           }
-        } ~
+        }
+      } ~
         delete {
           complete {
             deleteStream(sysid, strid)
