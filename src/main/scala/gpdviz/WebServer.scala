@@ -1,17 +1,19 @@
 package gpdviz
 
 import akka.actor.ActorSystem
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.marshalling.ToResponseMarshallable
+import akka.http.scaladsl.model._
+import akka.http.scaladsl.server.Directives
+import StatusCodes._
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
+import akka.stream.ActorMaterializer
 import com.cloudera.science.geojson.GeoJsonProtocol
 import com.typesafe.config.{Config, ConfigFactory}
 import gpdviz.async.Notifier
 import gpdviz.data.{DbInterface, FileDb, PostgresDb}
 import gpdviz.model._
-import spray.http.StatusCodes._
-import spray.http._
-import spray.httpx.SprayJsonSupport
-import spray.httpx.marshalling.ToResponseMarshallable
 import spray.json.{DefaultJsonProtocol, JsObject}
-import spray.routing.SimpleRoutingApp
 
 import scala.io.StdIn
 
@@ -65,14 +67,14 @@ trait JsonImplicits extends DefaultJsonProtocol with SprayJsonSupport with GeoJs
 }
 
 
-trait MyService extends SimpleRoutingApp with JsonImplicits  {
+trait MyService extends Directives with JsonImplicits  {
   def config: Config
   def db: DbInterface
   def notifier: Notifier
 
   def routes = {
     val ssRoute = path("api" / "ss" ) {
-      (post & entity(as[SSRegister])) { ssr =>
+      (post & entity(as[SSRegister])) { ssr ⇒
         complete {
           registerSensorSystem(ssr)
         }
@@ -84,8 +86,8 @@ trait MyService extends SimpleRoutingApp with JsonImplicits  {
         }
     }
 
-    val oneSsRoute = pathPrefix("api" / "ss" / Segment) { sysid =>
-      (post & entity(as[StreamRegister])) { strr =>
+    val oneSsRoute = pathPrefix("api" / "ss" / Segment) { sysid ⇒
+      (post & entity(as[StreamRegister])) { strr ⇒
         complete {
           addStream(sysid, strr)
         }
@@ -95,7 +97,7 @@ trait MyService extends SimpleRoutingApp with JsonImplicits  {
             getSensorSystem(sysid)
           }
       } ~
-        (put & entity(as[SSUpdate])) { ssu =>
+        (put & entity(as[SSUpdate])) { ssu ⇒
           complete {
             updateSensorSystem(sysid, ssu)
           }
@@ -107,7 +109,7 @@ trait MyService extends SimpleRoutingApp with JsonImplicits  {
         }
     }
 
-    val oneStrRoute = pathPrefix("api" / "ss" / Segment / Segment) { case (sysid, strid) =>
+    val oneStrRoute = pathPrefix("api" / "ss" / Segment / Segment) { case (sysid, strid) ⇒
       get {
           complete {
             getStream(sysid, strid)
@@ -120,25 +122,34 @@ trait MyService extends SimpleRoutingApp with JsonImplicits  {
         }
     }
 
-    val oneStr2Route = pathPrefix("api" / "ss" / Segment / Segment / "obs") { case (sysid, strid) =>
-      (post & entity(as[ObservationsRegister])) { obssr =>
+    val oneStr2Route = pathPrefix("api" / "ss" / Segment / Segment / "obs") { case (sysid, strid) ⇒
+      (post & entity(as[ObservationsRegister])) { obssr ⇒
         complete {
           addObservations(sysid, strid, obssr)
         }
       }
     }
 
-    val staticRoute = get {
-      path(Segment / Rest) { case (sysid, rest) =>
-        getFromFile("static/web/" + rest)
-      } ~
-        path(Segment ~ Slash) { sysid =>
+    val staticRoute = {
+      val index = (get & path(Segment ~ Slash)) { sysid ⇒
         complete {
           getSensorSystemIndex(sysid)
-        } ~
-          getFromBrowseableDirectory("static/web")
-      } ~
+        }
+      }
+
+      val staticFile = (get & path(Segment / Remaining)) { case (sysid, rest) ⇒
+        getFromFile("static/web/" + rest)
+      }
+
+      val staticWeb = get {
+        getFromBrowseableDirectory("static/web")
+      }
+
+      val staticRoot = get {
         getFromBrowseableDirectory("static/")
+      }
+
+      staticFile ~ index ~ staticWeb ~ staticRoot
     }
 
     oneStr2Route ~ oneStrRoute ~ oneSsRoute ~ ssRoute ~ staticRoute
@@ -146,7 +157,7 @@ trait MyService extends SimpleRoutingApp with JsonImplicits  {
 
   private def registerSensorSystem(ssr: SSRegister): ToResponseMarshallable = {
     db.getSensorSystem(ssr.sysid) match {
-      case None =>
+      case None ⇒
         val ss = SensorSystem(ssr.sysid,
           name = ssr.name,
           description = ssr.description,
@@ -155,52 +166,52 @@ trait MyService extends SimpleRoutingApp with JsonImplicits  {
           clickListener = ssr.clickListener
         )
         db.saveSensorSystem(ss) match {
-          case Right(rss) =>
+          case Right(rss) ⇒
             notifier.notifySensorSystemRegistered(rss)
             rss
-          case Left(error) => InternalServerError -> error
+          case Left(error) ⇒ InternalServerError -> error
         }
 
-      case Some(ss) => Conflict -> GnError(409, "Already registered", sysid = Some(ssr.sysid))
+      case Some(ss) ⇒ Conflict -> GnError(409, "Already registered", sysid = Some(ssr.sysid))
     }
   }
 
-  private def getSensorSystem(sysid: String): ToResponseMarshallable = withSensorSystem(sysid) { ss => ss }
+  private def getSensorSystem(sysid: String): ToResponseMarshallable = withSensorSystem(sysid) { ss ⇒ ss }
 
-  private def updateSensorSystem(sysid: String, ssu: SSUpdate): ToResponseMarshallable = withSensorSystem(sysid) { ss =>
+  private def updateSensorSystem(sysid: String, ssu: SSUpdate): ToResponseMarshallable = withSensorSystem(sysid) { ss ⇒
     //println(s"updateSensorSystem: sysid=$sysid ssu=$ssu")
 
     var updated = ss.copy()
     ssu.pushEvents foreach {
-      pe => updated = updated.copy(pushEvents = pe)
+      pe ⇒ updated = updated.copy(pushEvents = pe)
     }
-    ssu.center foreach { _ =>
+    ssu.center foreach { _ ⇒
       updated = updated.copy(center = ssu.center)
     }
 
     db.saveSensorSystem(updated) match {
-      case Right(uss) =>
+      case Right(uss) ⇒
         notifier.notifySensorSystemUpdated(uss)
         if (ssu.refresh.getOrElse(false)) {
           notifier.notifySensorSystemRefresh(uss)
         }
         uss
-      case Left(error) => InternalServerError -> error
+      case Left(error) ⇒ InternalServerError -> error
     }
   }
 
-  private def unregisterSensorSystem(sysid: String): ToResponseMarshallable = withSensorSystem(sysid) { ss =>
+  private def unregisterSensorSystem(sysid: String): ToResponseMarshallable = withSensorSystem(sysid) { ss ⇒
     db.deleteSensorSystem(sysid) match {
-      case Right(s) =>
+      case Right(s) ⇒
         notifier.notifySensorSystemUnregistered(s)
         s
-      case Left(error) => InternalServerError -> error
+      case Left(error) ⇒ InternalServerError -> error
     }
   }
 
-  private def addStream(sysid: String, strr: StreamRegister): ToResponseMarshallable = withSensorSystem(sysid) { ss =>
+  private def addStream(sysid: String, strr: StreamRegister): ToResponseMarshallable = withSensorSystem(sysid) { ss ⇒
     ss.streams.get(strr.strid) match {
-      case None =>
+      case None ⇒
         val ds = DataStream(
           strid       = strr.strid,
           name        = strr.name,
@@ -212,20 +223,20 @@ trait MyService extends SimpleRoutingApp with JsonImplicits  {
         )
         val updated = ss.copy(streams = ss.streams.updated(strr.strid, ds))
         db.saveSensorSystem(updated) match {
-          case Right(uss) =>
+          case Right(uss) ⇒
             notifier.notifyStreamAdded(uss, ds)
             uss
-          case Left(error) => InternalServerError -> error
+          case Left(error) ⇒ InternalServerError -> error
         }
 
-      case Some(_) => streamAlreadyDefined(sysid, strr.strid)
+      case Some(_) ⇒ streamAlreadyDefined(sysid, strr.strid)
     }
   }
 
-  private def addObservations(sysid: String, strid: String, obssr: ObservationsRegister): ToResponseMarshallable = withSensorSystem(sysid) { ss =>
+  private def addObservations(sysid: String, strid: String, obssr: ObservationsRegister): ToResponseMarshallable = withSensorSystem(sysid) { ss ⇒
     println(s"addObservations: sysid=$sysid, strid=$strid, obssr=${obssr.observations.size}")
     ss.streams.get(strid) match {
-      case Some(str) =>
+      case Some(str) ⇒
         val newObs = obssr.observations
         val previous = str.observations.getOrElse(Map.empty)
         var obsUpdated = previous
@@ -238,43 +249,43 @@ trait MyService extends SimpleRoutingApp with JsonImplicits  {
         val strUpdated = str.copy(observations = Some(obsUpdated))
         val ssUpdated = ss.copy(streams = ss.streams.updated(strid, strUpdated))
         db.saveSensorSystem(ssUpdated) match {
-          case Right(uss) =>
+          case Right(uss) ⇒
             notifier.notifyObservations2Added(uss, strid, newObs)
             newObs
 
-          case Left(error) => InternalServerError -> error
+          case Left(error) ⇒ InternalServerError -> error
         }
 
-      case None => streamUndefined(sysid, strid)
+      case None ⇒ streamUndefined(sysid, strid)
     }
   }
 
-  private def getStream(sysid: String, strid: String): ToResponseMarshallable = withSensorSystem(sysid) { ss =>
+  private def getStream(sysid: String, strid: String): ToResponseMarshallable = withSensorSystem(sysid) { ss ⇒
     ss.streams.get(strid) match {
-      case Some(str) => str
-      case None => streamUndefined(sysid, strid)
+      case Some(str) ⇒ str
+      case None ⇒ streamUndefined(sysid, strid)
     }
   }
 
-  private def deleteStream(sysid: String, strid: String): ToResponseMarshallable = withSensorSystem(sysid) { ss =>
+  private def deleteStream(sysid: String, strid: String): ToResponseMarshallable = withSensorSystem(sysid) { ss ⇒
     ss.streams.get(strid) match {
-      case Some(_) =>
+      case Some(_) ⇒
         val updated = ss.copy(streams = ss.streams - strid)
         db.saveSensorSystem(updated) match {
-          case Right(uss) =>
+          case Right(uss) ⇒
             notifier.notifyStreamRemoved(uss, strid)
             uss
-          case Left(error) => InternalServerError -> error
+          case Left(error) ⇒ InternalServerError -> error
         }
 
-      case None => streamUndefined(sysid, strid)
+      case None ⇒ streamUndefined(sysid, strid)
     }
   }
 
-  private def withSensorSystem(sysid: String)(p : SensorSystem => ToResponseMarshallable): ToResponseMarshallable = {
+  private def withSensorSystem(sysid: String)(p : SensorSystem ⇒ ToResponseMarshallable): ToResponseMarshallable = {
     db.getSensorSystem(sysid) match {
-      case Some(ss) => p(ss)
-      case None => NotFound -> GnError(404, "not registered", sysid = Some(sysid))
+      case Some(ss) ⇒ p(ss)
+      case None ⇒ NotFound -> GnError(404, "not registered", sysid = Some(sysid))
     }
   }
 
@@ -302,21 +313,24 @@ object WebServer extends MyService {
 
   def main(args: Array[String]) {
     implicit val system = ActorSystem()
+    implicit val materializer = ActorMaterializer()
+    // needed for the future flatMap/onComplete in the end
+    implicit val executionContext = system.dispatcher
 
     println(s"Gpdviz using: ${db.details}")
 
     val interface = config.getString("gpdviz.http.interface")
     val port = config.getInt("gpdviz.http.port")
 
-    startServer(interface, port) {
-      routes
-    }
+    val bindingFuture = Http().bindAndHandle(routes, interface, port)
 
     println(s"Gpdviz server '${notifier.serverName}' online at $interface:$port/")
     if (!args.contains("-d")) {
       println("Press RETURN to stop...")
       StdIn.readLine()
-      system.terminate()
+      bindingFuture
+        .flatMap(_.unbind()) // trigger unbinding from the port
+        .onComplete(_ ⇒ system.terminate()) // and shutdown when done
     }
   }
 }

@@ -1,5 +1,9 @@
 # gpdviz2
 
+2017-05-18
+
+- migrate to akka-http
+
 2017-05-16
 
 - reflect updates upon sensor system unregistration and stream removal
