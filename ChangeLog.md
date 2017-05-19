@@ -1,7 +1,8 @@
 # gpdviz2
 
-2017-05-18
+2017-05-19
 
+- add cors
 - migrate to akka-http
 
 2017-05-16

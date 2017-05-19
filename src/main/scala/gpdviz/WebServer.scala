@@ -14,6 +14,7 @@ import gpdviz.async.Notifier
 import gpdviz.data.{DbInterface, FileDb, PostgresDb}
 import gpdviz.model._
 import spray.json.{DefaultJsonProtocol, JsObject}
+import ch.megard.akka.http.cors.scaladsl.CorsDirectives.cors
 
 import scala.io.StdIn
 
@@ -74,16 +75,18 @@ trait MyService extends Directives with JsonImplicits  {
 
   def routes = {
     val ssRoute = path("api" / "ss" ) {
-      (post & entity(as[SSRegister])) { ssr ⇒
-        complete {
-          registerSensorSystem(ssr)
-        }
-      } ~
-        get {
+      cors() {
+        (post & entity(as[SSRegister])) { ssr ⇒
           complete {
-            db.listSensorSystems()
+            registerSensorSystem(ssr)
           }
-        }
+        } ~
+          get {
+            complete {
+              db.listSensorSystems()
+            }
+          }
+      }
     }
 
     val oneSsRoute = pathPrefix("api" / "ss" / Segment) { sysid ⇒
