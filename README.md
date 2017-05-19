@@ -6,9 +6,9 @@ Web-based visualization of geo-located point data streams in real-time.
 
 This is a preliminary revisit of the [initial idea](https://github.com/carueda/gpdviz).
 
-At the moment, implementation based on:
+Implementation currently based on:
 
-- [Spray](http://spray.io/)
+- [Akka-HTTP](http://doc.akka.io/docs/akka-http/current/scala/http/)
 - [Angular 1.5](https://angularjs.org/)
 - [Leaflet](http://leafletjs.com/)
 - [Highcharts](http://www.highcharts.com/)
@@ -35,15 +35,14 @@ On another terminal (this requires [httpie](https://httpie.org/)):
 still pretty ad hoc ...
 
 	$ sbt assembly
-	$ scp target/scala-2.11/gpdviz-0.0.3.jar server.example.net:gpdviz/
-	$ tar zcf gpdviz_static3.tgz static
-	$ scp gpdviz_static3.tgz  server.example.net:gpdviz/
+	$ scp target/scala-2.11/gpdviz-0.1.0.jar server.example.net:gpdviz/
+	$ tar zcf gpdviz_static-0.1.0.tgz static
+	$ scp     gpdviz_static-0.1.0.tgz server.example.net:gpdviz/
 
 
 ## model
 
-- "chart data" very ad hoc still
-- just values, no names or any other md
+- model very ad hoc still
 - currently only associated with a stream
 - could also be associated with concrete feature
 - ...

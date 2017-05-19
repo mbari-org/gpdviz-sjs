@@ -1,4 +1,4 @@
-val gpdvizVersion = "0.0.9"
+val gpdvizVersion = "0.1.0"
 
 version := gpdvizVersion
 name := "gpdviz"
@@ -13,19 +13,16 @@ assemblyJarName in assembly := s"gpdviz-$gpdvizVersion.jar"
 lazy val doobieVersion = "0.4.1"
 
 libraryDependencies ++= {
-  val sprayV      = "1.3.2"
-  val akkaV       = "2.4.10"
+  val akkaHttpV   = "10.0.6"
   val scalatestV  = "2.2.1"
   val esriV       = "1.2.1"
   val pusherV     = "1.0.0"
 
   Seq(
-    "io.spray"             %% "spray-can"       % sprayV,
-    "io.spray"             %% "spray-routing-shapeless2"   % sprayV,
-    "io.spray"             %% "spray-json"      % sprayV,
-    "io.spray"             %% "spray-testkit"   % sprayV     % "test",
-    "org.scalatest"        %% "scalatest"       % scalatestV % "test",
-    "com.typesafe.akka"    %% "akka-actor"      % akkaV,
+    "com.typesafe.akka"    %% "akka-http"            % akkaHttpV,
+    "com.typesafe.akka"    %% "akka-http-spray-json" % akkaHttpV,
+    "com.typesafe.akka"    %% "akka-http-testkit"    % akkaHttpV,
+    "org.scalatest"        %% "scalatest"            % scalatestV % "test",
 
     "com.esri.geometry"     % "esri-geometry-api" % esriV,
 
