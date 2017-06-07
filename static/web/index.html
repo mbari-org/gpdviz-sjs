@@ -65,7 +65,7 @@
           <div ng-if="vm.ss.streams">
             <!--<pre>orderedStreams={{vm.ss.orderedStreams|json}}</pre>-->
             <ul>
-              <li ng-repeat="str in vm.ss.orderedStreams">
+              <li ng-repeat="str in vm.ss.orderedStreams" style="margin: 0 -20px;">
                 <div>
                   <span style="font-weight:bold" ng-bind="str.strid"></span>
                   <span ng-if="str.name" ng-bind="' - ' + str.name"></span>
@@ -74,8 +74,10 @@
                 </div>
                 <div>
                   <span ng-bind="'Obs: ' + str.numberObs"></span>
-                  <br>
-                  <span ng-bind="'Latest: ' +str.latestIso" style="color: gray; font-family: monospace"></span>
+                  <span ng-if="str.latestIso" style="font-size: small; color: gray">
+                    <br>
+                    <span ng-bind="'Latest: ' +str.latestIso"></span>
+                  </span>
                 </div>
                 <!--ul>
                   <li ng-repeat="(timestamp, obs) in str.observations">

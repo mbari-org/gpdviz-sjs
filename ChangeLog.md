@@ -1,5 +1,9 @@
 # gpdviz2
 
+2017-06-07
+
+- some style adjustment (incl large mouse position font)
+
 2017-05-19
 
 - add cors
