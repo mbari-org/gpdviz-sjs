@@ -2,7 +2,7 @@ val gpdvizVersion = "0.1.0"
 
 version := gpdvizVersion
 name := "gpdviz"
-scalaVersion := "2.11.8"
+scalaVersion := "2.12.2"
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-Xlint")
 
@@ -10,11 +10,11 @@ mainClass in assembly := Some("gpdviz.WebServer")
 
 assemblyJarName in assembly := s"gpdviz-$gpdvizVersion.jar"
 
-lazy val doobieVersion = "0.4.1"
+//lazy val doobieVersion = "0.4.1"
 
 libraryDependencies ++= {
-  val akkaHttpV   = "10.0.6"
-  val scalatestV  = "2.2.1"
+  val akkaHttpV   = "10.0.9"
+  val scalatestV  = "3.0.3"
   val esriV       = "1.2.1"
   val pusherV     = "1.0.0"
 

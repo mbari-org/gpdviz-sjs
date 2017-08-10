@@ -1,5 +1,9 @@
 # gpdviz2
 
+2017-08-10
+
+- use sbt 0.13.13, scala 2.12; some dependency updates
+
 2017-06-07
 
 - some style adjustment (incl large mouse position font)
