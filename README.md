@@ -27,7 +27,7 @@ On another terminal (this requires [httpie](https://httpie.org/)):
 	$ data/ss1.demo.sh
 
 
-![](https://github.com/carueda/gpdviz2/blob/master/static/gpdviz2.png)
+![](https://github.com/carueda/gpdviz2/blob/master/static/gpdviz2.gif)
 
 
 ## build/install fat jar
@@ -35,7 +35,7 @@ On another terminal (this requires [httpie](https://httpie.org/)):
 still pretty ad hoc ...
 
 	$ sbt assembly
-	$ scp target/scala-2.11/gpdviz-0.1.0.jar server.example.net:gpdviz/
+	$ scp target/scala-2.12/gpdviz-0.1.0.jar server.example.net:gpdviz/
 	$ tar zcf gpdviz_static-0.1.0.tgz static
 	$ scp     gpdviz_static-0.1.0.tgz server.example.net:gpdviz/
 

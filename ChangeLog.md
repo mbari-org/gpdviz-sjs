@@ -2,6 +2,10 @@
 
 2017-08-10
 
+- tried again to enable scoverage, but got warnings/errors 
+ (coverage: `[warn] Could not instrument [EmptyTree$/null]. No pos.`;
+ coverageReport: `(*:coverageReport) No source root found for '/Users/carueda/github/carueda/gpdviz2/<macro>' (source roots: '/Users/carueda/github/carueda/gpdviz2/src/main/scala/')`)
+ ).
 - use carueda.cfg
 - use sbt 0.13.13, scala 2.12; some dependency updates
 
