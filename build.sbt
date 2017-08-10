@@ -24,7 +24,7 @@ libraryDependencies ++= {
     "com.typesafe.akka"    %% "akka-http-testkit"    % akkaHttpV,
     "org.scalatest"        %% "scalatest"            % scalatestV % "test",
     "ch.megard"            %% "akka-http-cors"       % "0.2.1",
-    "com.github.carueda"   %% "cfg"                  % "0.0.5",
+    "com.github.carueda"   %% "cfg"                  % "0.0.5" % "provided",
 
     "com.esri.geometry"     % "esri-geometry-api" % esriV,
 
