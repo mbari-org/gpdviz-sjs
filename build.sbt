@@ -24,6 +24,7 @@ libraryDependencies ++= {
     "com.typesafe.akka"    %% "akka-http-testkit"    % akkaHttpV,
     "org.scalatest"        %% "scalatest"            % scalatestV % "test",
     "ch.megard"            %% "akka-http-cors"       % "0.2.1",
+    "com.github.carueda"   %% "cfg"                  % "0.0.5",
 
     "com.esri.geometry"     % "esri-geometry-api" % esriV,
 
@@ -44,3 +45,7 @@ libraryDependencies ++= {
 
   )
 }
+
+addCompilerPlugin(
+  ("org.scalameta" % "paradise" % "3.0.0-M8").cross(CrossVersion.full)
+)

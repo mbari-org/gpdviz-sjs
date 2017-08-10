@@ -3,7 +3,6 @@ package gpdviz
 import akka.http.scaladsl.model.ContentTypes._
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import com.typesafe.config.{Config, ConfigFactory}
 import gpdviz.async.Notifier
 import gpdviz.data.FileDb
 import gpdviz.model._
@@ -12,8 +11,7 @@ import spray.json.JsObject
 
 
 class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with MyService {
-  val config: Config = ConfigFactory.load().resolve()
-  val notifier = new Notifier(config)
+  val notifier = new Notifier
 
   val db = new FileDb("data_test")
 

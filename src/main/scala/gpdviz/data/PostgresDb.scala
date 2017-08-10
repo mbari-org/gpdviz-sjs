@@ -1,7 +1,7 @@
 package gpdviz.data
 
-import com.typesafe.config.Config
 import gpdviz.GnError
+import gpdviz.config.PostgresCfg
 import gpdviz.model.{SensorSystem, SensorSystemSummary}
 /*
 import doobie.imports._
@@ -15,9 +15,9 @@ import Scalaz._
 /**
   * experimenting with doobie/postgres...
   */
-class PostgresDb(config: Config) extends DbInterface {
+class PostgresDb(pgCfg: PostgresCfg) extends DbInterface {
 
-  val details: String = s"PostgreSQL-based database (url: ${config.getString("connection.url")})"
+  val details: String = s"PostgreSQL-based database (url: ${pgCfg.url})"
 
   def listSensorSystems(): Seq[SensorSystemSummary] = ???
 /*
@@ -93,10 +93,10 @@ class PostgresDb(config: Config) extends DbInterface {
   println(a) // List(Point(1.0,2.0))
 
   private lazy val xa = DriverManagerTransactor[IOLite](
-    driver = config.getString("connection.driverName"),
-    url    = config.getString("connection.url"),
-    user   = config.getString("connection.userName"),
-    pass   = config.getString("connection.password")
+    driver = pgCfg.driverName,
+    url    = pgCfg.url,
+    user   = pgCfg.userName,
+    pass   = pgCfg.password
   )
 */
 }

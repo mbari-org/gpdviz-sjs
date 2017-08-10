@@ -2,18 +2,17 @@ package gpdviz.async
 
 import java.nio.file.{Files, Paths}
 
-import spray.json._
-import com.typesafe.config.Config
 import com.pusher.rest.Pusher
 import gpdviz.JsonImplicits
+import gpdviz.config.cfg
 import gpdviz.model.{DataStream, ObsData, SensorSystem}
+import spray.json._
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 
 
-class Notifier(config: Config) extends JsonImplicits {
-  val serverName: String = config.getString("gpdviz.serverName")
+class Notifier extends JsonImplicits {
 
   def getSensorSystemIndex(sysid: String, ssOpt: Option[SensorSystem]): String = {
     val ssVar = ssOpt match {
@@ -24,8 +23,8 @@ class Notifier(config: Config) extends JsonImplicits {
     template
       .replace("#sysid", sysid)
       .replace("#ssVar", ssVar)
-      .replace("#pusherKey", key)
-      .replace("#pusherChannel", s"$serverName-$sysid")
+      .replace("#pusherKey", cfg.pusher.key)
+      .replace("#pusherChannel", s"${cfg.serverName}-$sysid")
   }
 
   def notifySensorSystemRegistered(ss: SensorSystem): Unit = {
@@ -104,7 +103,7 @@ class Notifier(config: Config) extends JsonImplicits {
   private def notifyEvent(sysid: String, what: String, data: Any): Unit = {
     val map = Map("what" -> what, "data" -> data)
     //println(s"notifyEvent: sysid:$sysid  what=$what")  //  data=$data")
-    val channel = s"$serverName-$sysid"
+    val channel = s"${cfg.serverName}-$sysid"
     val res = pusher.trigger(channel, "my_event", map.asJava)
     if (res.getHttpStatus != 200)
       println(s"!!!notifyEvent: pusher.trigger ERROR: status=${res.getHttpStatus} message=${res.getMessage}")
@@ -112,12 +111,6 @@ class Notifier(config: Config) extends JsonImplicits {
 
   private val webDir = "static/web"
 
-  private val pc = config.getConfig("gpdviz.async.pusher")
-  private val appId   = pc.getString("appId")
-  private val key     = pc.getString("key")
-  private val secret  = pc.getString("secret")
-
-  private val pusher = new Pusher(appId, key, secret)
+  private val pusher = new Pusher(cfg.pusher.appId, cfg.pusher.key, cfg.pusher.secret)
   pusher.setEncrypted(true)
-
 }

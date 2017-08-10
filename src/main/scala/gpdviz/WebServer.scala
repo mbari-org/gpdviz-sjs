@@ -9,7 +9,7 @@ import StatusCodes._
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.stream.ActorMaterializer
 import com.cloudera.science.geojson.GeoJsonProtocol
-import com.typesafe.config.{Config, ConfigFactory}
+import gpdviz.config.cfg
 import gpdviz.async.Notifier
 import gpdviz.data.{DbInterface, FileDb, PostgresDb}
 import gpdviz.model._
@@ -69,7 +69,6 @@ trait JsonImplicits extends DefaultJsonProtocol with SprayJsonSupport with GeoJs
 
 
 trait MyService extends Directives with JsonImplicits  {
-  def config: Config
   def db: DbInterface
   def notifier: Notifier
 
@@ -310,13 +309,11 @@ trait MyService extends Directives with JsonImplicits  {
 }
 
 object WebServer extends MyService {
-  val config: Config = ConfigFactory.load().resolve()
-  val db: DbInterface = {
-    if (config.hasPath("gpdviz.postgres.connection.url"))
-      new PostgresDb(config.getConfig("gpdviz.postgres"))
-    else new FileDb("data")
+  val db: DbInterface = cfg.postgres match {
+    case None     ⇒ new FileDb("data")
+    case Some(pg) ⇒ new PostgresDb(pg)
   }
-  val notifier: Notifier = new Notifier(config)
+  val notifier: Notifier = new Notifier
 
   def main(args: Array[String]) {
     implicit val system = ActorSystem()
@@ -326,12 +323,9 @@ object WebServer extends MyService {
 
     println(s"Gpdviz using: ${db.details}")
 
-    val interface = config.getString("gpdviz.http.interface")
-    val port = config.getInt("gpdviz.http.port")
+    val bindingFuture = Http().bindAndHandle(routes, cfg.httpInterface, cfg.httpPort)
 
-    val bindingFuture = Http().bindAndHandle(routes, interface, port)
-
-    println(s"Gpdviz server '${notifier.serverName}' online at $interface:$port/")
+    println(s"Gpdviz server '${cfg.serverName}' online at ${cfg.httpInterface}:${cfg.httpPort}/")
     if (!args.contains("-d")) {
       println("Press RETURN to stop...")
       StdIn.readLine()
