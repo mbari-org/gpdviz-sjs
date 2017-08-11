@@ -15,10 +15,16 @@ Implementation currently based on:
 - [Pusher](https://pusher.com/)
 
 
+## setup
+
+
+    $ npm install jsdom
+
+
 ## local run
 
 	$ source setenv.sh  # or use whatever mechanism to define the required env vars, see application.conf
-	$ sbt run
+	$ bin/run.sh
 
 Open http://localhost:5050/ss1/
 

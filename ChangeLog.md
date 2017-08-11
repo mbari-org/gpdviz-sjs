@@ -1,5 +1,9 @@
 # gpdviz2
 
+2017-08-11
+
+- preparing for scalaJs
+
 2017-08-10
 
 - tried again to enable scoverage, but got warnings/errors 
