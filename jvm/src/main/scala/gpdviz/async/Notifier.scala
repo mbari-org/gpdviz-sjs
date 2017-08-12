@@ -3,7 +3,7 @@ package gpdviz.async
 import java.nio.file.{Files, Paths}
 
 import com.pusher.rest.Pusher
-import gpdviz.JsonImplicits
+import gpdviz.server.JsonImplicits
 import gpdviz.config.cfg
 import gpdviz.model.{DataStream, ObsData, SensorSystem}
 import spray.json._

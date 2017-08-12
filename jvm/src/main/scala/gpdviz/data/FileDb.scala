@@ -3,10 +3,10 @@ package gpdviz.data
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
 
-import gpdviz.GnError
 import gpdviz.model.{SensorSystem, SensorSystemSummary}
 import spray.json._
-import gpdviz.JsonImplicits
+import gpdviz.server.JsonImplicits
+import gpdviz.server.{GnError, JsonImplicits}
 
 import scala.util.control.NonFatal
 
