@@ -2,6 +2,7 @@
 
 2017-08-11
 
+- move web stuff to jvm/src/main/resources
 - preparing for scalaJs
 
 2017-08-10

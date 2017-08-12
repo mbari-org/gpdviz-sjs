@@ -136,22 +136,26 @@ trait GpdvizService extends Directives with JsonImplicits  {
         }
       }
 
+      val jsStuff = pathSuffix("gpdviz-fastopt.js" / Segments ) { _ ⇒
+        getFromResource("gpdviz-fastopt.js")
+      }
+
       val staticFile = (get & path(Segment / Remaining)) { case (sysid, rest) ⇒
-        getFromFile("static/web/" + rest)
+        getFromResource("web/" + rest)
       }
 
       val staticWeb = get {
-        getFromBrowseableDirectory("static/web")
+        getFromResourceDirectory("web")
       }
 
       val staticRoot = get {
-        getFromBrowseableDirectory("static/")
+        getFromResourceDirectory("")
       }
 
-      staticFile ~ index ~ staticWeb ~ staticRoot
+      staticFile ~ index ~ jsStuff ~ staticWeb ~ staticRoot
     }
 
-    oneStr2Route ~ oneStrRoute ~ oneSsRoute ~ ssRoute ~ staticRoute
+    staticRoute ~ oneStr2Route ~ oneStrRoute ~ oneSsRoute ~ ssRoute
   }
 
   private def registerSensorSystem(ssr: SSRegister): ToResponseMarshallable = {

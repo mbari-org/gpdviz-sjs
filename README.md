@@ -15,16 +15,11 @@ Implementation currently based on:
 - [Pusher](https://pusher.com/)
 
 
-## setup
-
+## build and run
 
     $ npm install jsdom
-
-
-## local run
-
 	$ source setenv.sh  # or use whatever mechanism to define the required env vars, see application.conf
-	$ bin/run.sh
+	$ sbt "gpdvizJVM/runMain gpdviz.server.GpdvizServer"
 
 Open http://localhost:5050/ss1/
 
@@ -36,15 +31,11 @@ On another terminal (this requires [httpie](https://httpie.org/)):
 ![](https://github.com/carueda/gpdviz2/blob/master/static/gpdviz2.gif)
 
 
-## build/install fat jar
-
-still pretty ad hoc ...
+## dist
 
 	$ sbt assembly
-	$ scp target/scala-2.12/gpdviz-0.1.0.jar server.example.net:gpdviz/
-	$ tar zcf gpdviz_static-0.1.0.tgz static
-	$ scp     gpdviz_static-0.1.0.tgz server.example.net:gpdviz/
-
+	$ source setenv.sh  
+	$ bin/run.sh
 
 ## model
 
@@ -52,4 +43,3 @@ still pretty ad hoc ...
 - currently only associated with a stream
 - could also be associated with concrete feature
 - ...
-
