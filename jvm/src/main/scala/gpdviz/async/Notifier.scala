@@ -1,11 +1,9 @@
 package gpdviz.async
 
-import java.nio.file.{Files, Paths}
-
 import com.pusher.rest.Pusher
-import gpdviz.JsonImplicits
 import gpdviz.config.cfg
 import gpdviz.model.{DataStream, ObsData, SensorSystem}
+import gpdviz.server.JsonImplicits
 import spray.json._
 
 import scala.annotation.tailrec
@@ -19,7 +17,8 @@ class Notifier extends JsonImplicits {
       case Some(ss) => ss.toJson.prettyPrint.replace("\n", "\n      ")
       case None     => "undefined"
     }
-    val template = Files.readAllLines(Paths.get(webDir, "index.html")).asScala.mkString("\n")
+    //val template = Files.readAllLines(Paths.get(webDir, "index.html")).asScala.mkString("\n")
+    val template = io.Source.fromResource("web/index.html").mkString
     template
       .replace("#sysid", sysid)
       .replace("#ssVar", ssVar)
@@ -108,8 +107,6 @@ class Notifier extends JsonImplicits {
     if (res.getHttpStatus != 200)
       println(s"!!!notifyEvent: pusher.trigger ERROR: status=${res.getHttpStatus} message=${res.getMessage}")
   }
-
-  private val webDir = "static/web"
 
   private val pusher = new Pusher(cfg.pusher.appId, cfg.pusher.key, cfg.pusher.secret)
   pusher.setEncrypted(true)

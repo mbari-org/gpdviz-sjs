@@ -6,11 +6,12 @@ import akka.http.scaladsl.testkit.ScalatestRouteTest
 import gpdviz.async.Notifier
 import gpdviz.data.FileDb
 import gpdviz.model._
+import gpdviz.server._
 import org.scalatest.{Matchers, WordSpec}
 import spray.json.JsObject
 
 
-class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with MyService {
+class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with GpdvizService {
   val notifier = new Notifier
 
   val db = new FileDb("data_test")

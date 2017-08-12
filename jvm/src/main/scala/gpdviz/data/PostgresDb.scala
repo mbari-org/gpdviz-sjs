@@ -1,8 +1,8 @@
 package gpdviz.data
 
-import gpdviz.GnError
 import gpdviz.config.PostgresCfg
 import gpdviz.model.{SensorSystem, SensorSystemSummary}
+import gpdviz.server.GnError
 /*
 import doobie.imports._
 import doobie.postgres.imports._

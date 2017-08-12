@@ -7,6 +7,12 @@ jdk: oraclejdk8
 before_install:
 - openssl aes-256-cbc -K $encrypted_511ced99b06c_key -iv $encrypted_511ced99b06c_iv
   -in setenv.sh.enc -out setenv.sh -d
+install:
+  - . $HOME/.nvm/nvm.sh
+  - nvm install stable
+  - nvm use stable
+  - npm install
+  - npm install jsdom
 before_script:
 - source setenv.sh
 script: sbt clean test

@@ -1,23 +1,16 @@
-package gpdviz
+package gpdviz.server
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.marshalling.ToResponseMarshallable
-import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.Directives
-import StatusCodes._
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import akka.stream.ActorMaterializer
+import akka.http.scaladsl.marshalling.ToResponseMarshallable
+import akka.http.scaladsl.model.{ContentType, HttpCharsets, HttpEntity, MediaTypes}
+import akka.http.scaladsl.model.StatusCodes.{Conflict, InternalServerError, NotFound}
+import akka.http.scaladsl.server.Directives
+import ch.megard.akka.http.cors.scaladsl.CorsDirectives.cors
 import com.cloudera.science.geojson.GeoJsonProtocol
-import gpdviz.config.cfg
 import gpdviz.async.Notifier
-import gpdviz.data.{DbInterface, FileDb, PostgresDb}
+import gpdviz.data.DbInterface
 import gpdviz.model._
 import spray.json.{DefaultJsonProtocol, JsObject}
-import ch.megard.akka.http.cors.scaladsl.CorsDirectives.cors
-
-import scala.io.StdIn
-
 
 // generic error for now
 case class GnError(code: Int,
@@ -68,7 +61,7 @@ trait JsonImplicits extends DefaultJsonProtocol with SprayJsonSupport with GeoJs
 }
 
 
-trait MyService extends Directives with JsonImplicits  {
+trait GpdvizService extends Directives with JsonImplicits  {
   def db: DbInterface
   def notifier: Notifier
 
@@ -143,22 +136,26 @@ trait MyService extends Directives with JsonImplicits  {
         }
       }
 
+      val jsStuff = pathSuffix("gpdviz-fastopt.js" / Segments ) { _ ⇒
+        getFromResource("gpdviz-fastopt.js")
+      }
+
       val staticFile = (get & path(Segment / Remaining)) { case (sysid, rest) ⇒
-        getFromFile("static/web/" + rest)
+        getFromResource("web/" + rest)
       }
 
       val staticWeb = get {
-        getFromBrowseableDirectory("static/web")
+        getFromResourceDirectory("web")
       }
 
       val staticRoot = get {
-        getFromBrowseableDirectory("static/")
+        getFromResourceDirectory("")
       }
 
-      staticFile ~ index ~ staticWeb ~ staticRoot
+      staticFile ~ index ~ jsStuff ~ staticWeb ~ staticRoot
     }
 
-    oneStr2Route ~ oneStrRoute ~ oneSsRoute ~ ssRoute ~ staticRoute
+    staticRoute ~ oneStr2Route ~ oneStrRoute ~ oneSsRoute ~ ssRoute
   }
 
   private def registerSensorSystem(ssr: SSRegister): ToResponseMarshallable = {
@@ -306,32 +303,4 @@ trait MyService extends Directives with JsonImplicits  {
 
   private def streamAlreadyDefined(sysid: String, strid: String) =
     Conflict -> GnError(409, "stream already defined", sysid = Some(sysid), strid = Some(strid))
-}
-
-object WebServer extends MyService {
-  val db: DbInterface = cfg.postgres match {
-    case None     ⇒ new FileDb("data")
-    case Some(pg) ⇒ new PostgresDb(pg)
-  }
-  val notifier: Notifier = new Notifier
-
-  def main(args: Array[String]) {
-    implicit val system = ActorSystem()
-    implicit val materializer = ActorMaterializer()
-    // needed for the future flatMap/onComplete in the end
-    implicit val executionContext = system.dispatcher
-
-    println(s"Gpdviz using: ${db.details}")
-
-    val bindingFuture = Http().bindAndHandle(routes, cfg.httpInterface, cfg.httpPort)
-
-    println(s"Gpdviz server '${cfg.serverName}' online at ${cfg.httpInterface}:${cfg.httpPort}/")
-    if (!args.contains("-d")) {
-      println("Press RETURN to stop...")
-      StdIn.readLine()
-      bindingFuture
-        .flatMap(_.unbind()) // trigger unbinding from the port
-        .onComplete(_ ⇒ system.terminate()) // and shutdown when done
-    }
-  }
 }

@@ -1,7 +1,7 @@
 package gpdviz.data
 
-import gpdviz.GnError
 import gpdviz.model.{SensorSystem, SensorSystemSummary}
+import gpdviz.server.GnError
 
 
 trait DbInterface {
