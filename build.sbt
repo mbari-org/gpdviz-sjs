@@ -70,3 +70,15 @@ lazy val gpdvizJS  = gpdviz.js
 lazy val gpdvizJVM = gpdviz.jvm.settings(
   (resources in Compile) += (fastOptJS in (gpdvizJS, Compile)).value.data
 )
+
+// Puts the js source map under jvm's classpath so it can be resolved.
+// Execute 'package' to trigger this.
+// TODO how to include this as part or 'gpdvizJVM/runMain gpdviz.server.GpdvizServer`?
+resourceGenerators in Compile += Def.task {
+  val f1 = (fastOptJS in Compile in gpdvizJS).value.data
+  val f1SourceMap = f1.getParentFile / (f1.getName + ".map")
+  val file = (classDirectory in Compile in gpdvizJVM).value / f1SourceMap.name
+  println("copying source map " + file)
+  IO.copyFile(f1SourceMap, file)
+  Seq(file)
+}.taskValue

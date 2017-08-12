@@ -6,16 +6,17 @@ import carueda.cfg._
 case class GpdvizCfg(
                       serverName:    String = "mygpdviz",
                       httpInterface: String = "0.0.0.0",
-                      httpPort:      Int    = 5050
-                    ) {
-  object pusher {
-    val appId:   String = $
-    val key:     String = $
-    val secret:  String = $
-  }
+                      httpPort:      Int    = 5050,
+                      pusher:        Option[PusherCfg],
+                      postgres:      Option[PostgresCfg]
+                    )
 
-  val postgres: Option[PostgresCfg] = $
-}
+@Cfg
+case class PusherCfg(
+                      appId:   String,
+                      key:     String,
+                      secret:  String
+                    )
 
 @Cfg
 case class PostgresCfg(

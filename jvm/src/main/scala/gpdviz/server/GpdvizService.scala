@@ -2,8 +2,8 @@ package gpdviz.server
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.marshalling.ToResponseMarshallable
-import akka.http.scaladsl.model.{ContentType, HttpCharsets, HttpEntity, MediaTypes}
 import akka.http.scaladsl.model.StatusCodes.{Conflict, InternalServerError, NotFound}
+import akka.http.scaladsl.model.{ContentType, HttpCharsets, HttpEntity, MediaTypes}
 import akka.http.scaladsl.server.Directives
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives.cors
 import com.cloudera.science.geojson.GeoJsonProtocol
@@ -138,6 +138,8 @@ trait GpdvizService extends Directives with JsonImplicits  {
 
       val jsStuff = pathSuffix("gpdviz-fastopt.js" / Segments ) { _ ⇒
         getFromResource("gpdviz-fastopt.js")
+      } ~ pathSuffix("gpdviz-fastopt.js.map" / Segments ) { _ ⇒
+        getFromResource("gpdviz-fastopt.js.map")
       }
 
       val staticFile = (get & path(Segment / Remaining)) { case (sysid, rest) ⇒

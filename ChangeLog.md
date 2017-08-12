@@ -1,5 +1,10 @@
 # gpdviz2
 
+2017-08-12
+
+- webSocket preparations. Pusher config now optional; if missing, webSockets (to be) used
+- `sbt package` to copy js source map so it gets resolved in webapp
+
 2017-08-11
 
 - move web stuff to jvm/src/main/resources
