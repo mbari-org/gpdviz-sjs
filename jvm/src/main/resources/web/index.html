@@ -20,10 +20,12 @@
 
   <script type="text/javascript" src="app.js"></script>
   <script>
+    var sysid = "#sysid";
     var Gpdviz = { "initialSs": #ssVar };
     //Pusher.logToConsole = true; // don't include this in production
-    var pusher = new Pusher('#pusherKey', { encrypted: true });
-    var channel = pusher.subscribe('#pusherChannel');
+    var pusherKey = '#pusherKey';
+    var pusher = pusherKey && new Pusher(pusherKey, { encrypted: true });
+    var channel = pusher && pusher.subscribe('#pusherChannel');
   </script>
   <style>
     body { margin: 5px 10px; }

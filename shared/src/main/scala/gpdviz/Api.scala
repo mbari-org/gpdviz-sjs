@@ -1,7 +1,8 @@
 package gpdviz
 
 case class ClientConfig(
-                         pusher: Option[ClientPusherConfig]
+                         serverName: String,
+                         pusher:     Option[ClientPusherConfig]
                        )
 
 case class ClientPusherConfig(

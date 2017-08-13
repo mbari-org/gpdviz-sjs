@@ -4,7 +4,6 @@ import akka.NotUsed
 import akka.http.scaladsl.model.ws.{Message, TextMessage}
 import akka.stream.scaladsl.{BroadcastHub, Flow, Keep, RunnableGraph, Sink, Source}
 import akka.stream.{ActorMaterializer, ThrottleMode}
-import gpdviz.config.cfg
 import gpdviz.model.{DataStream, ObsData, SensorSystem}
 
 import scala.collection.immutable.Seq
@@ -42,9 +41,9 @@ class WebSocketNotifier()(implicit materializer: ActorMaterializer) extends Noti
     template
       .replace("#sysid", sysid)
       .replace("#ssVar", ssVar)
-      // TODO no pusher here!
-      .replace("#pusherKey", cfg.pusher.get.key)
-      .replace("#pusherChannel", s"${cfg.serverName}-$sysid")
+      // TODO should not deal with pusher here!
+      .replace("#pusherKey", "")
+      .replace("#pusherChannel", "")
   }
 
   def notifySensorSystemRegistered(ss: SensorSystem): Unit = ()

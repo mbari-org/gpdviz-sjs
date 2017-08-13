@@ -1,23 +1,27 @@
 package gpdviz
 
 import autowire._
+import gpdviz.pusher.PusherListener
+import gpdviz.websocket.WsListener
 
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
-// TODO for now, just some webSocket preparations
 object Frontend extends js.JSApp {
 
   def main(): Unit = {
+    AutowireClient[Api].clientConfig().call() foreach gotClientConfig
+  }
 
-    AutowireClient[Api].clientConfig().call().foreach { clientConfig ⇒
-      println("clientConfig = " + clientConfig)
+  private def gotClientConfig(clientConfig: ClientConfig): Unit = {
+    println("clientConfig = " + clientConfig)
 
-      clientConfig.pusher match {
-        case None ⇒ new WsListener
+    val sysid: js.Dynamic = js.Dynamic.global.sysid
+    val pusherChannel = s"${clientConfig.serverName}-$sysid"
 
-        case Some(pc) ⇒
-      }
+    clientConfig.pusher match {
+      case None     ⇒ new WsListener
+      case Some(pc) ⇒ new PusherListener(pc, pusherChannel)
     }
   }
 }

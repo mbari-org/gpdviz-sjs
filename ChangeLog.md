@@ -1,5 +1,9 @@
 # gpdviz2
 
+2017-08-14
+
+- a bit of scalajs preps re pusher
+
 2017-08-12
 
 - using webjars for several of the js libraries.

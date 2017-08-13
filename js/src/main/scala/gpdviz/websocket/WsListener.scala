@@ -1,4 +1,4 @@
-package gpdviz
+package gpdviz.websocket
 
 import org.scalajs.dom
 import org.scalajs.dom.raw._
