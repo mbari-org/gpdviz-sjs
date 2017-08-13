@@ -2,6 +2,7 @@
 
 2017-08-12
 
+- start using autowire
 - webSocket preparations. Pusher config now optional; if missing, webSockets (to be) used
 - `sbt package` to copy js source map so it gets resolved in webapp
 

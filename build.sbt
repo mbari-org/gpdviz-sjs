@@ -7,6 +7,8 @@ val cfgV          = "0.0.5"
 val scalatestV    = "3.0.3"
 val esriV         = "1.2.1"
 val pusherV       = "1.0.0"
+val autowireV     = "0.2.6"
+val upickleV      = "0.4.4"
 
 
 def commonSettings = Seq(
@@ -14,6 +16,10 @@ def commonSettings = Seq(
   version := gpdvizVersion,
   scalaVersion := scalaV,
   scalaJSUseMainModuleInitializer := true,
+  libraryDependencies ++= Seq(
+    "com.lihaoyi"    %%%   "autowire"   % autowireV,
+    "com.lihaoyi"    %%%   "upickle"    % upickleV
+  ),
   scalacOptions ++= Seq("-deprecation", "-feature", "-encoding", "utf8",
     "-Ywarn-dead-code", "-unchecked", "-Xlint", "-Ywarn-unused-import")
 )

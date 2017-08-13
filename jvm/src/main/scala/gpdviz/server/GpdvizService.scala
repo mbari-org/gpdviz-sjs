@@ -7,10 +7,12 @@ import akka.http.scaladsl.model.{ContentType, HttpCharsets, HttpEntity, MediaTyp
 import akka.http.scaladsl.server.Directives
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives.cors
 import com.cloudera.science.geojson.GeoJsonProtocol
+import gpdviz.{Api, ApiImpl, AutowireServer}
 import gpdviz.async.Notifier
 import gpdviz.data.DbInterface
 import gpdviz.model._
 import spray.json.{DefaultJsonProtocol, JsObject}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 // generic error for now
 case class GnError(code: Int,
@@ -157,7 +159,22 @@ trait GpdvizService extends Directives with JsonImplicits  {
       staticFile ~ index ~ jsStuff ~ staticWeb ~ staticRoot
     }
 
-    staticRoute ~ oneStr2Route ~ oneStrRoute ~ oneSsRoute ~ ssRoute
+    val ajax = post {
+      path("ajax" / Segments) { s ⇒
+        entity(as[String]) { e ⇒
+          complete {
+            AutowireServer.route[Api](ApiImpl)(
+              autowire.Core.Request(
+                s,
+                upickle.default.read[Map[String, String]](e)
+              )
+            )
+          }
+        }
+      }
+    }
+
+    ajax ~ staticRoute ~ oneStr2Route ~ oneStrRoute ~ oneSsRoute ~ ssRoute
   }
 
   private def registerSensorSystem(ssr: SSRegister): ToResponseMarshallable = {
