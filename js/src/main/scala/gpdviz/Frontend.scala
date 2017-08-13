@@ -10,10 +10,13 @@ object Frontend extends js.JSApp {
 
   def main(): Unit = {
 
-    AutowireClient[Api].usingPusher().call().foreach { usingPusher ⇒
-      println("usingPusher = " + usingPusher)
-      if (!usingPusher) {
-        new WsListener
+    AutowireClient[Api].clientConfig().call().foreach { clientConfig ⇒
+      println("clientConfig = " + clientConfig)
+
+      clientConfig.pusher match {
+        case None ⇒ new WsListener
+
+        case Some(pc) ⇒
       }
     }
   }

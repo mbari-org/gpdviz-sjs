@@ -42,7 +42,8 @@ class WebSocketNotifier()(implicit materializer: ActorMaterializer) extends Noti
     template
       .replace("#sysid", sysid)
       .replace("#ssVar", ssVar)
-      .replace("#pusherKey", "873ed039a231e9c7a288") // TODO
+      // TODO no pusher here!
+      .replace("#pusherKey", cfg.pusher.get.key)
       .replace("#pusherChannel", s"${cfg.serverName}-$sysid")
   }
 
