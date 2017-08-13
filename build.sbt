@@ -74,7 +74,7 @@ lazy val gpdviz = crossProject
       "org.webjars.bower" %  "angular"      %  "1.6.5"   / "angular.js"     minified "angular.min.js" dependsOn "jquery.js",
       "org.webjars"       %  "leaflet"      %  "1.0.0"   / "leaflet.js",
       "org.webjars"       %  "esri-leaflet" %  "2.0.7"   / "esri-leaflet.js" dependsOn "leaflet.js",
-      "org.webjars"       %  "highcharts"   %  "5.0.14"  / "5.0.14/highcharts.js"
+      "org.webjars"       %  "highstock"    %  "5.0.14"  / "5.0.14/highstock.js"
     )
   )
 

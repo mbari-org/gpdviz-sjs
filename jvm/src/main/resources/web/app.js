@@ -63,6 +63,7 @@
         },
 
         get: function (strid, timeMs) {
+          if (!strTimePoss[strid]) return;
           if (!strTimePoss[strid].sorted) {
             strTimePoss[strid].list = _.sortBy(strTimePoss[strid].list, "timeMs");
             strTimePoss[strid].sorted = true;
