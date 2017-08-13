@@ -68,7 +68,13 @@ lazy val gpdviz = crossProject
     ),
     jsDependencies += RuntimeDOM % "test",
     jsDependencies ++= Seq(
-      "org.webjars"   %    "leaflet"    % "1.0.0" / "1.0.0/leaflet.js"
+      "org.webjars"       %  "momentjs"     %  "2.18.1"  / "moment.js"      minified "moment.min.js",
+      "org.webjars"       %  "lodash"       %  "4.17.4"  / "lodash.js"      minified "lodash.min.js",
+      "org.webjars"       %  "jquery"       %  "3.2.1"   / "jquery.js"      minified "jquery.min.js",
+      "org.webjars.bower" %  "angular"      %  "1.6.5"   / "angular.js"     minified "angular.min.js" dependsOn "jquery.js",
+      "org.webjars"       %  "leaflet"      %  "1.0.0"   / "leaflet.js",
+      "org.webjars"       %  "esri-leaflet" %  "2.0.7"   / "esri-leaflet.js" dependsOn "leaflet.js",
+      "org.webjars"       %  "highcharts"   %  "5.0.14"  / "5.0.14/highcharts.js"
     )
   )
 
@@ -77,14 +83,22 @@ lazy val gpdvizJVM = gpdviz.jvm.settings(
   (resources in Compile) += (fastOptJS in (gpdvizJS, Compile)).value.data
 )
 
-// Puts the js source map under jvm's classpath so it can be resolved.
+// Puts some js resources under jvm's classpath so they can be resolved.
 // Execute 'package' to trigger this.
 // TODO how to include this as part or 'gpdvizJVM/runMain gpdviz.server.GpdvizServer`?
 resourceGenerators in Compile += Def.task {
-  val f1 = (fastOptJS in Compile in gpdvizJS).value.data
-  val f1SourceMap = f1.getParentFile / (f1.getName + ".map")
-  val file = (classDirectory in Compile in gpdvizJVM).value / f1SourceMap.name
-  println("copying source map " + file)
-  IO.copyFile(f1SourceMap, file)
-  Seq(file)
+  val parentDir = (fastOptJS in Compile in gpdvizJS).value.data.getParentFile
+
+  def copy(name: String): File = {
+    val sourceFile = parentDir / name
+    require (sourceFile.exists())
+    val destFile = (classDirectory in Compile in gpdvizJVM).value / sourceFile.name
+    println(s"Copying $sourceFile --> $destFile")
+    IO.copyFile(sourceFile, destFile)
+    destFile
+  }
+  Seq(
+    copy("gpdviz-fastopt.js.map"),
+    copy("gpdviz-jsdeps.js")
+  )
 }.taskValue

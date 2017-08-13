@@ -142,6 +142,8 @@ trait GpdvizService extends Directives with JsonImplicits  {
         getFromResource("gpdviz-fastopt.js")
       } ~ pathSuffix("gpdviz-fastopt.js.map" / Segments ) { _ ⇒
         getFromResource("gpdviz-fastopt.js.map")
+      } ~ pathSuffix("gpdviz-jsdeps.js" / Segments ) { _ ⇒
+        getFromResource("gpdviz-jsdeps.js")
       }
 
       val staticFile = (get & path(Segment / Remaining)) { case (sysid, rest) ⇒

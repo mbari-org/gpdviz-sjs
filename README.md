@@ -9,7 +9,7 @@ This is a preliminary revisit of the [initial idea](https://github.com/carueda/g
 Implementation currently based on:
 
 - [Akka-HTTP](http://doc.akka.io/docs/akka-http/current/scala/http/)
-- [Angular 1.5](https://angularjs.org/)
+- [ScalaJS](https://www.scala-js.org/)
 - [Leaflet](http://leafletjs.com/)
 - [Highcharts](http://www.highcharts.com/)
 - [Pusher](https://pusher.com/)
@@ -17,9 +17,11 @@ Implementation currently based on:
 
 ## build and run
 
-    $ npm install jsdom
+    $ npm install jsdom source-map-support
 	$ source setenv.sh  # or use whatever mechanism to define the required env vars, see application.conf
-	$ sbt "gpdvizJVM/runMain gpdviz.server.GpdvizServer"
+	$ sbt
+	> package   # to copy js resources to jvm's classpath needed for the webapp
+	> gpdvizJVM/runMain gpdviz.server.GpdvizServer
 
 Open http://localhost:5050/ss1/
 
@@ -31,7 +33,7 @@ On another terminal (this requires [httpie](https://httpie.org/)):
 ![](https://github.com/carueda/gpdviz2/blob/master/static/gpdviz2.gif)
 
 
-## dist
+## dist and run
 
 	$ sbt assembly
 	$ source setenv.sh  

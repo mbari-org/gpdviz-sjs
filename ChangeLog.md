@@ -2,9 +2,12 @@
 
 2017-08-12
 
+- using webjars for several of the js libraries.
+  Note: still using `leaflet.css` from CDN as I could not find a way to extract css 
+  resources from the leaflet webjar.
+- `sbt package` to copy js resources so they get resolved for webapp
 - start using autowire
 - webSocket preparations. Pusher config now optional; if missing, webSockets (to be) used
-- `sbt package` to copy js source map so it gets resolved in webapp
 
 2017-08-11
 
