@@ -471,6 +471,7 @@
 
     function addObsFeatureOrGeometry(str, timestamp, obs) {
       function markerCreator(geojson, mapStyle) {
+        console.debug(":::::: geojson=", geojson);
         return function() {
           return L.geoJSON(geojson, {
             style: mapStyle,
