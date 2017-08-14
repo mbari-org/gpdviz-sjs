@@ -4,9 +4,8 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
 
 import gpdviz.model.{SensorSystem, SensorSystemSummary}
-import spray.json._
-import gpdviz.server.JsonImplicits
 import gpdviz.server.{GnError, JsonImplicits}
+import spray.json._
 
 import scala.util.control.NonFatal
 

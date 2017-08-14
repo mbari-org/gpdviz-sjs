@@ -1,4 +1,6 @@
-package gpdviz
+package gpdviz.webapp
+
+import gpdviz._
 
 class NotifHandler {
 

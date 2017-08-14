@@ -1,6 +1,6 @@
 package gpdviz.websocket
 
-import gpdviz.NotifHandler
+import gpdviz.webapp.NotifHandler
 import org.scalajs.dom
 import org.scalajs.dom.raw._
 

@@ -11,7 +11,7 @@ import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 
 
-class PusherNotifier(pusherCfg: PusherCfg) extends Notifier with JsonImplicits{
+class PusherNotifier(pusherCfg: PusherCfg) extends Notifier with JsonImplicits {
 
   def details: String = "Pusher"
 

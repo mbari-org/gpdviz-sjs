@@ -1,13 +1,24 @@
-package gpdviz
+package gpdviz.webapp
 
 import autowire._
 import gpdviz.pusher.PusherListener
 import gpdviz.websocket.WsListener
+import gpdviz.{Api, ClientConfig}
 
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
+import scala.scalajs.js.annotation.JSGlobalScope
+
+@js.native
+@JSGlobalScope
+object DOMGlobalScope extends js.Object {
+  def sysid: String = js.native
+}
+
 
 object Frontend extends js.JSApp {
+
+  val sysid: String = DOMGlobalScope.sysid
 
   def main(): Unit = {
     AutowireClient[Api].clientConfig().call() foreach gotClientConfig
@@ -15,8 +26,6 @@ object Frontend extends js.JSApp {
 
   private def gotClientConfig(clientConfig: ClientConfig): Unit = {
     println("clientConfig = " + clientConfig)
-
-    val sysid: js.Dynamic = js.Dynamic.global.sysid
 
     val notifHandler = new NotifHandler
 

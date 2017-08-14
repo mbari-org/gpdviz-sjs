@@ -1,6 +1,7 @@
 package gpdviz.pusher
 
 import gpdviz._
+import gpdviz.webapp.NotifHandler
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._

@@ -1,10 +1,9 @@
-package gpdviz
+package gpdviz.webapp
 
 import org.scalajs.dom
 
-import scalajs.concurrent.JSExecutionContext.Implicits.queue
-
 import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 object AutowireClient extends autowire.Client[String, upickle.default.Reader, upickle.default.Writer] {
   def write[Result: upickle.default.Writer](r: Result): String = upickle.default.write(r)
