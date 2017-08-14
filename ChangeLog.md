@@ -2,7 +2,7 @@
 
 2017-08-14
 
-- a bit of scalajs preps re pusher
+- more scalajs preps re notification handling
 
 2017-08-12
 

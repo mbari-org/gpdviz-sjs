@@ -1,32 +1,29 @@
 package gpdviz.pusher
 
-import gpdviz.ClientPusherConfig
+import gpdviz._
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
-import scala.scalajs.js.JSON
+import scala.scalajs.js.annotation.JSGlobal
 
-class PusherListener(pusherConfig: ClientPusherConfig, pusherChannel: String) {
+@js.native
+@JSGlobal
+class Pusher(key: String, conf: js.Dictionary[_]) extends js.Object {
+  def subscribe(channel: String): js.Dynamic = js.native
+}
 
-  println(s"PusherListener: pusherChannel=$pusherChannel")
+class PusherListener(pusherConfig: ClientPusherConfig, channelName: String, notifHandler: NotifHandler) {
+  println(s"PusherListener: pusherChannel=$channelName")
 
-  // no pusher facade out there ...
-
-  //val pusher = new Pusher(pc.key, { encrypted: true })
-  val pusher: js.Object with js.Dynamic = js.Dynamic.newInstance(js.Dynamic.global.Pusher)(
-    pusherConfig.key,
-    Map("encrypted" → true).toJSDictionary
-  )
-
+  val pusher = new Pusher(pusherConfig.key, Map("encrypted" → true).toJSDictionary)
   println("PusherListener: pusher=" + pusher)
 
-  val channel: js.Dynamic = pusher.subscribe(pusherChannel)
+  val channel: js.Dynamic = pusher.subscribe(channelName)
 
-  channel.bind("my_event", handleNotification _)
+  channel.bind("my_event", handleEvent _)
 
-  // TODO
-  def handleNotification(payload: js.Dynamic): Unit = {
-    println("handleNotification: payload.what=" + payload.what)
-    println("handleNotification: payload.data=" + JSON.stringify(payload.data))
+  def handleEvent(payload: js.Dynamic): Unit = {
+    val n = upickle.default.read[Notif](payload.asInstanceOf[String])
+    notifHandler.handleNotification(n)
   }
 }

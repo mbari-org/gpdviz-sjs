@@ -4,15 +4,6 @@ import com.cloudera.science.geojson.Feature
 import com.esri.core.geometry.Geometry
 import spray.json.JsObject
 
-case class LatLon(lat: Double, lon: Double)
-
-case class SensorSystemSummary(sysid:        String,
-                               name:         Option[String] = None,
-                               description:  Option[String] = None,
-                               streamIds:    Set[String] = Set.empty
-                              )
-
-
 case class SensorSystem(sysid:        String,
                         name:         Option[String] = None,
                         description:  Option[String] = None,
@@ -36,7 +27,3 @@ case class ObsData(feature:     Option[Feature] = None,
                    geometry:    Option[Geometry] = None,
                    scalarData:  Option[ScalarData] = None
                    )
-
-case class ScalarData(vars:      List[String],
-                      vals:      List[Double],
-                      position:  Option[LatLon] = None)

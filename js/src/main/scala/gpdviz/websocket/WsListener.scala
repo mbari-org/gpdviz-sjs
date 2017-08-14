@@ -1,12 +1,13 @@
 package gpdviz.websocket
 
+import gpdviz.NotifHandler
 import org.scalajs.dom
 import org.scalajs.dom.raw._
 
 import scala.scalajs.js
 
 // TODO for now, just some webSocket preparations
-class WsListener {
+class WsListener(notifHandler: NotifHandler) {
 
   private val webSocketDiv = dom.document.getElementById("websocket")
 

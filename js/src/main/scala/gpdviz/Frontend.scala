@@ -17,11 +17,15 @@ object Frontend extends js.JSApp {
     println("clientConfig = " + clientConfig)
 
     val sysid: js.Dynamic = js.Dynamic.global.sysid
-    val pusherChannel = s"${clientConfig.serverName}-$sysid"
+
+    val notifHandler = new NotifHandler
 
     clientConfig.pusher match {
-      case None     ⇒ new WsListener
-      case Some(pc) ⇒ new PusherListener(pc, pusherChannel)
+      case None     ⇒ new WsListener(notifHandler)
+
+      case Some(pc) ⇒
+        val pusherChannel = s"${clientConfig.serverName}-$sysid-2"
+        new PusherListener(pc, pusherChannel, notifHandler)
     }
   }
 }
