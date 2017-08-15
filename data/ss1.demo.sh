@@ -113,7 +113,7 @@ function generate_str4() {
     strid=str4
 	http post ${GPDVIZ}/api/ss/${SS} strid=${strid} \
 	    name="${strid}_name" \
-	    variables:='{ "temperature": {"units":"°C"} }' \
+	    variables:='[ { "name": "temperature", "units": "°C" } ]' \
 	    mapStyle:='{"color":"yellow", "radius": 10}' zOrder:=10 > /dev/null
 
 	timestamp="`date +%s`000"
@@ -152,28 +152,28 @@ function add_str1() {
 	             "offset": -10
             }]
 	     }' \
-	     variables:='{
-	       "baz": {
-	         "units": "m",
-	         "chartStyle": {
-	           "yAxis": 0,
-	           "type": "column"
-	         }
-	       },
-	       "bam": {
-	         "units": "Ω",
-	         "chartStyle": {
-	           "yAxis": 1
-	         }
+	     variables:='[
+	     {
+	       "name": "baz",
+	       "units": "m",
+	       "chartStyle": {
+	         "yAxis": 0,
+	         "type": "column"
 	       }
-	     }' \
+	     }, {
+	       "name": "bam",
+	       "units": "Ω",
+	       "chartStyle": {
+	         "yAxis": 1
+	       }
+	     }]' \
 	     mapStyle:='{"color":"green", "dashArray": "5,5"}' > /dev/null
 }
 
 function add_str2() {
     echo "add stream str2"
 	http post ${GPDVIZ}/api/ss/${SS} strid=str2 \
-	     variables:='{ "foo": {}, "bar": {} }' \
+	     variables:='[ { "name": "foo"}, {"name": "bar" } ]' \
 	     mapStyle:='{"color":"red", "radius": 14}' zOrder:=10 > /dev/null
 }
 

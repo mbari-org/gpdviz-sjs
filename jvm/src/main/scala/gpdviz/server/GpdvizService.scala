@@ -39,7 +39,7 @@ case class StreamRegister(strid:        String,
                           description:  Option[String] = None,
                           mapStyle:     Option[JsObject] = None,
                           zOrder:       Option[Int] = None,
-                          variables:    Option[JsObject] = None,
+                          variables:    Option[List[VariableDef]] = None,
                           chartStyle:   Option[JsObject] = None
                           )
 
@@ -51,6 +51,7 @@ trait JsonImplicits extends DefaultJsonProtocol with SprayJsonSupport with GeoJs
   implicit val sssRegFormat = jsonFormat4(SensorSystemSummary)
   implicit val ssRegFormat  = jsonFormat6(SSRegister)
   implicit val ssUpdFormat  = jsonFormat3(SSUpdate)
+  implicit val varDefFormat = jsonFormat3(VariableDef)
   implicit val strRegFormat = jsonFormat7(StreamRegister)
 
   implicit val scalarDataFormat = jsonFormat3(ScalarData)

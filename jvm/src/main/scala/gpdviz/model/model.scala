@@ -13,12 +13,17 @@ case class SensorSystem(sysid:        String,
                         clickListener: Option[String] = None
                         )
 
+case class VariableDef(name:          String,
+                       units:         Option[String] = None,
+                       chartStyle:    Option[JsObject] = None
+                      )
+
 case class DataStream(strid:    String,
                       name:         Option[String] = None,
                       description:  Option[String] = None,
                       mapStyle:     Option[JsObject] = None,
                       zOrder:       Int = 0,
-                      variables:    Option[JsObject] = None,
+                      variables:    Option[List[VariableDef]] = None,
                       chartStyle:   Option[JsObject] = None,
                       observations: Option[Map[String, List[ObsData]]] = None
                       )

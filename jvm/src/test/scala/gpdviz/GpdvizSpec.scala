@@ -8,7 +8,6 @@ import gpdviz.data.FileDb
 import gpdviz.model._
 import gpdviz.server._
 import org.scalatest.{Matchers, WordSpec}
-import spray.json.JsObject
 
 
 class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with GpdvizService {
@@ -71,7 +70,7 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
     }
 
     "add a stream" in {
-      val variables = Some(JsObject("temperature" → JsObject.empty))
+      val variables = Some(List(VariableDef("temperature")))
       val streamRegister = StreamRegister(strid = strid, variables = variables)
       Post(s"/api/ss/${sysid.get}", streamRegister) ~> routes ~> check {
         status shouldBe OK

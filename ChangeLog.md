@@ -1,7 +1,9 @@
 # gpdviz2
 
-2017-08-14
+2017-08-15
 
+- some better organization
+- less opaque variable definition structure
 - start using binding.scala
 - more scalajs preps re notification handling
 

@@ -386,7 +386,7 @@
       }
 
       var indexes = _.map(obs.scalarData.vars, function (varName) {
-        return _.indexOf(_.keys(str.variables), varName);
+        return _.indexOf(_.map(str.variables, "name"), varName);
       });
       //console.debug("& indexes=", indexes);
       _.each(obs.scalarData.vals, function (v, valIndex) {
@@ -573,8 +573,9 @@
     var yAxisList = str.chartStyle && str.chartStyle.yAxis;
 
     var initialSeriesData = [];
-    _.each(variables, function(varProps, varName) {
-      // console.debug("varName=", varName, "varProps=", varProps);
+    _.each(variables, function(varProps) {
+      //console.debug("varProps=", varProps);
+      var varName = varProps.name;
 
       if (varName === 'temperature') {
         seriesIndexTemperature = initialSeriesData.length;

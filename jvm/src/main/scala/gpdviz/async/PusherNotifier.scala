@@ -3,7 +3,7 @@ package gpdviz.async
 import com.pusher.rest.Pusher
 import gpdviz._
 import gpdviz.config.{PusherCfg, cfg}
-import gpdviz.model.{DataStream, ObsData, SensorSystem}
+import gpdviz.model._
 import gpdviz.server.JsonImplicits
 import spray.json._
 
@@ -57,8 +57,10 @@ class PusherNotifier(pusherCfg: PusherCfg) extends Notifier with JsonImplicits {
 
       notifyEvent2(ss.sysid, StreamAdded(
         sysid = ss.sysid,
-        strid = str.strid,
-        str = str.toJson.compactPrint
+        str = VmDataStream(str.strid, str.name, str.description,
+          mapStyle = str.mapStyle.map(_.toJson.compactPrint), str.zOrder,
+          variables = str.variables.map(_.map(v ⇒ VmVariableDef(v.name, v.units, v.chartStyle.map(_.toJson.compactPrint))))
+        )
       ))
     }
   }
@@ -95,15 +97,15 @@ class PusherNotifier(pusherCfg: PusherCfg) extends Notifier with JsonImplicits {
 
   private def notifyObservations2AddedNEW(ss: SensorSystem, strid: String, observations: Map[String, List[ObsData]]): Unit = if (ss.pushEvents) {
     val obs = observations mapValues { list ⇒
-      val obsDataSTRs = collection.mutable.ListBuffer[ObsDataSTR]()
+      val obsDataList = collection.mutable.ListBuffer[VmObsData]()
       list foreach  { o ⇒
-        obsDataSTRs += ObsDataSTR(
+        obsDataList += VmObsData(
           feature = o.feature.map(_.toJson.compactPrint),
           geometry = o.geometry.map(_.toJson.compactPrint),
           scalarData = o.scalarData
         )
       }
-      obsDataSTRs.toList
+      obsDataList.toList
     }
 
     @tailrec
