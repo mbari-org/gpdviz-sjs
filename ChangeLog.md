@@ -2,6 +2,7 @@
 
 2017-08-14
 
+- start using binding.scala
 - more scalajs preps re notification handling
 
 2017-08-12

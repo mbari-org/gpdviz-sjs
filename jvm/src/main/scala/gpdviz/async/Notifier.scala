@@ -7,7 +7,8 @@ trait Notifier {
 
   def details: String
 
-  def getSensorSystemIndex(sysid: String, ssOpt: Option[SensorSystem]): String
+  def getSensorSystemIndex(sysid: String, ssOpt: Option[SensorSystem],
+                           indexResource: String = "web/index.html"): String
 
   def notifySensorSystemRegistered(ss: SensorSystem): Unit
 

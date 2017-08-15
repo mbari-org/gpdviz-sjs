@@ -132,7 +132,12 @@ trait GpdvizService extends Directives with JsonImplicits  {
     }
 
     val staticRoute = {
-      val index = (get & path(Segment ~ Slash)) { sysid ⇒
+      val index2 = (get & path(Segment / "index2.html")) { sysid ⇒
+        complete {
+          getSensorSystemIndex(sysid, "web/index2.html")
+        }
+      }
+      val index = index2 ~ (get & path(Segment ~ Slash)) { sysid ⇒
         complete {
           getSensorSystemIndex(sysid)
         }
@@ -158,7 +163,7 @@ trait GpdvizService extends Directives with JsonImplicits  {
         getFromResourceDirectory("")
       }
 
-      staticFile ~ index ~ jsStuff ~ staticWeb ~ staticRoot
+      index ~ staticFile ~ jsStuff ~ staticWeb ~ staticRoot
     }
 
     val ajax = post {
@@ -313,9 +318,9 @@ trait GpdvizService extends Directives with JsonImplicits  {
     }
   }
 
-  private def getSensorSystemIndex(sysid: String): ToResponseMarshallable = {
+  private def getSensorSystemIndex(sysid: String, indexResource: String = "web/index.html"): ToResponseMarshallable = {
     val ssOpt = db.getSensorSystem(sysid)
-    val ssIndex = notifier.getSensorSystemIndex(sysid, ssOpt)
+    val ssIndex = notifier.getSensorSystemIndex(sysid, ssOpt, indexResource)
     HttpEntity(ContentType(MediaTypes.`text/html`, HttpCharsets.`UTF-8`), ssIndex.getBytes("UTF-8"))
   }
 

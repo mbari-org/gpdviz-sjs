@@ -35,9 +35,10 @@ class WebSocketNotifier()(implicit materializer: ActorMaterializer) extends Noti
 
   def details: String = "WebSockets"
 
-  def getSensorSystemIndex(sysid: String, ssOpt: Option[SensorSystem]): String = {
+  def getSensorSystemIndex(sysid: String, ssOpt: Option[SensorSystem],
+                           indexResource: String = "web/index.html"): String = {
     val ssVar = "undefined"
-    val template = io.Source.fromResource("web/index.html").mkString
+    val template = io.Source.fromResource(indexResource).mkString
     template
       .replace("#sysid", sysid)
       .replace("#ssVar", ssVar)

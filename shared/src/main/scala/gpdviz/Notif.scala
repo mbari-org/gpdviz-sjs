@@ -1,18 +1,22 @@
 package gpdviz
 
-import gpdviz.model.ScalarData
+import gpdviz.model.{LatLon, ScalarData}
 
-sealed trait Notif
+sealed trait Notif {
+  def sysid: String
+}
 
 case class SensorSystemRegistered(
                                  sysid: String,
                                  name: Option[String],
                                  description: Option[String],
+                                 center:       Option[LatLon],
                                  clickListener: Option[String],
                                  ) extends Notif
 
 case class StreamAdded(
                         sysid: String,
+                        strid: String,
                         str: String
                       ) extends Notif
 

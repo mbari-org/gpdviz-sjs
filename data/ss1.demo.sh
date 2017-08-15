@@ -23,6 +23,7 @@ function register() {
     echo "register ${SS}"
 	http post ${GPDVIZ}/api/ss sysid=${SS} \
 	     name='Test sensor system' \
+	     description='Description of Test sensor system' \
 	     center:='{"lat":36.82, "lon":-122}' \
 	     pushEvents:=true > /dev/null
 }

@@ -1,7 +1,6 @@
 package gpdviz.pusher
 
 import gpdviz._
-import gpdviz.webapp.NotifHandler
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
@@ -13,7 +12,8 @@ class Pusher(key: String, conf: js.Dictionary[_]) extends js.Object {
   def subscribe(channel: String): js.Dynamic = js.native
 }
 
-class PusherListener(pusherConfig: ClientPusherConfig, channelName: String, notifHandler: NotifHandler) {
+class PusherListener(pusherConfig: ClientPusherConfig, channelName: String,
+                     handleNotification: (Notif) ⇒ Unit) {
   println(s"PusherListener: pusherChannel=$channelName")
 
   val pusher = new Pusher(pusherConfig.key, Map("encrypted" → true).toJSDictionary)
@@ -25,6 +25,6 @@ class PusherListener(pusherConfig: ClientPusherConfig, channelName: String, noti
 
   def handleEvent(payload: js.Dynamic): Unit = {
     val n = upickle.default.read[Notif](payload.asInstanceOf[String])
-    notifHandler.handleNotification(n)
+    handleNotification(n)
   }
 }

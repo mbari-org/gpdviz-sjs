@@ -15,12 +15,13 @@ class PusherNotifier(pusherCfg: PusherCfg) extends Notifier with JsonImplicits {
 
   def details: String = "Pusher"
 
-  def getSensorSystemIndex(sysid: String, ssOpt: Option[SensorSystem]): String = {
+  def getSensorSystemIndex(sysid: String, ssOpt: Option[SensorSystem],
+                           indexResource: String = "web/index.html"): String = {
     val ssVar = ssOpt match {
       case Some(ss) ⇒ ss.toJson.prettyPrint.replace("\n", "\n      ")
       case None     ⇒ "undefined"
     }
-    val template = io.Source.fromResource("web/index.html").mkString
+    val template = io.Source.fromResource(indexResource).mkString
     template
       .replace("#sysid", sysid)
       .replace("#ssVar", ssVar)
@@ -40,6 +41,7 @@ class PusherNotifier(pusherCfg: PusherCfg) extends Notifier with JsonImplicits {
         sysid = ss.sysid,
         name = ss.name,
         description = ss.description,
+        center = ss.center,
         clickListener = ss.clickListener
       ))
     }
@@ -55,6 +57,7 @@ class PusherNotifier(pusherCfg: PusherCfg) extends Notifier with JsonImplicits {
 
       notifyEvent2(ss.sysid, StreamAdded(
         sysid = ss.sysid,
+        strid = str.strid,
         str = str.toJson.compactPrint
       ))
     }

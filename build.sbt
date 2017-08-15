@@ -10,6 +10,10 @@ val pusherV       = "1.0.0"
 val autowireV     = "0.2.6"
 val upickleV      = "0.4.4"
 
+val scalaJsDomV      = "0.9.3"
+val bindingV         = "10.0.2"
+val macrosParadiseV  = "2.1.0"
+
 
 def commonSettings = Seq(
   name := "gpdviz",
@@ -21,7 +25,9 @@ def commonSettings = Seq(
     "com.lihaoyi"    %%%   "upickle"    % upickleV
   ),
   scalacOptions ++= Seq("-deprecation", "-feature", "-encoding", "utf8",
-    "-Ywarn-dead-code", "-unchecked", "-Xlint", "-Ywarn-unused-import")
+    "-Ywarn-dead-code", "-unchecked", "-Xlint"
+    //, "-Ywarn-unused-import"
+  )
 )
 
 mainClass in assembly := Some("gpdviz.WebServer")
@@ -64,8 +70,11 @@ lazy val gpdviz = crossProject
   //.jsConfigure(_.enablePlugins(ScalaJSPlugin, JSDependenciesPlugin)).
   .jsSettings(
     libraryDependencies ++= Seq(
-      "org.scala-js"         %%%  "scalajs-dom"        % "0.9.3"
+      "org.scala-js"              %%%  "scalajs-dom"        %  scalaJsDomV,
+      "com.thoughtworks.binding"  %%%  "dom"                %  bindingV,
+      "com.thoughtworks.binding"  %%%  "futurebinding"      %  bindingV
     ),
+    addCompilerPlugin("org.scalamacros" % "paradise" % macrosParadiseV cross CrossVersion.full),
     jsDependencies += RuntimeDOM % "test",
     jsDependencies ++= Seq(
       "org.webjars"       %  "momentjs"     %  "2.18.1"  / "moment.js"      minified "moment.min.js",
