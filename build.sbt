@@ -9,6 +9,7 @@ val esriV         = "1.2.1"
 val pusherV       = "1.0.0"
 val autowireV     = "0.2.6"
 val upickleV      = "0.4.4"
+val pprintV       = "0.5.2"
 
 val scalaJsDomV      = "0.9.3"
 val bindingV         = "10.0.2"
@@ -22,7 +23,8 @@ def commonSettings = Seq(
   scalaJSUseMainModuleInitializer := true,
   libraryDependencies ++= Seq(
     "com.lihaoyi"    %%%   "autowire"   % autowireV,
-    "com.lihaoyi"    %%%   "upickle"    % upickleV
+    "com.lihaoyi"    %%%   "upickle"    % upickleV,
+    "com.lihaoyi"    %%%   "pprint"     % pprintV
   ),
   scalacOptions ++= Seq("-deprecation", "-feature", "-encoding", "utf8",
     "-Ywarn-dead-code", "-unchecked", "-Xlint"

@@ -5,6 +5,8 @@ import com.thoughtworks.binding.{Binding, dom}
 import gpdviz.model.VmDataStream
 import org.scalajs.dom.raw.Node
 
+import pprint.PPrinter.BlackWhite.{apply ⇒ pp}
+
 class View(vm: VModel) {
 
   def render(node: Node): Unit = dom.render(node, binding())
@@ -17,6 +19,15 @@ class View(vm: VModel) {
           {
           for (v <- Constants(str.variables.getOrElse(List.empty): _*))
             yield <li>{ v.name + v.units.map( " units=" + _).getOrElse("") }</li>
+          }
+        </ul>
+      </div>
+      <div>Observations:
+        <ul>
+          {
+          val obss = str.observations.getOrElse(Map.empty)
+          for (timestamp <- Constants(obss.keys.toSeq.sorted: _*))
+            yield <li>{ timestamp + " -> " + obss(timestamp).map(pp(_)) }</li>
           }
         </ul>
       </div>
