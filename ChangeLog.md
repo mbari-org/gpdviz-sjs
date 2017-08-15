@@ -2,6 +2,7 @@
 
 2017-08-15
 
+- make ss1.demo.sh generate deterministic timestamps and values
 - some better organization
 - less opaque variable definition structure
 - start using binding.scala
