@@ -5,7 +5,8 @@ import gpdviz._
 import gpdviz.model.VmSensorSystem
 import org.scalajs.dom.window
 
-class VModel(val sysid: String) {
+// TODO llmap should not be a model concern
+class VModel(val sysid: String, llmap: LLMap) {
   val ss: Var[VmSensorSystem] = Var(VmSensorSystem(sysid))
 
   val handleNotification: (Notif) ⇒ Unit = (n: Notif) ⇒ {
@@ -36,6 +37,7 @@ class VModel(val sysid: String) {
       case n: StreamRemoved ⇒
         val streams = ss.get.streams - n.strid
         ss := ss.get.copy(streams = streams)
+        llmap.removeStream(n.strid)
 
       case _: SensorSystemUpdated ⇒
 

@@ -11,16 +11,24 @@ import scala.scalajs.js.JSConverters._
 
 @js.native
 trait LLMap extends js.Object {
-
   def addSelectionPoint(p: js.Array[Double]): String = js.native
-
   def addGeoJson(strid: String, feature: String, style: js.UndefOr[String]): Unit = js.native
+  def removeStream(strid: String): Unit = js.native
+  def clearMarkers(): Unit = js.native
 }
 
 
 class View(vm: VModel, llmap: LLMap) {
 
   llmap.addSelectionPoint(js.Array(36.646, -122.02))
+
+  // exploring some stuff ...
+  Binding {
+    val ss = vm.ss.bind
+    println(s"ss is changing: ss is empty = ${ss.streams.isEmpty}")
+    if (ss.streams.isEmpty)
+      llmap.clearMarkers()
+  }.watch()
 
   def render(): Unit = {
 

@@ -30,7 +30,7 @@ object Frontend extends js.JSApp {
 }
 
 class WebApp(clientConfig: ClientConfig, sysid: String, llmap: LLMap) {
-  val vm = new VModel(sysid)
+  val vm = new VModel(sysid, llmap)
 
   clientConfig.pusher match {
     case None ⇒

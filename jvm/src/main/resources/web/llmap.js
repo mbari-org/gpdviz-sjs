@@ -1,4 +1,7 @@
 function setupLLMap() {
+
+  var byStrId = {};
+
   // TODO capture center and zoom from sensor system properties
   var center = [36.79, -122.02];
   var zoom = 11;
@@ -120,7 +123,7 @@ function setupLLMap() {
   function addMarker(strid, createMarker) {
     var marker = createMarker();
     marker.addTo(map);
-    //byStrId[strid].marker = marker;
+    byStrId[strid].marker = marker;
     markersLayer.addLayer(marker);
 
     var group = overlayGroupByStreamId[strid];
@@ -156,7 +159,27 @@ function setupLLMap() {
         style && JSON.parse(style);
       console.debug("addGeoJson: geojson=", geojson);
       console.debug("addGeoJson: mapStyle=", mapStyle);
+
+      byStrId[strid] = {}; // {str: str, charter: createCharter(str)};
+
       addMarker(strid, markerCreator(geojson, mapStyle));
+    },
+
+    // TODO
+    removeStream: function(strid) {
+      console.debug("TODO removeStream: strid=", strid)
+    },
+
+    clearMarkers: function() {
+      selectionGroup.clearLayers();
+      markersLayer.clearLayers();
+      markersLayerMG.clearLayers();
+      _.each(overlayGroupByStreamId, function(group) {
+        controlLayers.removeLayer(group);
+        map.removeLayer(group);
+      });
+      overlayGroupByStreamId = {};
     }
+
   }
 }
