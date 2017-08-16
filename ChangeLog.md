@@ -3,7 +3,7 @@
 2017-08-15
 
 - exploring some stuff ... before adding Var/Vars within the Vm model... 
-  https://github.com/OlivierBlanvillain/monadic-html/issues/57
+  https://github.com/OlivierBlanvillain/monadic-html/issues/13
 - LLMap to interface with Leaflet
 - make ss1.demo.sh generate deterministic timestamps and values
 - some better organization
