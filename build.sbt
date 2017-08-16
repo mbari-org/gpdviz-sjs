@@ -26,8 +26,10 @@ def commonSettings = Seq(
     "com.lihaoyi"    %%%   "upickle"    % upickleV,
     "com.lihaoyi"    %%%   "pprint"     % pprintV
   ),
-  scalacOptions ++= Seq("-deprecation", "-feature", "-encoding", "utf8",
-    "-Ywarn-dead-code", "-unchecked", "-Xlint"
+  scalacOptions ++= Seq("-deprecation", "-feature", "-encoding", "utf8"
+    //, "-Ywarn-dead-code"
+    //, "-unchecked",
+    //, "-Xlint"
     //, "-Ywarn-unused-import"
   )
 )
