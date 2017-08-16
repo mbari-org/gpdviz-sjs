@@ -15,19 +15,21 @@ import scala.scalajs.js.annotation.JSGlobalScope
 @JSGlobalScope
 object DOMGlobalScope extends js.Object {
   def sysid: String = js.native
-}
 
+  def setupLLMap(): LLMap = js.native
+}
 
 object Frontend extends js.JSApp {
   def main(): Unit = if (elm.scalajs != null) {
+    val llmap = DOMGlobalScope.setupLLMap()
     AutowireClient[Api].clientConfig().call() foreach { clientConfig ⇒
       println("clientConfig = " + clientConfig)
-      new WebApp(clientConfig, DOMGlobalScope.sysid)
+      new WebApp(clientConfig, DOMGlobalScope.sysid, llmap)
     }
   }
 }
 
-class WebApp(clientConfig: ClientConfig, sysid: String) {
+class WebApp(clientConfig: ClientConfig, sysid: String, llmap: LLMap) {
   val vm = new VModel(sysid)
 
   clientConfig.pusher match {
@@ -39,11 +41,14 @@ class WebApp(clientConfig: ClientConfig, sysid: String) {
       new PusherListener(pc, pusherChannel, vm.handleNotification)
   }
 
-  new View(vm).render(elm.scalajs)
+  new View(vm, llmap).render()
 }
 
 private object elm {
-  def scalajs:  HTMLElement  = byId("scalajs")
+  def scalajs:      HTMLElement  = byId("scalajs")
+  def sysName:      HTMLElement  = byId("sysName")
+  def sysDesc:      HTMLElement  = byId("sysDesc")
+  def sysActivity:  HTMLElement  = byId("sysActivity")
 
   private def byId[T](id: String): T = document.getElementById(id).asInstanceOf[T]
 }

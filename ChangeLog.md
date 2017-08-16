@@ -2,6 +2,7 @@
 
 2017-08-15
 
+- LLMap to interface with Leaflet
 - make ss1.demo.sh generate deterministic timestamps and values
 - some better organization
 - less opaque variable definition structure

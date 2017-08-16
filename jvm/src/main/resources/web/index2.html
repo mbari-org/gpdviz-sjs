@@ -13,6 +13,8 @@
 
   <script src="gpdviz-jsdeps.js"></script>
 
+  <script src="llmap.js"></script>
+
   <!--<script src="leaflet/leaflet.gridlayer.googlemutant/Leaflet.GoogleMutant.js"></script>-->
 
   <script src="leaflet/Leaflet.MousePosition/src/L.Control.MousePosition.js"></script>
@@ -29,6 +31,29 @@
   <div id="websocket">
   </div>
   <div id="scalajs">
+    <div style="text-align: center">
+      <div style="background-color: #ebfaf5">
+        <span style="font-weight: bold">
+          <code>#sysid</code>
+          <span id="sysName"></span>
+        </span>
+        <span id="sysDesc"></span>
+      </div>
+    </div>
+
+    <table style="width: 100%">
+      <tbody>
+      <tr>
+        <td style="vertical-align: top">
+          <div id="mapid" style="height:800px">
+          </div>
+        </td>
+        <td style="width: 300px; vertical-align: top">
+          <div id="sysActivity"></div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
   </div>
 
   <script src="gpdviz-fastopt.js"></script>
