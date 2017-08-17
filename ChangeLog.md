@@ -1,5 +1,9 @@
 # gpdviz2
 
+2017-08-16
+
+- extract Charter from app.js to charter.js for reuse
+ 
 2017-08-15
 
 - exploring some stuff ... before adding Var/Vars within the Vm model... 
