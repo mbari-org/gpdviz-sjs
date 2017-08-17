@@ -159,7 +159,19 @@ function setupLLMap() {
 
   // TODO
   function addStream(str) {
-    console.debug("addStream: str=", str);
+    // json-ify some stuff
+    str.mapStyle   = str.mapStyle   ? JSON.parse(str.mapStyle) : {};
+    str.chartStyle = str.chartStyle ? JSON.parse(str.chartStyle) : {};
+    if (str.variables) {
+      str.variables = _.map(str.variables, function (variable) {
+        if (variable.chartStyle) {
+          variable.chartStyle = JSON.parse(variable.chartStyle);
+        }
+        return variable;
+      });
+    }
+    console.debug("addStream: str=", _.cloneDeep(str));
+
     str.observations = {}; // TODO check already provided observation (not the case at the moment)
     byStrId[str.strid] = {
       str:      str,
@@ -173,7 +185,13 @@ function setupLLMap() {
     console.debug("TODO removeStream: strid=", strid)
   }
 
-  function addGeoJson(strid, timestamp, geoJsonStr, style) {
+  function addGeoJson(strid, timestamp, geoJsonStr) {
+    var str = byStrId[strid] && byStrId[strid].str;
+    if (!str) {
+      console.warn("addGeoJson: unknown stream by strid=", strid);
+      return;
+    }
+
     var geoJsonKey = timestamp + "->" + geoJsonStr;
     if (byStrId[strid].geoJsons[geoJsonKey]) {
       console.warn("addGeoJson: already added: strid=", strid, "geoJsonKey=", geoJsonKey);
@@ -181,8 +199,13 @@ function setupLLMap() {
     }
 
     var geoJson = JSON.parse(geoJsonStr);
-    var mapStyle = geoJson && geoJson.properties && geoJson.properties.style ||
-      style && JSON.parse(style);
+
+    if (geoJson.properties && geoJson.properties.style) {
+      var mapStyle = geoJson.properties.style;
+    }
+    else {
+      mapStyle = str.mapStyle ? _.cloneDeep(str.mapStyle) : {};
+    }
 
     console.debug("addGeoJson: timestamp=", timestamp, "geoJson=", geoJson, "mapStyle=", mapStyle);
 
@@ -192,8 +215,7 @@ function setupLLMap() {
   }
 
   function addObsScalarData(strid, timestamp, scalarData) {
-    //console.debug("TODO addObsScalarData: strid=", strid, "timestamp=", timestamp, "scalarData=", scalarData);
-    var str = byStrId[strid].str;
+    var str = byStrId[strid] && byStrId[strid].str;
     if (!str) {
       console.warn("addObsScalarData: unknown stream by strid=", strid);
       return;
@@ -267,7 +289,7 @@ function setupLLMap() {
       // console.debug("ADDED absoluteChart=", vm.absoluteCharts[chartId]);
       byStrId[str.strid].marker.on('click', function (e) {
         var idElm = $("#" + chartId);
-        console.debug("CLICK: idElm=", idElm, " visible=", idElm && idElm.is(":visible"));
+        //console.debug("CLICK: idElm=", idElm, " visible=", idElm && idElm.is(":visible"));
         idElm.stop();
         if (idElm.is(":visible")) {
           idElm.fadeOut(700);
@@ -282,7 +304,7 @@ function setupLLMap() {
       $(document).keyup(function (e) {
         if (e.keyCode === 27) {
           var idElm = $("#" + chartId);
-          console.debug("ESC: idElm=", idElm);
+          //console.debug("ESC: idElm=", idElm);
           idElm.fadeOut(700);
           setTimeout(charter.deactivateChart, 700);
         }

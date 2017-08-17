@@ -57,9 +57,15 @@ class PusherNotifier(pusherCfg: PusherCfg) extends Notifier with JsonImplicits {
 
       notifyEvent2(ss.sysid, StreamAdded(
         sysid = ss.sysid,
-        str = VmDataStream(str.strid, str.name, str.description,
-          mapStyle = str.mapStyle.map(_.toJson.compactPrint), str.zOrder,
+        str = VmDataStream(
+          str.strid,
+          str.name,
+          str.description,
+          mapStyle = str.mapStyle.map(_.toJson.compactPrint),
+          str.zOrder,
+          chartStyle = str.chartStyle.map(_.toJson.compactPrint),
           variables = str.variables.map(_.map(v ⇒ VmVariableDef(v.name, v.units, v.chartStyle.map(_.toJson.compactPrint))))
+          // TODO NOTE observations not captured at time of stream registration
         )
       ))
     }

@@ -2,6 +2,7 @@
 
 2017-08-17
 
+- pass mapStyle, chartStyle to js part
 - incorporating charts in new scalajs-based scheme
 - TODO: consider using https://scalacenter.github.io/scalajs-bundler/
  

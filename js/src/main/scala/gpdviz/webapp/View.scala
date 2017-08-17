@@ -57,16 +57,28 @@ class View(vm: VModel) {
 
   @dom private def streamBinding(str: VmDataStream): Binding[Node] = {
     <div>
-      { str.strid + str.description.map(" - " + _).getOrElse("") }
-      <div>Variables:
+      <span style="font-weight: bold">{ str.strid }</span>
+      { str.name.map(" - " + _).getOrElse("") }
+      { str.description.map(" - " + _).getOrElse("") }
+      <div>{ str.chartStyle.map(" chartStyle=" + _).getOrElse("") }</div>
+      <div>{ str.mapStyle.map(" mapStyle=" + _).getOrElse("") }</div>
+
+      <div>
+        <span style="font-weight: bold">Variables:</span>
         <ul>
           {
           for (v <- Constants(str.variables.getOrElse(List.empty): _*))
-            yield <li>{ v.name + v.units.map( " units=" + _).getOrElse("") }</li>
+            yield <li>
+              { v.name +
+                v.units.map( " units=" + _).getOrElse("") +
+                v.chartStyle.map( " chartStyle=" + _).getOrElse("")
+              }
+            </li>
           }
         </ul>
       </div>
-      <div>Observations:
+      <div>
+        <span style="font-weight: bold">Observations:</span>
         <ul>
           {
           val obss = str.observations.getOrElse(Map.empty)

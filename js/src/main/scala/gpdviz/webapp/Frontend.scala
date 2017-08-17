@@ -31,7 +31,7 @@ trait LLMap extends js.Object {
 
   def removeStream(strid: String): Unit = js.native
 
-  def addGeoJson(strid: String, timestamp: String, feature: String, style: js.UndefOr[String]): Unit = js.native
+  def addGeoJson(strid: String, timestamp: String, feature: String): Unit = js.native
 
   def addObsScalarData(strid: String, timestamp: String, scalarData: js.Dictionary[_]): Unit = js.native
 

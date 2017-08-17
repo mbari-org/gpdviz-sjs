@@ -42,16 +42,16 @@ class NotifHandler(sysid: String, llmap: LLMap, vm: VModel) {
           "strid"        → str.strid,
           "name"         → str.name.orUndefined,
           "description"  → str.description.orUndefined,
-          //"mapStyle"     → str.mapStyle.orUndefined,
+          "mapStyle"     → str.mapStyle.orUndefined,
           "zOrder"       → str.zOrder,
 
+          "chartStyle"   → str.chartStyle.orUndefined,
           "variables"    → str.variables.map(vars ⇒ vars.map(v ⇒ Map(
             "name"       → v.name,
             "units"      → v.units.orUndefined,
             "chartStyle" → v.chartStyle.orUndefined
           ).toJSDictionary).toJSArray).orUndefined
 
-          //, "chartStyle"   → str.chartStyle.orUndefined
           //,"observations" → str.observations.toJSArray
         ).toJSDictionary)
 
@@ -67,10 +67,10 @@ class NotifHandler(sysid: String, llmap: LLMap, vm: VModel) {
         obss.keys.toSeq.sorted foreach { timestamp ⇒
           obss(timestamp) foreach { obs ⇒
             obs.feature foreach { feature ⇒
-              llmap.addGeoJson(str.strid, timestamp, feature, str.mapStyle.orUndefined)
+              llmap.addGeoJson(str.strid, timestamp, feature)
             }
             obs.geometry foreach { geometry ⇒
-              llmap.addGeoJson(str.strid, timestamp, geometry, str.mapStyle.orUndefined)
+              llmap.addGeoJson(str.strid, timestamp, geometry)
             }
             obs.scalarData foreach { scalarData ⇒
               llmap.addObsScalarData(str.strid, timestamp, Map(
