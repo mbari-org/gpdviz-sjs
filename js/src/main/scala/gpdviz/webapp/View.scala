@@ -2,43 +2,42 @@ package gpdviz.webapp
 
 import com.thoughtworks.binding.Binding.Constants
 import com.thoughtworks.binding.{Binding, dom}
-import gpdviz.model.{VmDataStream, VmObsData}
+import gpdviz.model.VmDataStream
 import org.scalajs.dom.raw.Node
 import pprint.PPrinter.BlackWhite.{apply ⇒ pp}
 
-import scala.scalajs.js
-import scala.scalajs.js.JSConverters._
+case class AbsChart(
+                   id:          String,
+                   heightStr:   String,
+                   minWidthStr: String
+                   )
 
-@js.native
-trait LLMap extends js.Object {
-  def addSelectionPoint(p: js.Array[Double]): String = js.native
-  def addGeoJson(strid: String, feature: String, style: js.UndefOr[String]): Unit = js.native
-  def removeStream(strid: String): Unit = js.native
-  def clearMarkers(): Unit = js.native
-}
-
-
-class View(vm: VModel, llmap: LLMap) {
-
-  llmap.addSelectionPoint(js.Array(36.646, -122.02))
-
-  // exploring some stuff ...
-  Binding {
-    val ss = vm.ss.bind
-    println(s"ss is changing: ss is empty = ${ss.streams.isEmpty}")
-    if (ss.streams.isEmpty)
-      llmap.clearMarkers()
-  }.watch()
+class View(vm: VModel) {
 
   def render(): Unit = {
 
-    @dom val sysName = <span>{ vm.ss.bind.name.map(" - " + _).getOrElse("") }</span>
-    @dom val sysDesc = <span>{ vm.ss.bind.description.getOrElse("") }</span>
-
     dom.render(elm.sysName, sysName)
     dom.render(elm.sysDesc, sysDesc)
+    dom.render(elm.absoluteCharts, absoluteCharts)
     dom.render(elm.sysActivity, sysActivity())
   }
+
+  @dom private val sysName = <span>{ vm.ss.bind.name.map(" - " + _).getOrElse("") }</span>
+
+  @dom private val sysDesc = <span>{ vm.ss.bind.description.getOrElse("") }</span>
+
+  @dom private val absoluteCharts = <div>
+    {
+      vm.absCharts map { c ⇒
+        //println("ADDING absoluteChart div id=" + c.id)
+        <div id={ c.id }
+             class="absoluteChart"
+             style={ s"'min-width': ${c.minWidthStr}, height: ${c.heightStr}" }
+        >
+        </div>
+      }
+    }
+  </div>
 
   @dom private def sysActivity(): Binding[Node] = {
     <div>
@@ -72,22 +71,10 @@ class View(vm: VModel, llmap: LLMap) {
           {
           val obss = str.observations.getOrElse(Map.empty)
           for (timestamp <- Constants(obss.keys.toSeq.sorted: _*))
-            yield <li>{ timestamp + " -> " + obss(timestamp).map(handleObservation(str)) }</li>
+            yield <li>{ timestamp + " -> " + obss(timestamp).map(pp(_)) }</li>
           }
         </ul>
       </div>
     </div>
-  }
-
-  private def handleObservation(str: VmDataStream)(obs: VmObsData): String = {
-    obs.feature foreach { feature ⇒
-      llmap.addGeoJson(str.strid, feature, str.mapStyle.orUndefined)
-    }
-
-    obs.geometry foreach { geometry ⇒
-      llmap.addGeoJson(str.strid, geometry, str.mapStyle.orUndefined)
-    }
-
-    pp(obs).toString
   }
 }

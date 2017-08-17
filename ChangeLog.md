@@ -1,5 +1,10 @@
 # gpdviz2
 
+2017-08-17
+
+- incorporating charts in new scalajs-based scheme
+- TODO: consider using https://scalacenter.github.io/scalajs-bundler/
+ 
 2017-08-16
 
 - extract Charter from app.js to charter.js for reuse

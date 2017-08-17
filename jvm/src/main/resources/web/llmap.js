@@ -138,48 +138,199 @@ function setupLLMap() {
     markersLayerMG.addLayer(marker);
   }
 
-  return {
-    addSelectionPoint: function(p) {
-      // console.debug("addSelectionPoint: p=", p);
-      selectionGroup.clearLayers();
-      if (!p) return;
+  function clearMarkers() {
+    selectionGroup.clearLayers();
+    markersLayer.clearLayers();
+    markersLayerMG.clearLayers();
+    _.each(overlayGroupByStreamId, function(group) {
+      controlLayers.removeLayer(group);
+      map.removeLayer(group);
+    });
+    overlayGroupByStreamId = {};
+  }
 
-      var marker = L.marker([p[0], p[1]], {
-        keyboard: false,
-        icon: selectionIcon,
-        riseOnHover: true,
-        opacity: 0.9
-      }).addTo(map);
-      selectionGroup.addLayer(marker);
-    },
+  function sensorSystemRegistered() {
+    clearMarkers();
+  }
 
-    addGeoJson: function(strid, feature, style) {
-      var geojson = JSON.parse(feature);
-      var mapStyle = geojson && geojson.properties && geojson.properties.style ||
-        style && JSON.parse(style);
-      console.debug("addGeoJson: geojson=", geojson);
-      console.debug("addGeoJson: mapStyle=", mapStyle);
+  function sensorSystemUnregistered() {
+    clearMarkers();
+  }
 
-      byStrId[strid] = {}; // {str: str, charter: createCharter(str)};
+  // TODO
+  function addStream(str) {
+    console.debug("addStream: str=", str);
+    str.observations = {}; // TODO check already provided observation (not the case at the moment)
+    byStrId[str.strid] = {
+      str:      str,
+      charter:  createCharter(str),
+      geoJsons: {}
+    };
+  }
 
-      addMarker(strid, markerCreator(geojson, mapStyle));
-    },
+  // TODO
+  function removeStream(strid) {
+    console.debug("TODO removeStream: strid=", strid)
+  }
 
-    // TODO
-    removeStream: function(strid) {
-      console.debug("TODO removeStream: strid=", strid)
-    },
-
-    clearMarkers: function() {
-      selectionGroup.clearLayers();
-      markersLayer.clearLayers();
-      markersLayerMG.clearLayers();
-      _.each(overlayGroupByStreamId, function(group) {
-        controlLayers.removeLayer(group);
-        map.removeLayer(group);
-      });
-      overlayGroupByStreamId = {};
+  function addGeoJson(strid, timestamp, geoJsonStr, style) {
+    var geoJsonKey = timestamp + "->" + geoJsonStr;
+    if (byStrId[strid].geoJsons[geoJsonKey]) {
+      console.warn("addGeoJson: already added: strid=", strid, "geoJsonKey=", geoJsonKey);
+      return;
     }
 
+    var geoJson = JSON.parse(geoJsonStr);
+    var mapStyle = geoJson && geoJson.properties && geoJson.properties.style ||
+      style && JSON.parse(style);
+
+    console.debug("addGeoJson: timestamp=", timestamp, "geoJson=", geoJson, "mapStyle=", mapStyle);
+
+    byStrId[strid].geoJsons[geoJsonKey] = geoJson;
+
+    addMarker(strid, markerCreator(geoJson, mapStyle));
+  }
+
+  function addObsScalarData(strid, timestamp, scalarData) {
+    //console.debug("TODO addObsScalarData: strid=", strid, "timestamp=", timestamp, "scalarData=", scalarData);
+    var str = byStrId[strid].str;
+    if (!str) {
+      console.warn("addObsScalarData: unknown stream by strid=", strid);
+      return;
+    }
+    var charter = byStrId[strid].charter;
+    if (!charter) {
+      charter = byStrId[strid].charter = createCharter(str);
+    }
+
+    var indexes = _.map(scalarData.vars, function (varName) {
+      return _.indexOf(_.map(str.variables, "name"), varName);
+    });
+    //console.debug("& indexes=", indexes);
+    _.each(scalarData.vals, function (v, valIndex) {
+      var varIndex = indexes[valIndex];
+      charter.addChartPoint(varIndex, timestamp, v);
+    });
+
+    // console.debug(str.strid, "scalarData.position=", scalarData.position);
+    if (scalarData.position) {
+      positionsByTime.set(str.strid, timestamp, scalarData.position);
+    }
+
+    if (!byStrId[str.strid].marker) {
+      return;
+    }
+    var chartId = "chart-container-" + str.strid;
+
+    var useChartPopup = str.chartStyle && str.chartStyle.useChartPopup;
+
+    if (useChartPopup) {
+      if (byStrId[str.strid].popupInfo) return;
+    }
+    else if (byStrId[str.strid].absChartUsed) return;
+
+    if (str.chartHeight === undefined) {
+      str.chartHeight = 400;
+      if (str.chartStyle && str.chartStyle.height) {
+        str.chartHeight = str.chartStyle.height;
+      }
+    }
+    var chartHeightStr = getSizeStr(str.chartHeight);
+    var minWidthPx = str.chartStyle && str.chartStyle.minWidthPx || 600;
+    var minWidthStr = minWidthPx + 'px';
+
+    if (useChartPopup) {
+      if (debug) console.debug("setting popup for stream ", str.strid);
+      var chartContainer = '<div id="' + chartId +
+        '" style="min-width:' + minWidthStr + ';height:' + chartHeightStr + ';margin:0 auto"></div>';
+
+      var popupInfo = L.popup({
+        //autoClose: false, closeOnClick: false
+        minWidth: minWidthPx + 50
+      });
+      popupInfo._strid = str.strid;
+
+      popupInfo.setContent(chartContainer);
+
+      byStrId[str.strid].marker.bindPopup(popupInfo);
+      byStrId[str.strid].popupInfo = popupInfo;
+    }
+
+    else {
+      byStrId[str.strid].absChartUsed = true;
+      // vm.absoluteCharts[chartId] = {
+      //   id: chartId,
+      //   heightStr: chartHeightStr,
+      //   minWidthStr: minWidthStr
+      // };
+
+      // console.debug("ADDED absoluteChart=", vm.absoluteCharts[chartId]);
+      byStrId[str.strid].marker.on('click', function (e) {
+        var idElm = $("#" + chartId);
+        console.debug("CLICK: idElm=", idElm, " visible=", idElm && idElm.is(":visible"));
+        idElm.stop();
+        if (idElm.is(":visible")) {
+          idElm.fadeOut(700);
+          setTimeout(charter.deactivateChart, 700);
+        }
+        else {
+          charter.activateChart();
+          idElm.fadeIn('fast');
+        }
+      });
+
+      $(document).keyup(function (e) {
+        if (e.keyCode === 27) {
+          var idElm = $("#" + chartId);
+          console.debug("ESC: idElm=", idElm);
+          idElm.fadeOut(700);
+          setTimeout(charter.deactivateChart, 700);
+        }
+      });
+    }
+  }
+
+  function createCharter(str) {
+    return Charter(str, function(point) {
+      if (point) {
+        console.debug("hovered point=", point.x);
+        //$scope.$apply(function() {
+        //  vm.hoveredPoint.isoTime = moment.utc(point.x).format();
+          var p = positionsByTime.get(str.strid, point.x);
+          if (p) {
+            //vm.hoveredPoint.position = p;
+            addSelectionPoint([p.lat, p.lon]);
+          }
+        //});
+      }
+    });
+  }
+
+  function addSelectionPoint(p) {
+    // console.debug("addSelectionPoint: p=", p);
+    selectionGroup.clearLayers();
+    if (!p) return;
+
+    var marker = L.marker([p[0], p[1]], {
+      keyboard: false,
+      icon: selectionIcon,
+      riseOnHover: true,
+      opacity: 0.9
+    }).addTo(map);
+    selectionGroup.addLayer(marker);
+  }
+
+  return {
+    sensorSystemRegistered:    sensorSystemRegistered,
+    sensorSystemUnregistered:  sensorSystemUnregistered,
+    addStream:                 addStream,
+    removeStream:              removeStream,
+    addGeoJson:                addGeoJson,
+    addObsScalarData:          addObsScalarData,
+    addSelectionPoint:         addSelectionPoint
+  };
+
+  function getSizeStr(size) {
+    return typeof size === 'number' ? size + 'px' : size;
   }
 }
