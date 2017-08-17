@@ -1,0 +1,434 @@
+{
+  "center": {
+    "lat": 36.849999999999994,
+    "lon": -122.125
+  },
+  "sysid": "waypointer_demo",
+  "clickListener": "http://127.0.0.1:5000/click",
+  "pushEvents": true,
+  "streams": {
+    "initialPoint": {
+      "mapStyle": {
+        "color": "blue",
+        "radius": 5,
+        "fillColor": "blue",
+        "fillOpacity": 1
+      },
+      "variables": [],
+      "zOrder": 15,
+      "strid": "initialPoint",
+      "observations": {
+        "1502987172": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.06016540527345, 36.83539346553288]
+          }
+        }]
+      }
+    },
+    "waypoints": {
+      "mapStyle": {
+        "color": "green",
+        "radius": 2,
+        "fillColor": "green",
+        "fillOpacity": 1
+      },
+      "variables": [],
+      "zOrder": 5,
+      "strid": "waypoints",
+      "observations": {
+        "1502987188071": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.23462931908153, 36.869258638163075]
+          }
+        }],
+        "1502987172289": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.21760059553043, 36.83520119106086]
+          }
+        }],
+        "1502987191948": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.10020043634984, 36.9]
+          }
+        }],
+        "1502987184616": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.03490000198765, 36.869800003975314]
+          }
+        }],
+        "1502987195696": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.23537625171112, 36.87075250342222]
+          }
+        }]
+      }
+    },
+    "reduced_boundary": {
+      "mapStyle": {
+        "color": "gray",
+        "fillColor": "white",
+        "weight": 2,
+        "fillOpacity": 0
+      },
+      "variables": [],
+      "zOrder": 5,
+      "strid": "reduced_boundary",
+      "observations": {
+        "1502986872": [{
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [[[-122.243527864045, 36.896], [-122.052472135955, 36.896], [-122.006472135955, 36.803999999999995], [-122.197527864045, 36.803999999999995], [-122.243527864045, 36.896]]]
+          }
+        }]
+      }
+    },
+    "problem_line": {
+      "strid": "problem_line",
+      "mapStyle": {
+        "color": "red"
+      },
+      "zOrder": 100,
+      "variables": []
+    },
+    "boundary_polygon": {
+      "mapStyle": {
+        "color": "blue",
+        "fillColor": "white",
+        "weight": 2,
+        "fillOpacity": 0.25
+      },
+      "variables": [{
+        "name": "temperature",
+        "units": "°C",
+        "chartStyle": {
+          "dataGrouping": {
+            "enabled": false
+          },
+          "yAxis": 0
+        }
+      }, {
+        "name": "smoothed_temp",
+        "units": "°C",
+        "chartStyle": {
+          "dataGrouping": {
+            "enabled": false
+          },
+          "yAxis": 0
+        }
+      }, {
+        "name": "change_temp",
+        "units": "°C",
+        "chartStyle": {
+          "dataGrouping": {
+            "enabled": false
+          },
+          "type": "column",
+          "yAxis": 1
+        }
+      }, {
+        "name": "acc_distance",
+        "units": "m",
+        "chartStyle": {
+          "dataGrouping": {
+            "enabled": false
+          },
+          "type": "column",
+          "yAxis": 2
+        }
+      }],
+      "zOrder": 0,
+      "strid": "boundary_polygon",
+      "chartStyle": {
+        "yAxis": [{
+          "offset": -10,
+          "title": {
+            "text": "Temp (°C)"
+          },
+          "opposite": false,
+          "height": "30%"
+        }, {
+          "height": "25%",
+          "opposite": false,
+          "plotLines": [{
+            "color": "red",
+            "width": 2,
+            "dashStyle": "Dash",
+            "value": 0.15
+          }, {
+            "color": "red",
+            "width": 2,
+            "dashStyle": "Dash",
+            "value": -0.15
+          }],
+          "offset": -10,
+          "title": {
+            "text": "Temp grad (°C)"
+          },
+          "top": "40%"
+        }, {
+          "height": "25%",
+          "opposite": false,
+          "plotLines": [{
+            "color": "red",
+            "width": 2,
+            "dashStyle": "Dash",
+            "value": 1500
+          }],
+          "offset": -10,
+          "title": {
+            "text": "Acc dist (m)"
+          },
+          "top": "70%"
+        }],
+        "height": 700,
+        "subtitle": "W=1000m Dt=300s temp_thr=0.15 dist_thr=1500m h1=270 h2=75 f=30m",
+        "title": "Temperature Front Tracking"
+      },
+      "observations": {
+        "1502986772": [{
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [[[-122.25, 36.9], [-122.05, 36.9], [-122.0, 36.8], [-122.2, 36.8], [-122.25, 36.9]]]
+          }
+        }]
+      }
+    },
+    "front_points": {
+      "strid": "front_points",
+      "mapStyle": {
+        "color": "red",
+        "radius": 5,
+        "fillColor": "red",
+        "fillOpacity": 1
+      },
+      "zOrder": 30,
+      "variables": []
+    },
+    "positions": {
+      "mapStyle": {
+        "color": "gray",
+        "radius": 1
+      },
+      "variables": [],
+      "zOrder": 19,
+      "strid": "positions",
+      "observations": {
+        "1502987194": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.12127685546876, 36.89554709191561]
+          }
+        }],
+        "1502987188": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.07080841064455, 36.86945886908651]
+          }
+        }],
+        "1502987183": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.16453552246095, 36.83594302796877]
+          }
+        }],
+        "1502987198": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.17758178710939, 36.88099370889478]
+          }
+        }],
+        "1502987193": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.16659545898439, 36.88264140094618]
+          }
+        }],
+        "1502987182": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.14736938476564, 36.835118682834256]
+          }
+        }],
+        "1502987190": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.2222137451172, 36.870832155646326]
+          }
+        }],
+        "1502987186": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.09140777587892, 36.8628667499676]
+          }
+        }],
+        "1502987197": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.12814331054689, 36.89252680660987]
+          }
+        }],
+        "1502987191": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.23526000976564, 36.87110680999585]
+          }
+        }],
+        "1502987180": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.09140777587892, 36.837591691585295]
+          }
+        }],
+        "1502987195": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.1120071411133, 36.897469029429075]
+          }
+        }],
+        "1502987184": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.18410491943361, 36.837866465399735]
+          }
+        }],
+        "1502987181": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.11475372314453, 36.83704214099502]
+          }
+        }]
+      }
+    },
+    "line_for_intersection": {
+      "mapStyle": {
+        "color": "gray",
+        "weight": 1
+      },
+      "variables": [],
+      "zOrder": 100,
+      "strid": "line_for_intersection",
+      "observations": {
+        "1502987188071": [{
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[-122.07080841064455, 36.86945886908651], [-122.3613476768845, 36.86910375601744]]
+          }
+        }],
+        "1502987172289": [{
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[-122.06016540527345, 36.83539346553288], [-122.3505757854063, 36.83503878941239]]
+          }
+        }],
+        "1502987191948": [{
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[-122.23526000976564, 36.87110680999585], [-121.9543932464047, 36.931192419289566]]
+          }
+        }],
+        "1502987184616": [{
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[-122.18410491943361, 36.837866465399735], [-121.90336001050873, 36.897952811966015]]
+          }
+        }],
+        "1502987195696": [{
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[-122.1120071411133, 36.897469029429075], [-122.39252809841828, 36.83672006710787]]
+          }
+        }]
+      }
+    },
+    "turn_points": {
+      "mapStyle": {
+        "color": "blue",
+        "radius": 2,
+        "fillColor": "blue",
+        "fillOpacity": 1
+      },
+      "variables": [],
+      "zOrder": 25,
+      "strid": "turn_points",
+      "observations": {
+        "1502987188071": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.07080841064455, 36.86945886908651]
+          }
+        }],
+        "1502987172289": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.06016540527345, 36.83539346553288]
+          }
+        }],
+        "1502987191948": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.23526000976564, 36.87110680999585]
+          }
+        }],
+        "1502987184616": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.18410491943361, 36.837866465399735]
+          }
+        }],
+        "1502987195696": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.1120071411133, 36.897469029429075]
+          }
+        }]
+      }
+    },
+    "to_waypoints": {
+      "mapStyle": {
+        "color": "green",
+        "dashArray": "5,5"
+      },
+      "variables": [],
+      "zOrder": 10,
+      "strid": "to_waypoints",
+      "observations": {
+        "1502987188071": [{
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[-122.07080841064455, 36.86945886908651], [-122.23462931908153, 36.869258638163075]]
+          }
+        }],
+        "1502987172289": [{
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[-122.06016540527345, 36.83539346553288], [-122.21760059553043, 36.83520119106086]]
+          }
+        }],
+        "1502987191948": [{
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[-122.23526000976564, 36.87110680999585], [-122.10020043634984, 36.9]]
+          }
+        }],
+        "1502987184616": [{
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[-122.18410491943361, 36.837866465399735], [-122.03490000198765, 36.869800003975314]]
+          }
+        }],
+        "1502987195696": [{
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[-122.1120071411133, 36.897469029429075], [-122.23537625171112, 36.87075250342222]]
+          }
+        }]
+      }
+    }
+  }
+}
