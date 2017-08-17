@@ -40,6 +40,60 @@ function generate_str1() {
 	add_scalars str1 $(( timestamp + 1000 )) $(( secs - 1 ))
 }
 
+function add_str1() {
+    echo "add stream str1"
+	http post ${GPDVIZ}/api/ss/${SS} strid=str1 \
+	     name="Stream one" \
+	     description="Description of Stream one" \
+	     chartStyle:='{
+	       "height": "500px",
+            "yAxis": [{
+	             "height": "50%",
+	             "title": {"text": "baz (m)"},
+	             "opposite": false,
+	             "offset": -10
+	           }, {
+	             "top": "55%",
+	             "height": "45%",
+	             "title": {"text": "bam (Ω)"},
+	             "opposite": false,
+	             "offset": -10
+            }]
+	     }' \
+	     variables:='[
+	     {
+	       "name": "baz",
+	       "units": "m",
+	       "chartStyle": {
+	         "yAxis": 0,
+	         "type": "column"
+	       }
+	     }, {
+	       "name": "bam",
+	       "units": "Ω",
+	       "chartStyle": {
+	         "yAxis": 1
+	       }
+	     }]' \
+	     mapStyle:='{"color":"green", "dashArray": "5,5"}' > /dev/null
+}
+
+function add_str1_polygon() {
+	timestamp=$1
+    read -r -d '' geometry <<-EOF
+      "${timestamp}": [{
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [[-121.8564,36.9], [-122.2217,36.9574], [-122.0945,36.6486], [-121.8674,36.6858]]
+          ]
+        }
+      }]
+EOF
+    observations="{${geometry}}"
+    add_observations str1 "${observations}"
+}
+
 function generate_str2() {
 	add_str2
 	
@@ -94,6 +148,13 @@ EOF
 	add_observations str2 "${observations}"
 }
 
+function add_str2() {
+    echo "add stream str2"
+	http post ${GPDVIZ}/api/ss/${SS} strid=str2 \
+	     variables:='[ { "name": "foo"}, {"name": "bar" } ]' \
+	     mapStyle:='{"color":"red", "radius": 14}' zOrder:=10 > /dev/null
+}
+
 function generate_str3() {
 	add_str3
 
@@ -110,6 +171,12 @@ function generate_str3() {
 EOF
     observations="{${geometry}}"
     add_observations str3 "${observations}"
+}
+
+function add_str3() {
+    echo "add stream str3"
+	http post ${GPDVIZ}/api/ss/${SS} strid=str3 \
+	     mapStyle:='{"color":"blue"}' > /dev/null
 }
 
 function generate_str4() {
@@ -133,73 +200,6 @@ EOF
     echo "added ${strid} point: timestamp=${timestamp}"
 	
 	add_delayed_data ${strid} temperature 10
-}
-
-function add_str1() {
-    echo "add stream str1"
-	http post ${GPDVIZ}/api/ss/${SS} strid=str1 \
-	     name="Stream one" \
-	     description="Description of Stream one" \
-	     chartStyle:='{
-	       "height": "500px",
-            "yAxis": [{
-	             "height": "50%",
-	             "title": {"text": "baz (m)"},
-	             "opposite": false,
-	             "offset": -10
-	           }, {
-	             "top": "55%",
-	             "height": "45%",
-	             "title": {"text": "bam (Ω)"},
-	             "opposite": false,
-	             "offset": -10
-            }]
-	     }' \
-	     variables:='[
-	     {
-	       "name": "baz",
-	       "units": "m",
-	       "chartStyle": {
-	         "yAxis": 0,
-	         "type": "column"
-	       }
-	     }, {
-	       "name": "bam",
-	       "units": "Ω",
-	       "chartStyle": {
-	         "yAxis": 1
-	       }
-	     }]' \
-	     mapStyle:='{"color":"green", "dashArray": "5,5"}' > /dev/null
-}
-
-function add_str2() {
-    echo "add stream str2"
-	http post ${GPDVIZ}/api/ss/${SS} strid=str2 \
-	     variables:='[ { "name": "foo"}, {"name": "bar" } ]' \
-	     mapStyle:='{"color":"red", "radius": 14}' zOrder:=10 > /dev/null
-}
-
-function add_str3() {
-    echo "add stream str3"
-	http post ${GPDVIZ}/api/ss/${SS} strid=str3 \
-	     mapStyle:='{"color":"blue"}' > /dev/null
-}
-
-function add_str1_polygon() {
-	timestamp=$1
-    read -r -d '' geometry <<-EOF
-      "${timestamp}": [{
-        "geometry": {
-          "type": "Polygon",
-          "coordinates": [
-            [[-121.8564,36.9], [-122.2217,36.9574], [-122.0945,36.6486], [-121.8674,36.6858]]
-          ]
-        }
-      }]
-EOF
-    observations="{${geometry}}"
-    add_observations str1 "${observations}"
 }
 
 function add_delayed_data() {
