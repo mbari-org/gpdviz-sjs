@@ -183,7 +183,7 @@ function setupLLMap(hoveredPoint, clickHandler) {
         return variable;
       });
     }
-    console.debug("addStream: str=", _.cloneDeep(str));
+    //console.debug("addStream: str=", _.cloneDeep(str));
 
     str.observations = {}; // TODO check already provided observation (not the case at the moment)
     byStrId[str.strid] = {
@@ -219,7 +219,7 @@ function setupLLMap(hoveredPoint, clickHandler) {
       mapStyle = str.mapStyle ? _.cloneDeep(str.mapStyle) : {};
     }
 
-    console.debug("addGeoJson: timestamp=", timestamp, "geoJson=", geoJson, "mapStyle=", mapStyle);
+    //console.debug("addGeoJson: timestamp=", timestamp, "geoJson=", geoJson, "mapStyle=", mapStyle);
 
     byStrId[strid].geoJsons[geoJsonKey] = geoJson;
 

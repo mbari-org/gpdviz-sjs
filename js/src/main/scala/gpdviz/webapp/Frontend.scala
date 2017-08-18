@@ -7,6 +7,7 @@ import gpdviz.websocket.WsListener
 import org.scalajs.dom
 import org.scalajs.dom.document
 import org.scalajs.dom.raw.HTMLElement
+import org.scalajs.dom.window.console
 import pprint.PPrinter.BlackWhite.{apply ⇒ pp}
 
 import scala.collection.mutable
@@ -51,7 +52,7 @@ object Frontend extends js.JSApp {
 }
 
 class WebApp(clientConfig: ClientConfig) {
-  println("clientConfig = " + pp(clientConfig))
+  console.log("clientConfig = " + pp(clientConfig))
   val sysid: String = DOMGlobalScope.sysid
   val llmap: LLMap  = DOMGlobalScope.setupLLMap(hoveredPoint, clickHandler)
 
@@ -77,7 +78,7 @@ class WebApp(clientConfig: ClientConfig) {
       val x = p("x").asInstanceOf[Float].toLong
       //val y = p("y").asInstanceOf[Double].toLong
       //val isoTime = p("isoTime").asInstanceOf[String]
-      //println("hoveredPoint: p=" + p + " x=" +x+ " strid=" + strid)
+      //console.log("hoveredPoint: p=" + p + " x=" +x+ " strid=" + strid)
 
       PositionsByTime.get(strid, x) foreach { latLon ⇒
         llmap.addSelectionPoint(js.Array(latLon.lat, latLon.lon))
@@ -97,7 +98,7 @@ class WebApp(clientConfig: ClientConfig) {
         lazy val metaKey  = dict("metaKey").asInstanceOf[Boolean]
 
         //val p: mutable.Map[String, _] = dict
-        //println("clickHandler: p=" + p)
+        //console.log("clickHandler: p=" + p)
 
         if (shiftKey || altKey || metaKey) {
           dom.ext.Ajax.post(
@@ -107,7 +108,7 @@ class WebApp(clientConfig: ClientConfig) {
           ).onComplete {
             case Success(_) ⇒ // ok
             case Failure(t) ⇒
-              dom.window.console.warn(s"failure in call to click listener $url: $t")
+              console.warn(s"failure in call to click listener $url: $t")
           }
         }
       }
