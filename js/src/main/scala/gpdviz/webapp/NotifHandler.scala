@@ -33,7 +33,7 @@ class NotifHandler(sysid: String, llmap: LLMap, vm: VModel) {
         ss := ss.get.copy(streams = ss.get.streams updated (str.strid, str))
 
         val useChartPopup = str.chartStyle.map(upickle.default.read[Js.Obj]) exists { chartStyle: Js.Obj ⇒
-          chartStyle("useChartPopup").value == Js.True.value
+          chartStyle.obj.get("useChartPopup").contains(Js.True)
         }
         if (!useChartPopup) {
           vm.absoluteCharts.get += {
@@ -67,7 +67,7 @@ class NotifHandler(sysid: String, llmap: LLMap, vm: VModel) {
         llmap.removeStream(strid)
 
       case Observations2Added(_, strid, obss) ⇒
-        //println(s"Observations2Added: $strid -> ${obss.size}")
+        //console.log(s"Observations2Added: $strid -> ${obss.size}")
         val str = ss.get.streams.getOrElse(strid, throw new IllegalStateException(s"undefined stream $strid"))
 
         obss.keys.toSeq.sorted foreach { timestamp ⇒
