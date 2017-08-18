@@ -67,7 +67,7 @@ class NotifHandler(sysid: String, llmap: LLMap, vm: VModel) {
         llmap.removeStream(strid)
 
       case Observations2Added(_, strid, obss) ⇒
-        println(s"Observations2Added: $strid -> ${obss.size}")
+        //println(s"Observations2Added: $strid -> ${obss.size}")
         val str = ss.get.streams.getOrElse(strid, throw new IllegalStateException(s"undefined stream $strid"))
 
         obss.keys.toSeq.sorted foreach { timestamp ⇒

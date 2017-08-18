@@ -4,6 +4,7 @@ import autowire._
 import gpdviz._
 import gpdviz.pusher.PusherListener
 import gpdviz.websocket.WsListener
+import org.scalajs.dom
 import org.scalajs.dom.document
 import org.scalajs.dom.raw.HTMLElement
 import pprint.PPrinter.BlackWhite.{apply ⇒ pp}
@@ -11,14 +12,18 @@ import pprint.PPrinter.BlackWhite.{apply ⇒ pp}
 import scala.collection.mutable
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
+import scala.scalajs.js.JSON
 import scala.scalajs.js.annotation.JSGlobalScope
+import scala.util.{Failure, Success}
 
 @js.native
 @JSGlobalScope
 object DOMGlobalScope extends js.Object {
   def sysid: String = js.native
 
-  def setupLLMap(hoveredPoint: js.Function1[js.Dictionary[_], Any]): LLMap = js.native
+  def setupLLMap(hoveredPoint: js.Function1[js.Dictionary[_], Any],
+                 clickHandler: js.Function1[js.Dictionary[_], Any]
+                ): LLMap = js.native
 }
 
 @js.native
@@ -48,7 +53,7 @@ object Frontend extends js.JSApp {
 class WebApp(clientConfig: ClientConfig) {
   println("clientConfig = " + pp(clientConfig))
   val sysid: String = DOMGlobalScope.sysid
-  val llmap: LLMap  = DOMGlobalScope.setupLLMap(hoveredPoint)
+  val llmap: LLMap  = DOMGlobalScope.setupLLMap(hoveredPoint, clickHandler)
 
   val vm = new VModel(sysid)
 
@@ -76,6 +81,34 @@ class WebApp(clientConfig: ClientConfig) {
 
       PositionsByTime.get(strid, x) foreach { latLon ⇒
         llmap.addSelectionPoint(js.Array(latLon.lat, latLon.lon))
+      }
+    }
+  }
+
+  private def clickHandler: js.Function1[js.Dictionary[_], Any] = {
+    (dict: js.Dictionary[_]) ⇒ {
+
+      vm.ss.get.clickListener foreach { url ⇒
+        //require(dict.contains("lat"))
+        //require(dict.contains("lon"))
+
+        lazy val shiftKey = dict("shiftKey").asInstanceOf[Boolean]
+        lazy val altKey   = dict("altKey").asInstanceOf[Boolean]
+        lazy val metaKey  = dict("metaKey").asInstanceOf[Boolean]
+
+        //val p: mutable.Map[String, _] = dict
+        //println("clickHandler: p=" + p)
+
+        if (shiftKey || altKey || metaKey) {
+          dom.ext.Ajax.post(
+            url = url,
+            data = JSON.stringify(dict)
+          ).onComplete {
+            case Success(_) ⇒ // ok
+            case Failure(t) ⇒
+              dom.window.console.warn(s"failure in call to click listener $url: $t")
+          }
+        }
       }
     }
   }

@@ -2,6 +2,7 @@
 
 2017-08-18
 
+- enable click handler
 - enable hoveredPoint behavior
 - handle popup chart (besides static chart)
 - pass mapStyle, chartStyle to js part

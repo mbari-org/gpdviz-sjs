@@ -1,4 +1,4 @@
-function setupLLMap(hoveredPoint) {
+function setupLLMap(hoveredPoint, clickHandler) {
 
   var debug = window && window.location.toString().match(/.*\?debug/);
 
@@ -97,30 +97,24 @@ function setupLLMap(hoveredPoint) {
     });
 
     map.on('click', function (e) {
-      // TODO
-      // if (!vm.ss || !vm.ss.clickListener) return;
-      //
-      // var shiftKey = e.originalEvent.shiftKey;
-      // var altKey   = e.originalEvent.altKey;
-      // var metaKey  = e.originalEvent.metaKey;
-      // // console.debug("clickListener=", vm.ss.clickListener, "MAP CLICK: e=", e
-      // //   ,"latlng=", e.latlng
-      // //   ,"shiftKey=", shiftKey
-      // //   ,"altKey=",   altKey
-      // //   ,"metaKey=",  metaKey
-      // // );
-      // if (shiftKey || altKey || metaKey) {
-      //   var params = { lat: e.latlng.lat, lon: e.latlng.lng};
-      //   if (shiftKey) params.shiftKey = true;
-      //   if (altKey)   params.altKey = true;
-      //   if (metaKey)  params.metaKey = true;
-      //   $http({ method: "POST", url: vm.ss.clickListener, params: params}
-      //   ).then(function (response) {
-      //     // console.debug("url=", vm.ss.clickListener, "response=", response)
-      //   }, function (error) {
-      //     console.warn("url=", vm.ss.clickListener, "error=", error)
-      //   })
-      // }
+      var shiftKey = e.originalEvent.shiftKey;
+      var altKey   = e.originalEvent.altKey;
+      var metaKey  = e.originalEvent.metaKey;
+
+      if (debug) console.debug("MAP CLICK: e=", e
+        ,"latlng=",   e.latlng
+        ,"shiftKey=", shiftKey
+        ,"altKey=",   altKey
+        ,"metaKey=",  metaKey
+      );
+
+      clickHandler({
+        lat:       e.latlng.lat,
+        lon:       e.latlng.lng,
+        shiftKey:  shiftKey,
+        altKey:    altKey,
+        metaKey:   metaKey
+      });
     });
   })();
 

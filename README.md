@@ -21,7 +21,7 @@ Implementation currently based on:
 	$ source setenv.sh  # or use whatever mechanism to define the required env vars, see application.conf
 	$ sbt
 	> package   # to copy js resources to jvm's classpath needed for the webapp
-	> gpdvizJVM/runMain gpdviz.server.GpdvizServer
+	> ~gpdvizJVM/runMain gpdviz.server.GpdvizServer
 
 Open http://localhost:5050/ss1/
 
