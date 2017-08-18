@@ -1,4 +1,4 @@
-function setupLLMap() {
+function setupLLMap(hoveredPoint) {
 
   var debug = window && window.location.toString().match(/.*\?debug/);
 
@@ -36,42 +36,6 @@ function setupLLMap() {
   var controlLayers = L.control.layers(baseLayers).addTo(map);
 
   var overlayGroupByStreamId = {};
-
-  var positionsByTime = (function() {
-    var strTimePoss = {};
-
-    return {
-      set: function (strid, timeMs, position) {
-        if (strTimePoss[strid] === undefined) {
-          strTimePoss[strid] = {list: [], sorted: true};
-        }
-        strTimePoss[strid].list.push({timeMs: timeMs, position:position});
-        strTimePoss[strid].sorted = false;
-      },
-
-      get: function (strid, timeMs) {
-        if (!strTimePoss[strid]) return;
-        if (!strTimePoss[strid].sorted) {
-          strTimePoss[strid].list = _.sortBy(strTimePoss[strid].list, "timeMs");
-          strTimePoss[strid].sorted = true;
-        }
-        var list = strTimePoss[strid].list;
-        var ii = 0, mid = 0, kk = list.length - 1;
-        while (ii < kk) {
-          mid = Math.floor((ii + kk) / 2);
-          var mid_timeMs = list[mid].timeMs;
-          if (timeMs < mid_timeMs) {
-            kk = mid;
-          }
-          else if (timeMs > mid_timeMs) {
-            ii = mid + 1
-          }
-          else break;
-        }
-        return list[mid].position;
-      }
-    }
-  })();
 
   var selectionGroup = new L.LayerGroup().addTo(map);
 
@@ -230,7 +194,6 @@ function setupLLMap() {
     str.observations = {}; // TODO check already provided observation (not the case at the moment)
     byStrId[str.strid] = {
       str:      str,
-      //charter:  createCharter(str),
       geoJsons: {}
     };
   }
@@ -288,11 +251,6 @@ function setupLLMap() {
       var varIndex = indexes[valIndex];
       charter.addChartPoint(varIndex, timestamp, v);
     });
-
-    //console.debug(str.strid, "scalarData.position=", scalarData.position, "timestamp=", timestamp);
-    if (scalarData.position) {
-      positionsByTime.set(str.strid, timestamp, scalarData.position);
-    }
 
     if (!byStrId[str.strid].marker) {
       return;
@@ -369,17 +327,15 @@ function setupLLMap() {
 
   function createCharter(str) {
     return Charter(str, function(point) {
-      if (point) {
+      if (point && point.x) {
         var isoTime = moment.utc(point.x).format();
-        console.debug("hovered point=", point.x, isoTime);
-        //$scope.$apply(function() {
-        //  vm.hoveredPoint.isoTime = isoTime;
-          var p = positionsByTime.get(str.strid, point.x);
-          if (p) {
-            //vm.hoveredPoint.position = p;
-            addSelectionPoint([p.lat, p.lon]);
-          }
-        //});
+        //console.debug("hovered point=", point, isoTime);
+        hoveredPoint({
+          strid:   str.strid,
+          x:       point.x,
+          y:       point.y,
+          isoTime: isoTime
+        });
       }
     });
   }

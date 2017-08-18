@@ -85,6 +85,11 @@ class NotifHandler(sysid: String, llmap: LLMap, vm: VModel) {
                 "position" → scalarData.position.map(p ⇒
                   Map("lat" → p.lat, "lon" → p.lon).toJSDictionary).orUndefined
               ).toJSDictionary)
+
+              scalarData.position foreach { position ⇒
+                val timeMs = timestamp.toLong
+                PositionsByTime.set(strid, timeMs, position)
+              }
             }
           }
         }

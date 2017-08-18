@@ -8,6 +8,7 @@ import org.scalajs.dom.document
 import org.scalajs.dom.raw.HTMLElement
 import pprint.PPrinter.BlackWhite.{apply ⇒ pp}
 
+import scala.collection.mutable
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSGlobalScope
@@ -17,7 +18,7 @@ import scala.scalajs.js.annotation.JSGlobalScope
 object DOMGlobalScope extends js.Object {
   def sysid: String = js.native
 
-  def setupLLMap(): LLMap = js.native
+  def setupLLMap(hoveredPoint: js.Function1[js.Dictionary[_], Any]): LLMap = js.native
 }
 
 @js.native
@@ -35,20 +36,20 @@ trait LLMap extends js.Object {
 
   def addObsScalarData(strid: String, timestamp: String, scalarData: js.Dictionary[_]): Unit = js.native
 
-  def addSelectionPoint(p: js.Array[Double]): String = js.native
+  def addSelectionPoint(p: js.Array[Double]): Unit = js.native
 }
 
 object Frontend extends js.JSApp {
   def main(): Unit = if (elm.scalajs != null) {
-    val llmap = DOMGlobalScope.setupLLMap()
-    AutowireClient[Api].clientConfig().call() foreach { clientConfig ⇒
-      println("clientConfig = " + pp(clientConfig))
-      new WebApp(clientConfig, DOMGlobalScope.sysid, llmap)
-    }
+    AutowireClient[Api].clientConfig().call() foreach { new WebApp(_) }
   }
 }
 
-class WebApp(clientConfig: ClientConfig, sysid: String, llmap: LLMap) {
+class WebApp(clientConfig: ClientConfig) {
+  println("clientConfig = " + pp(clientConfig))
+  val sysid: String = DOMGlobalScope.sysid
+  val llmap: LLMap  = DOMGlobalScope.setupLLMap(hoveredPoint)
+
   val vm = new VModel(sysid)
 
   val notifHandler = new NotifHandler(sysid, llmap, vm)
@@ -63,6 +64,21 @@ class WebApp(clientConfig: ClientConfig, sysid: String, llmap: LLMap) {
   }
 
   new View(vm).render()
+
+  private def hoveredPoint: js.Function1[js.Dictionary[_], Any] = {
+    (dict: js.Dictionary[_]) ⇒ {
+      val p: mutable.Map[String, _] = dict
+      val strid = p("strid").asInstanceOf[String]
+      val x = p("x").asInstanceOf[Float].toLong
+      //val y = p("y").asInstanceOf[Double].toLong
+      //val isoTime = p("isoTime").asInstanceOf[String]
+      //println("hoveredPoint: p=" + p + " x=" +x+ " strid=" + strid)
+
+      PositionsByTime.get(strid, x) foreach { latLon ⇒
+        llmap.addSelectionPoint(js.Array(latLon.lat, latLon.lon))
+      }
+    }
+  }
 }
 
 private object elm {

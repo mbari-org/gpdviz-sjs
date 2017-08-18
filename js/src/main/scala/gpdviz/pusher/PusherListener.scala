@@ -14,10 +14,9 @@ class Pusher(key: String, conf: js.Dictionary[_]) extends js.Object {
 
 class PusherListener(pusherConfig: ClientPusherConfig, channelName: String,
                      handleNotification: (Notif) ⇒ Unit) {
-  println(s"PusherListener: pusherChannel=$channelName")
 
   val pusher = new Pusher(pusherConfig.key, Map("encrypted" → true).toJSDictionary)
-  println("PusherListener: pusher=" + pusher)
+  println(s"PusherListener: pusher key=${pusherConfig.key} pusherChannel=$channelName")
 
   val channel: js.Dynamic = pusher.subscribe(channelName)
 
