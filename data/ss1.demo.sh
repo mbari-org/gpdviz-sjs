@@ -56,7 +56,7 @@ function add_str1() {
 	           }, {
 	             "top": "55%",
 	             "height": "45%",
-	             "title": {"text": "bam (Ω)"},
+	             "title": {"text": "temperature (°)"},
 	             "opposite": false,
 	             "offset": -10
             }]
@@ -70,8 +70,8 @@ function add_str1() {
 	         "type": "column"
 	       }
 	     }, {
-	       "name": "bam",
-	       "units": "Ω",
+	       "name": "temperature",
+	       "units": "°",
 	       "chartStyle": {
 	         "yAxis": 1
 	       }
@@ -247,7 +247,7 @@ function add_scalars() {
     	read -r -d '' element <<-EOF
 		  "${timestamp}": [{
             "scalarData": {
-              "vars": ["baz","bam"],
+              "vars": ["baz","temperature"],
               "vals": [${val0}, ${val1}],
               "position": {"lat": ${lat}, "lon": ${lon}}
             }}]

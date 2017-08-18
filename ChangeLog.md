@@ -1,7 +1,8 @@
 # gpdviz2
 
-2017-08-17
+2017-08-18
 
+- enabling hoveredPoint behavior
 - handle popup chart (besides static chart)
 - pass mapStyle, chartStyle to js part
 - incorporating charts in new scalajs-based scheme

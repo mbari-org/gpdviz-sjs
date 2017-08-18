@@ -289,7 +289,7 @@ function setupLLMap() {
       charter.addChartPoint(varIndex, timestamp, v);
     });
 
-    // console.debug(str.strid, "scalarData.position=", scalarData.position);
+    //console.debug(str.strid, "scalarData.position=", scalarData.position, "timestamp=", timestamp);
     if (scalarData.position) {
       positionsByTime.set(str.strid, timestamp, scalarData.position);
     }
@@ -370,9 +370,10 @@ function setupLLMap() {
   function createCharter(str) {
     return Charter(str, function(point) {
       if (point) {
-        console.debug("hovered point=", point.x);
+        var isoTime = moment.utc(point.x).format();
+        console.debug("hovered point=", point.x, isoTime);
         //$scope.$apply(function() {
-        //  vm.hoveredPoint.isoTime = moment.utc(point.x).format();
+        //  vm.hoveredPoint.isoTime = isoTime;
           var p = positionsByTime.get(str.strid, point.x);
           if (p) {
             //vm.hoveredPoint.position = p;
