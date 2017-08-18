@@ -2,6 +2,7 @@
 
 2017-08-17
 
+- handle popup chart (besides static chart)
 - pass mapStyle, chartStyle to js part
 - incorporating charts in new scalajs-based scheme
 - TODO: consider using https://scalacenter.github.io/scalajs-bundler/

@@ -3,6 +3,7 @@ package gpdviz.webapp
 import gpdviz._
 import gpdviz.model.VmSensorSystem
 import org.scalajs.dom.window
+import upickle.Js
 
 import scala.scalajs.js.JSConverters._
 
@@ -31,11 +32,16 @@ class NotifHandler(sysid: String, llmap: LLMap, vm: VModel) {
       case StreamAdded(_, str) ⇒
         ss := ss.get.copy(streams = ss.get.streams updated (str.strid, str))
 
-        vm.absCharts.get += {
-          val chartId = "chart-container-" + str.strid
-          val chartHeightStr = "500px" // TODO chartHeightStr
-          val minWidthStr    = "400px" // TODO minWidthStr
-          AbsChart(chartId, chartHeightStr, minWidthStr)
+        val useChartPopup = str.chartStyle.map(upickle.default.read[Js.Obj]) exists { chartStyle: Js.Obj ⇒
+          chartStyle("useChartPopup").value == Js.True.value
+        }
+        if (!useChartPopup) {
+          vm.absoluteCharts.get += {
+            val chartId = "chart-container-" + str.strid
+            val chartHeightStr = "500px" // TODO chartHeightStr
+            val minWidthStr    = "400px" // TODO minWidthStr
+            ChartDiv(chartId, chartHeightStr, minWidthStr)
+          }
         }
 
         llmap.addStream(Map(

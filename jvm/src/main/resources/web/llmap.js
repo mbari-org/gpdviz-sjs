@@ -1,5 +1,7 @@
 function setupLLMap() {
 
+  var debug = window && window.location.toString().match(/.*\?debug/);
+
   var byStrId = {};
 
   // TODO capture center and zoom from sensor system properties
@@ -105,6 +107,59 @@ function setupLLMap() {
     shadowSize: [41, 41]
   });
 
+  (function popupEvents() {
+    map.on('popupopen', function(e) {
+      var strid = e.popup && e.popup._strid;
+      var str = strid && byStrId[strid].str;
+      var charter = str && byStrId[strid].charter;
+      // console.debug("popupopen: str=", str, "has-charter=", !!charter);
+      if (charter) {
+        charter.activateChart();
+      }
+    });
+    map.on('popupclose', function(e) {
+      var strid = e.popup && e.popup._strid;
+      var str = strid && byStrId[strid].str;
+      //console.debug("popupclose: str=", str);
+      if (str && byStrId[strid].charter) {
+        var charter = byStrId[str.strid].charter;
+        //console.debug("popupclose: charter=", charter);
+        charter.deactivateChart();
+      }
+      setTimeout(function() {
+        //vm.hoveredPoint = {};
+        addSelectionPoint();
+      });
+    });
+
+    map.on('click', function (e) {
+      // TODO
+      // if (!vm.ss || !vm.ss.clickListener) return;
+      //
+      // var shiftKey = e.originalEvent.shiftKey;
+      // var altKey   = e.originalEvent.altKey;
+      // var metaKey  = e.originalEvent.metaKey;
+      // // console.debug("clickListener=", vm.ss.clickListener, "MAP CLICK: e=", e
+      // //   ,"latlng=", e.latlng
+      // //   ,"shiftKey=", shiftKey
+      // //   ,"altKey=",   altKey
+      // //   ,"metaKey=",  metaKey
+      // // );
+      // if (shiftKey || altKey || metaKey) {
+      //   var params = { lat: e.latlng.lat, lon: e.latlng.lng};
+      //   if (shiftKey) params.shiftKey = true;
+      //   if (altKey)   params.altKey = true;
+      //   if (metaKey)  params.metaKey = true;
+      //   $http({ method: "POST", url: vm.ss.clickListener, params: params}
+      //   ).then(function (response) {
+      //     // console.debug("url=", vm.ss.clickListener, "response=", response)
+      //   }, function (error) {
+      //     console.warn("url=", vm.ss.clickListener, "error=", error)
+      //   })
+      // }
+    });
+  })();
+
   function markerCreator(geojson, mapStyle) {
     //console.debug(":::::: geojson=", geojson);
     return function() {
@@ -175,7 +230,7 @@ function setupLLMap() {
     str.observations = {}; // TODO check already provided observation (not the case at the moment)
     byStrId[str.strid] = {
       str:      str,
-      charter:  createCharter(str),
+      //charter:  createCharter(str),
       geoJsons: {}
     };
   }

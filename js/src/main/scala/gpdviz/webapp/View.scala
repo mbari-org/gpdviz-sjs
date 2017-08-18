@@ -6,7 +6,7 @@ import gpdviz.model.VmDataStream
 import org.scalajs.dom.raw.Node
 import pprint.PPrinter.BlackWhite.{apply ⇒ pp}
 
-case class AbsChart(
+case class ChartDiv(
                    id:          String,
                    heightStr:   String,
                    minWidthStr: String
@@ -28,11 +28,11 @@ class View(vm: VModel) {
 
   @dom private val absoluteCharts = <div>
     {
-      vm.absCharts map { c ⇒
-        //println("ADDING absoluteChart div id=" + c.id)
+      vm.absoluteCharts map { c ⇒
+      println("ADDING absoluteChart div id=" + c.id)
         <div id={ c.id }
              class="absoluteChart"
-             style={ s"'min-width': ${c.minWidthStr}, height: ${c.heightStr}" }
+             style={ s"'min-width': ${c.minWidthStr}; height: ${c.heightStr}" }
         >
         </div>
       }

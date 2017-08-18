@@ -7,5 +7,5 @@ class VModel(sysid: String) {
 
   val ss: Var[VmSensorSystem] = Var(VmSensorSystem(sysid))
 
-  val absCharts: Vars[AbsChart] = Vars.empty
+  val absoluteCharts: Vars[ChartDiv] = Vars.empty
 }

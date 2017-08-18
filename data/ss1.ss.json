@@ -32,6 +32,7 @@
       "zOrder": 0,
       "strid": "str1",
       "chartStyle": {
+        "useChartPopup": true,
         "height": "500px",
         "yAxis": [{
           "height": "50%",

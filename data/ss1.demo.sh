@@ -46,6 +46,7 @@ function add_str1() {
 	     name="Stream one" \
 	     description="Description of Stream one" \
 	     chartStyle:='{
+	       "useChartPopup": true,
 	       "height": "500px",
             "yAxis": [{
 	             "height": "50%",
