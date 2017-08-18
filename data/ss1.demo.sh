@@ -4,7 +4,7 @@ GPDVIZ=http://localhost:5050
 
 SS=ss1
 
-BASE_TIMESTAMP=150282809900
+BASE_TIMESTAMP_MS=1503090553000
 RANDOM=1341
 
 function run() {
@@ -33,7 +33,7 @@ function register() {
 
 function generate_str1() {
 	add_str1
-	now=${BASE_TIMESTAMP}
+	now=${BASE_TIMESTAMP_MS}
 	secs=60
 	timestamp=$(( now - secs * 1000 ))
 	add_str1_polygon ${timestamp}
@@ -159,7 +159,7 @@ function add_str2() {
 function generate_str3() {
 	add_str3
 
-	timestamp=${BASE_TIMESTAMP}
+	timestamp=${BASE_TIMESTAMP_MS}
     read -r -d '' geometry <<-EOF
       "${timestamp}": [{
         "geometry": {
@@ -187,7 +187,7 @@ function generate_str4() {
 	    variables:='[ { "name": "temperature", "units": "°C" } ]' \
 	    mapStyle:='{"color":"yellow", "radius": 10}' zOrder:=10 > /dev/null
 
-	timestamp=${BASE_TIMESTAMP}
+	timestamp=${BASE_TIMESTAMP_MS}
     read -r -d '' geometry <<-EOF
       "${timestamp}": [{
           "geometry": {
@@ -207,7 +207,7 @@ function add_delayed_data() {
     strid=$1
     varName=$2
 	secs=$3
-    timestamp=${BASE_TIMESTAMP}
+    timestamp=${BASE_TIMESTAMP_MS}
 	for i in `seq ${secs}`; do
         sleep 1
 	    timestamp=$(( timestamp + 1000 ))
