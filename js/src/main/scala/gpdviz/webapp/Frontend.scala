@@ -102,7 +102,8 @@ class WebApp(clientConfig: ClientConfig) {
         if (shiftKey || altKey || metaKey) {
           dom.ext.Ajax.post(
             url = url,
-            data = JSON.stringify(dict)
+            data = JSON.stringify(dict),
+            headers = Map("Content-type" → "application/json")
           ).onComplete {
             case Success(_) ⇒ // ok
             case Failure(t) ⇒
