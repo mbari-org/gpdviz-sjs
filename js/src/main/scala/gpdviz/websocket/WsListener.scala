@@ -6,7 +6,8 @@ import org.scalajs.dom.raw._
 
 import scala.scalajs.js
 
-// TODO for now, just some webSocket preparations
+// TODO keep connection alive
+
 class WsListener(handleNotification: (Notif) ⇒ Unit) {
 
   private val webSocketDiv = dom.document.getElementById("websocket")
@@ -49,7 +50,11 @@ class WsListener(handleNotification: (Notif) ⇒ Unit) {
     }
 
     ws.onmessage = { (event: MessageEvent) ⇒
-      writeMsg(event.data.toString)
+      val n = upickle.default.read[Notif](event.data.toString)
+      //import pprint.PPrinter.BlackWhite.{apply ⇒ pp}
+      //println("onmessage: n = " + pp(n))
+      handleNotification(n)
+      //writeMsg(event.data.toString)
     }
 
     ws.onclose = { (event: Event) ⇒
@@ -73,7 +78,7 @@ class WsListener(handleNotification: (Notif) ⇒ Unit) {
 
   private def writeMsg(msg: String): Unit = {
     messagesDiv.innerHTML = msg
-    println(msg)
+    //org.scalajs.dom.window.console.log(msg)
   }
 
   private def getWebSocketUri(document: Document): String = {

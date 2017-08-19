@@ -2,6 +2,8 @@
 
 2017-08-18
 
+- first working websocket version.
+  Undefine `gpdviz.pusher` in `application.conf` to exercise.
 - enable click handler
 - enable hoveredPoint behavior
 - handle popup chart (besides static chart)

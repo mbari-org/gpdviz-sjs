@@ -17,6 +17,7 @@ object GpdvizServer extends GpdvizService {
   }
 
   implicit val system: ActorSystem = ActorSystem()
+  implicit val executionContext: ExecutionContextExecutor = system.dispatcher
   implicit val materializer: ActorMaterializer = ActorMaterializer()
 
   val (notifier, route) = cfg.pusher match {
@@ -32,9 +33,6 @@ object GpdvizServer extends GpdvizService {
   }
 
   def main(args: Array[String]) {
-    // needed for the future flatMap/onComplete in the end
-    implicit val executionContext: ExecutionContextExecutor = system.dispatcher
-
     println(s"Gpdviz using: DB: ${db.details}  Async Notifications: ${notifier.details}")
 
     val bindingFuture = Http().bindAndHandle(route, cfg.httpInterface, cfg.httpPort)
