@@ -3,7 +3,7 @@ package gpdviz
 import akka.http.scaladsl.model.ContentTypes._
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import gpdviz.async.{Notifier, NullNotifier}
+import gpdviz.async.{Notifier, NullPublisher}
 import gpdviz.data.FileDb
 import gpdviz.model._
 import gpdviz.server._
@@ -11,7 +11,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 
 class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with GpdvizService {
-  val notifier: Notifier = NullNotifier
+  val notifier: Notifier = new Notifier(NullPublisher)
 
   val db = new FileDb("data_test")
 

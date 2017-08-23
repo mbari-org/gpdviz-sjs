@@ -3,7 +3,7 @@ package gpdviz.server
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
-import gpdviz.async.{PusherNotifier, WebSocketNotifier}
+import gpdviz.async._
 import gpdviz.config.cfg
 import gpdviz.data.{DbInterface, FileDb, PostgresDb}
 
@@ -20,20 +20,22 @@ object GpdvizServer extends GpdvizService {
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
   implicit val materializer: ActorMaterializer = ActorMaterializer()
 
-  val (notifier, route) = cfg.pusher match {
+  val (publisher, route) = cfg.pusher match {
     case Some(pc) ⇒
-      (new PusherNotifier(pc), routes)
+      (new PusherPublisher(pc), routes)
 
     case None     ⇒
-      val wsn = new WebSocketNotifier
+      val wsp = new WebSocketPublisher
       val wsRoute = path("ws") {
-        handleWebSocketMessages(wsn.wsHandler)
+        handleWebSocketMessages(wsp.wsHandler)
       }
-      (wsn, routes ~ wsRoute)
+      (wsp, routes ~ wsRoute)
   }
 
+  val notifier = new Notifier(publisher)
+
   def main(args: Array[String]) {
-    println(s"Gpdviz using: DB: ${db.details}  Async Notifications: ${notifier.details}")
+    println(s"Gpdviz using: DB: ${db.details}  Async Notifications: ${publisher.details}")
 
     val bindingFuture = Http().bindAndHandle(route, cfg.httpInterface, cfg.httpPort)
 
