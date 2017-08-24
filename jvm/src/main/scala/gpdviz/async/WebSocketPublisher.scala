@@ -28,8 +28,8 @@ class WebSocketPublisher()(implicit materializer: ActorMaterializer,
   private val dataSource: Source[Notif, ActorRef] = Source.actorPublisher[Notif](MyActorPublisher.props)
 
   val wsHandler: Flow[Any, TextMessage.Strict, NotUsed] = Flow
-    .fromSinkAndSource(Sink.ignore, dataSource map { s ⇒
-      TextMessage.Strict(upickle.default.write(s))
+    .fromSinkAndSource(Sink.ignore, dataSource map { notif ⇒
+      TextMessage.Strict(upickle.default.write(notif))
     })
 }
 
