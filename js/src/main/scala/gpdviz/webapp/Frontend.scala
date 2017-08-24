@@ -5,7 +5,7 @@ import gpdviz._
 import gpdviz.pusher.PusherListener
 import gpdviz.websocket.WsListener
 import org.scalajs.dom
-import org.scalajs.dom.document
+import org.scalajs.dom.{document, window}
 import org.scalajs.dom.raw.HTMLElement
 import org.scalajs.dom.window.console
 import pprint.PPrinter.BlackWhite.{apply ⇒ pp}
@@ -56,20 +56,57 @@ class WebApp(clientConfig: ClientConfig) {
   val sysid: String = DOMGlobalScope.sysid
   val llmap: LLMap  = DOMGlobalScope.setupLLMap(hoveredPoint, clickHandler)
 
-  val vm = new VModel(sysid)
+  val vm = new VModel(sysid, llmap)
 
-  val notifHandler = new NotifHandler(sysid, llmap, vm)
+  startUp()
 
-  clientConfig.pusher match {
-    case None ⇒
-      new WsListener(notifHandler.handleNotification)
+  private def startUp(): Unit = {
+    new View(vm).render()
 
-    case Some(pc) ⇒
-      val pusherChannel = s"${clientConfig.serverName}-$sysid-2"
-      new PusherListener(pc, pusherChannel, notifHandler.handleNotification)
+    refresh()
+
+    val handleNotification: Notif ⇒ Unit = {
+      case SensorSystemRegistered(_, name, description, center, clickListener) ⇒
+        vm.registerSystem(name, description, center, clickListener)
+
+      case SensorSystemUnregistered(_) ⇒
+        vm.unregisterSystem()
+
+      case StreamAdded(_, str) ⇒
+        vm.addStream(str)
+
+      case StreamRemoved(_, strid) ⇒
+        vm.removeStream(strid)
+
+      case Observations2Added(_, strid, obss) ⇒
+        vm.addObservations(strid, obss)
+
+      case SensorSystemUpdated(_) ⇒
+
+      case SensorSystemRefresh(_) ⇒
+        window.location.reload(true)
+    }
+
+    clientConfig.pusher match {
+      case None ⇒
+        new WsListener(handleNotification)
+
+      case Some(pc) ⇒
+        val pusherChannel = s"${clientConfig.serverName}-$sysid-2"
+        new PusherListener(pc, pusherChannel, handleNotification)
+    }
   }
 
-  new View(vm).render()
+  private def refresh(): Unit = {
+    AutowireClient[Api].refresh(sysid).call() foreach {
+      case Some(vss) ⇒
+        console.log("got initial state")
+        vm.refreshSystem(vss)
+
+      case None ⇒
+        console.log("no initial state")
+    }
+  }
 
   private def hoveredPoint: js.Function1[js.Dictionary[_], Any] = {
     (dict: js.Dictionary[_]) ⇒ {

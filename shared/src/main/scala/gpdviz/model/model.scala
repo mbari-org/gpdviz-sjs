@@ -15,7 +15,7 @@ case class ScalarData(vars:      List[String],
 case class VmSensorSystem(sysid:        String,
                           name:         Option[String] = None,
                           description:  Option[String] = None,
-                          streams:      Map[String, VmDataStream] = Map.empty,
+                          streams:      List[VmDataStream] = List.empty,
                           center:       Option[LatLon] = None,
                           clickListener: Option[String] = None
                          )

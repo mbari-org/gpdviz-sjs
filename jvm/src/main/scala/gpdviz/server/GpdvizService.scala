@@ -167,11 +167,15 @@ trait GpdvizService extends Directives with JsonImplicits  {
       index ~ staticFile ~ jsStuff ~ staticWeb ~ staticRoot
     }
 
+    val apiImpl = new ApiImpl(db)
+
+    val autowireServer = new AutowireServer(apiImpl)
+
     val ajax = post {
       path("ajax" / Segments) { s ⇒
         entity(as[String]) { e ⇒
           complete {
-            AutowireServer.route[Api](ApiImpl)(
+            autowireServer.route[Api](apiImpl)(
               autowire.Core.Request(
                 s,
                 upickle.default.read[Map[String, String]](e)

@@ -2,6 +2,7 @@
 
 2017-08-24
 
+- refresh initial state of sensor system
 - factor out publish functionality 
 
 2017-08-18

@@ -49,7 +49,7 @@ class View(vm: VModel) {
   @dom private def streamsBinding: Binding[Node] = {
     <ul>
       {
-      for (str <- Constants(vm.ss.bind.streams.values.toSeq: _*))
+      for (str <- Constants(vm.ss.bind.streams: _*))
         yield <li>{ streamBinding(str).bind } </li>
       }
     </ul>
