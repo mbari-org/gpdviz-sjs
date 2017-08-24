@@ -23,6 +23,7 @@ class Notifier(pub: Publisher) extends JsonImplicits {
         name = ss.name,
         description = ss.description,
         center = ss.center,
+        zoom = ss.zoom,
         clickListener = ss.clickListener
       ))
     }

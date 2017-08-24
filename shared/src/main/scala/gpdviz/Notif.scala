@@ -7,10 +7,11 @@ sealed trait Notif {
 }
 
 case class SensorSystemRegistered(
-                                 sysid: String,
-                                 name: Option[String],
-                                 description: Option[String],
-                                 center:       Option[LatLon],
+                                 sysid:         String,
+                                 name:          Option[String],
+                                 description:   Option[String],
+                                 center:        Option[LatLon],
+                                 zoom:          Option[Int],
                                  clickListener: Option[String],
                                  ) extends Notif
 

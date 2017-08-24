@@ -17,6 +17,7 @@ case class VmSensorSystem(sysid:        String,
                           description:  Option[String] = None,
                           streams:      List[VmDataStream] = List.empty,
                           center:       Option[LatLon] = None,
+                          zoom:         Option[Int] = None,
                           clickListener: Option[String] = None
                          )
 

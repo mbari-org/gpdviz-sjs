@@ -1,9 +1,11 @@
 package gpdviz
 
-import gpdviz.model.VmSensorSystem
+import gpdviz.model.{LatLon, VmSensorSystem}
 
 case class ClientConfig(
                          serverName: String,
+                         center:     LatLon,
+                         zoom:       Int,
                          pusher:     Option[ClientPusherConfig]
                        )
 

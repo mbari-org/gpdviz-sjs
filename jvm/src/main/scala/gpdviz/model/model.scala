@@ -10,6 +10,7 @@ case class SensorSystem(sysid:        String,
                         streams:      Map[String, DataStream] = Map.empty,
                         pushEvents:   Boolean = true,
                         center:       Option[LatLon] = None,
+                        zoom:         Option[Int] = None,
                         clickListener: Option[String] = None
                         )
 

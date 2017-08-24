@@ -1,13 +1,15 @@
 package gpdviz.webapp
 
 import com.thoughtworks.binding.Binding.{Var, Vars}
+import gpdviz.ClientConfig
 import gpdviz.model.{LatLon, VmDataStream, VmObsData, VmSensorSystem}
 import upickle.Js
 
+import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 
 
-class VModel(sysid: String, llmap: LLMap) {
+class VModel(sysid: String, cc: ClientConfig, llmap: LLMap) {
 
   val ss: Var[VmSensorSystem] = Var(VmSensorSystem(sysid))
 
@@ -15,6 +17,9 @@ class VModel(sysid: String, llmap: LLMap) {
 
   def refreshSystem(vss: VmSensorSystem): Unit = {
     ss := vss
+
+    llmap.setView(jsCenter(vss.center), vss.zoom.getOrElse(cc.zoom))
+
     vss.streams foreach { str ⇒
       addAbsoluteChart(str.strid, str.chartStyle)
       addStreamToMap(str)
@@ -27,6 +32,7 @@ class VModel(sysid: String, llmap: LLMap) {
   def registerSystem(name:          Option[String],
                      description:   Option[String],
                      center:        Option[LatLon],
+                     zoom:          Option[Int],
                      clickListener: Option[String]): Unit = {
     ss := VmSensorSystem(
       sysid = sysid,
@@ -36,7 +42,12 @@ class VModel(sysid: String, llmap: LLMap) {
       center = center,
       clickListener = clickListener
     )
-    llmap.sensorSystemRegistered()
+    llmap.sensorSystemRegistered(jsCenter(center), zoom.getOrElse(cc.zoom))
+  }
+
+  private def jsCenter(center: Option[LatLon]): js.Array[Double] = {
+    val c = center.getOrElse(cc.center)
+    js.Array(c.lat, c.lon)
   }
 
   def unregisterSystem(): Unit = {

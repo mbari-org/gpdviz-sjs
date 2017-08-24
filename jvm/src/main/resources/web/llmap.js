@@ -1,12 +1,8 @@
-function setupLLMap(hoveredPoint, clickHandler) {
+function setupLLMap(center, zoom, hoveredPoint, clickHandler) {
 
   var debug = window && window.location.toString().match(/.*\?debug/);
 
   var byStrId = {};
-
-  // TODO capture center and zoom from sensor system properties
-  var center = [36.79, -122.02];
-  var zoom = 11;
 
   var esriOceansLayer = L.esri.basemapLayer('Oceans');
   var osm = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
@@ -162,8 +158,9 @@ function setupLLMap(hoveredPoint, clickHandler) {
     overlayGroupByStreamId = {};
   }
 
-  function sensorSystemRegistered() {
+  function sensorSystemRegistered(center, zoom) {
     clearMarkers();
+    setView(center, zoom);
   }
 
   function sensorSystemUnregistered() {
@@ -348,6 +345,14 @@ function setupLLMap(hoveredPoint, clickHandler) {
     selectionGroup.addLayer(marker);
   }
 
+  function setView(center, zoom) {
+    map.setView([center[0], center[1]], zoom);
+  }
+
+  function setZoom(zoom) {
+    map.setZoom(zoom);
+  }
+
   return {
     sensorSystemRegistered:    sensorSystemRegistered,
     sensorSystemUnregistered:  sensorSystemUnregistered,
@@ -355,7 +360,8 @@ function setupLLMap(hoveredPoint, clickHandler) {
     removeStream:              removeStream,
     addGeoJson:                addGeoJson,
     addObsScalarData:          addObsScalarData,
-    addSelectionPoint:         addSelectionPoint
+    addSelectionPoint:         addSelectionPoint,
+    setView:                   setView
   };
 
   function getSizeStr(size) {

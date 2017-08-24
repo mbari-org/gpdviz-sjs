@@ -22,7 +22,9 @@ import scala.util.{Failure, Success}
 object DOMGlobalScope extends js.Object {
   def sysid: String = js.native
 
-  def setupLLMap(hoveredPoint: js.Function1[js.Dictionary[_], Any],
+  def setupLLMap(center: js.Array[Double],
+                 zoom: Int,
+                 hoveredPoint: js.Function1[js.Dictionary[_], Any],
                  clickHandler: js.Function1[js.Dictionary[_], Any]
                 ): LLMap = js.native
 }
@@ -30,7 +32,7 @@ object DOMGlobalScope extends js.Object {
 @js.native
 trait LLMap extends js.Object {
 
-  def sensorSystemRegistered(): Unit = js.native
+  def sensorSystemRegistered(center: js.Array[Double], zoom: Int): Unit = js.native
 
   def sensorSystemUnregistered(): Unit = js.native
 
@@ -43,6 +45,8 @@ trait LLMap extends js.Object {
   def addObsScalarData(strid: String, timestamp: String, scalarData: js.Dictionary[_]): Unit = js.native
 
   def addSelectionPoint(p: js.Array[Double]): Unit = js.native
+
+  def setView(center: js.Array[Double], zoom: Int): Unit = js.native
 }
 
 object Frontend extends js.JSApp {
@@ -51,12 +55,15 @@ object Frontend extends js.JSApp {
   }
 }
 
-class WebApp(clientConfig: ClientConfig) {
-  console.log("clientConfig = " + pp(clientConfig))
+class WebApp(cc: ClientConfig) {
+  console.log("clientConfig = " + pp(cc))
   val sysid: String = DOMGlobalScope.sysid
-  val llmap: LLMap  = DOMGlobalScope.setupLLMap(hoveredPoint, clickHandler)
+  val llmap: LLMap  = {
+    val center = js.Array(cc.center.lat, cc.center.lon)
+    DOMGlobalScope.setupLLMap(center, cc.zoom, hoveredPoint, clickHandler)
+  }
 
-  val vm = new VModel(sysid, llmap)
+  val vm = new VModel(sysid, cc, llmap)
 
   startUp()
 
@@ -66,8 +73,8 @@ class WebApp(clientConfig: ClientConfig) {
     refresh()
 
     val handleNotification: Notif ⇒ Unit = {
-      case SensorSystemRegistered(_, name, description, center, clickListener) ⇒
-        vm.registerSystem(name, description, center, clickListener)
+      case SensorSystemRegistered(_, name, description, center, zoom, clickListener) ⇒
+        vm.registerSystem(name, description, center, zoom, clickListener)
 
       case SensorSystemUnregistered(_) ⇒
         vm.unregisterSystem()
@@ -87,12 +94,12 @@ class WebApp(clientConfig: ClientConfig) {
         window.location.reload(true)
     }
 
-    clientConfig.pusher match {
+    cc.pusher match {
       case None ⇒
         new WsListener(handleNotification)
 
       case Some(pc) ⇒
-        val pusherChannel = s"${clientConfig.serverName}-$sysid-2"
+        val pusherChannel = s"${cc.serverName}-$sysid-2"
         new PusherListener(pc, pusherChannel, handleNotification)
     }
   }

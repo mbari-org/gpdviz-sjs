@@ -58,7 +58,7 @@ trait JsonImplicits extends DefaultJsonProtocol with SprayJsonSupport with GeoJs
   implicit val obsDataFormat  = jsonFormat3(ObsData)
   implicit val streamFormat  = jsonFormat8(DataStream)
   implicit val obssRegFormat = jsonFormat1(ObservationsRegister)
-  implicit val systemFormat  = jsonFormat7(SensorSystem)
+  implicit val systemFormat  = jsonFormat8(SensorSystem)
 
   implicit val dbErrorFormat = jsonFormat4(GnError)
 }

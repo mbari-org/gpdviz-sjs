@@ -2,7 +2,7 @@ package gpdviz
 
 import gpdviz.config.cfg
 import gpdviz.data.DbInterface
-import gpdviz.model.{VmDataStream, VmObsData, VmSensorSystem, VmVariableDef}
+import gpdviz.model._
 import gpdviz.server.JsonImplicits
 import spray.json._
 
@@ -11,6 +11,8 @@ class ApiImpl(db: DbInterface) extends Api with JsonImplicits {
 
   def clientConfig(): ClientConfig = ClientConfig(
     serverName = cfg.serverName,
+    center = LatLon(cfg.map.center.lat, cfg.map.center.lon),
+    zoom = cfg.map.zoom,
     pusher = cfg.pusher.map(p ⇒ ClientPusherConfig(p.key))
   )
 
@@ -46,6 +48,7 @@ class ApiImpl(db: DbInterface) extends Api with JsonImplicits {
           )
         },
         center = ss.center,
+        zoom = ss.zoom,
         clickListener = ss.clickListener
       )
     }

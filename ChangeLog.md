@@ -2,6 +2,7 @@
 
 2017-08-24
 
+- handle map center and zoom
 - enable the new scalajs based dispatch
 - websocket client: connect upon page load and keep connection alive.
   "Reconnect" button enabled if connection closed by server; this just tries to 
