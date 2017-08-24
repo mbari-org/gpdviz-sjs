@@ -2,6 +2,7 @@
 
 2017-08-24
 
+- enable the new scalajs based dispatch
 - websocket client: connect upon page load and keep connection alive.
   "Reconnect" button enabled if connection closed by server; this just tries to 
   re-establish connection. (Complete refresh needs page reload.)

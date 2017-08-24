@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="gpdviz" ng-controller="GpdvizController as vm">
+<html>
 <head>
   <title>#sysid - Gpdviz</title>
   <link rel="stylesheet" href="//unpkg.com/leaflet@1.0.0/dist/leaflet.css" />
@@ -13,92 +13,49 @@
 
   <script src="gpdviz-jsdeps.js"></script>
 
+  <script src="charter.js"></script>
+  <script src="llmap.js"></script>
+
   <!--<script src="leaflet/leaflet.gridlayer.googlemutant/Leaflet.GoogleMutant.js"></script>-->
 
   <script src="leaflet/Leaflet.MousePosition/src/L.Control.MousePosition.js"></script>
   <script src="leaflet/Leaflet.MagnifyingGlass/leaflet.magnifyingglass.js"></script>
 
-  <script type="text/javascript" src="charter.js"></script>
-  <script type="text/javascript" src="app.js"></script>
   <script>
     var sysid = "#sysid";
-    var Gpdviz = { "initialSs": #ssVar };
-    //Pusher.logToConsole = true; // don't include this in production
-    var pusherKey = '#pusherKey';
-    var pusher = pusherKey && new Pusher(pusherKey, { encrypted: true });
-    var channel = pusher && pusher.subscribe('#pusherChannel');
   </script>
   <style>
     body { margin: 5px 10px; }
   </style>
 </head>
 <body>
-  <div style="text-align: center">
-    <div style="background-color: #ebfaf5">
-      <span style="font-weight: bold">
-        <code>#sysid</code> - <span ng-bind="vm.ss.name"></span>
-      </span>
-      <span ng-bind="vm.ss.description"></span>
+  <div id="websocket">
+  </div>
+  <div id="scalajs">
+    <div style="text-align: center">
+      <div style="background-color: #ebfaf5">
+        <span style="font-weight: bold">
+          <code>#sysid</code>
+          <span id="sysName"></span>
+        </span>
+        <span id="sysDesc"></span>
+      </div>
     </div>
-  </div>
-  <div style="color: gray; font-family: monospace; margin-left: 25%">
-    <span ng-bind="vm.hoveredPoint.isoTime"></span>
-    &nbsp;&nbsp;
-    <span ng-bind="vm.hoveredPoint.position.lat ? vm.hoveredPoint.position.lat.toFixed(5) + ' : ' + vm.hoveredPoint.position.lon.toFixed(5) : ''"></span>
-  </div>
-  <table style="width: 100%">
-    <tbody>
-    <tr>
-      <td style="vertical-align: top">
-        <div id="mapid" style="height:800px">
-          <div ng-repeat="(id, c) in vm.absoluteCharts">
-            <div ng-attr-id="{{ id }}"
-                 class="absoluteChart"
-                 ng-style="{'min-width': c.minWidthStr, height: c.heightStr}"
-            ></div>
-          </div>
-        </div>
-      </td>
-      <td style="width: 300px; vertical-align: top">
-        <div ng-if="vm.ss" style="margin-top: 20px">
-          <div ng-if="vm.ss.streams">
-            <!--<pre>orderedStreams={{vm.ss.orderedStreams|json}}</pre>-->
-            <ul>
-              <li ng-repeat="str in vm.ss.orderedStreams" style="margin: 0 -20px;">
-                <div>
-                  <span style="font-weight:bold" ng-bind="str.strid"></span>
-                  <span ng-if="str.name" ng-bind="' - ' + str.name"></span>
-                  <br>
-                  <span style="color: gray" ng-bind="str.description"></span>
-                </div>
-                <div>
-                  <span ng-bind="'Obs: ' + str.numberObs"></span>
-                  <span ng-if="str.latestIso" style="font-size: small; color: gray">
-                    <br>
-                    <span ng-bind="'Latest: ' +str.latestIso"></span>
-                  </span>
-                </div>
-                <!--ul>
-                  <li ng-repeat="(timestamp, obs) in str.observations">
-                    <span ng-bind="timestamp + ': ' + (obs|json)"></span>
-                  </li>
-                </ul-->
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div ng-if="!vm.ss">
-          <span style="color: brown">
-            Waiting for registration event...
-          </span>
-        </div>
-      </td>
-    </tr>
-    </tbody>
-  </table>
 
-  <div ng-if="vm.debug">
-    <br>vm:<pre ng-bind="vm | json"></pre>
+    <table style="width: 100%">
+      <tbody>
+      <tr>
+        <td style="vertical-align: top">
+          <div id="mapid" style="height:800px">
+            <div id="absoluteCharts"></div>
+          </div>
+        </td>
+        <td style="width: 300px; vertical-align: top">
+          <div id="sysActivity"></div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
   </div>
 
   <script src="gpdviz-fastopt.js"></script>
