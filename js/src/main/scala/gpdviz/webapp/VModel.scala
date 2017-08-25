@@ -21,7 +21,7 @@ class VModel(sysid: String, cc: ClientConfig, llmap: LLMap) {
     llmap.setView(jsCenter(vss.center), vss.zoom.getOrElse(cc.zoom))
 
     vss.streams foreach { str ⇒
-      addAbsoluteChart(str.strid, str.chartStyle)
+      addAbsoluteChartIfSo(str.strid, str.chartStyle)
       addStreamToMap(str)
       str.observations foreach { obss ⇒
         addObservationsToMap(str, obss)
@@ -57,21 +57,29 @@ class VModel(sysid: String, cc: ClientConfig, llmap: LLMap) {
 
   def addStream(str: VmDataStream): Unit = {
     ss := ss.get.copy(streams = str :: ss.get.streams)
-    addAbsoluteChart(str.strid, str.chartStyle)
+    addAbsoluteChartIfSo(str.strid, str.chartStyle)
     addStreamToMap(str)
   }
 
-  private def addAbsoluteChart(strid: String, chartStyle: Option[String]): Unit = {
-    val useChartPopup = chartStyle.map(upickle.default.read[Js.Obj]) exists { chartStyle: Js.Obj ⇒
-      chartStyle.obj.get("useChartPopup").contains(Js.True)
-    }
+  private def addAbsoluteChartIfSo(strid: String, chartStyle: Option[String]): Unit = {
+    val jsObj: Js.Obj = chartStyle.map(upickle.default.read[Js.Obj]).getOrElse(Js.Obj())
+    //println(s"strid=$strid  jsObj=$jsObj")
+
+    val useChartPopup = jsObj.obj.get("useChartPopup").contains(Js.True)
     if (!useChartPopup) {
-      absoluteCharts.get += {
-        val chartId = "chart-container-" + strid
-        val chartHeightStr = "500px" // TODO chartHeightStr
-        val minWidthStr    = "400px" // TODO minWidthStr
-        ChartDiv(chartId, chartHeightStr, minWidthStr)
+      val chartId = "chart-container-" + strid
+      val chartHeightStr: String = jsObj.obj.get("height") match {
+        case Some(Js.Str(value)) ⇒ value
+        case Some(Js.Num(value)) ⇒ value.toInt + "px"
+        case _                   ⇒ 370 + "px"
       }
+      val minWidthStr: String = jsObj.obj.get("minWidth") match {
+        case Some(Js.Str(value)) ⇒ value
+        case Some(Js.Num(value)) ⇒ value.toInt + "px"
+        case _                   ⇒ 500 + "px"
+      }
+      //println(s"strid=$strid  chartHeightStr=$chartHeightStr  minWidthStr=$minWidthStr")
+      absoluteCharts.get += ChartDiv(chartId, chartHeightStr, minWidthStr)
     }
   }
 

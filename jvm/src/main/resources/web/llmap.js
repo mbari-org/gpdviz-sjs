@@ -167,7 +167,6 @@ function setupLLMap(center, zoom, hoveredPoint, clickHandler) {
     clearMarkers();
   }
 
-  // TODO
   function addStream(str) {
     // json-ify some stuff
     str.mapStyle   = str.mapStyle   ? JSON.parse(str.mapStyle) : {};
@@ -255,18 +254,21 @@ function setupLLMap(center, zoom, hoveredPoint, clickHandler) {
     }
     else if (byStrId[str.strid].absChartUsed) return;
 
-    if (str.chartHeight === undefined) {
-      str.chartHeight = 400;
+    if (str.chartHeightPx === undefined) {
+      str.chartHeightPx = 370;
       if (str.chartStyle && str.chartStyle.height) {
-        str.chartHeight = str.chartStyle.height;
+        str.chartHeightPx = str.chartStyle.height;
       }
+      //console.debug(str.strid, "str.chartHeightPx=", str.chartHeightPx);
     }
-    var chartHeightStr = getSizeStr(str.chartHeight);
-    var minWidthPx = str.chartStyle && str.chartStyle.minWidthPx || 600;
-    var minWidthStr = minWidthPx + 'px';
 
     if (useChartPopup) {
       if (debug) console.debug("setting popup for stream ", str.strid);
+
+      var chartHeightStr = getSizeStr(str.chartHeightPx);
+      var minWidthPx = str.chartStyle && str.chartStyle.minWidthPx || 500;
+      var minWidthStr = minWidthPx + 'px';
+
       var chartContainer = '<div id="' + chartId +
         '" style="min-width:' + minWidthStr + ';height:' + chartHeightStr + ';margin:0 auto"></div>';
 
@@ -284,13 +286,6 @@ function setupLLMap(center, zoom, hoveredPoint, clickHandler) {
 
     else {
       byStrId[str.strid].absChartUsed = true;
-      // vm.absoluteCharts[chartId] = {
-      //   id: chartId,
-      //   heightStr: chartHeightStr,
-      //   minWidthStr: minWidthStr
-      // };
-
-      // console.debug("ADDED absoluteChart=", vm.absoluteCharts[chartId]);
       byStrId[str.strid].marker.on('click', function (e) {
         var idElm = $("#" + chartId);
         //console.debug("CLICK: idElm=", idElm, " visible=", idElm && idElm.is(":visible"));

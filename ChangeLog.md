@@ -1,7 +1,8 @@
 # gpdviz2
 
-2017-08-24
+2017-08-25
 
+- handle chart height and minWidth
 - handle map center and zoom
 - enable the new scalajs based dispatch
 - websocket client: connect upon page load and keep connection alive.

@@ -129,11 +129,12 @@ function Charter(str, hoveredPoint) {
   }
 
   function createChart() {
+    //console.debug(str.strid, "createChart: str.chartHeightPx=", str.chartHeightPx);
     // http://stackoverflow.com/q/23624448/830737
     return new Highcharts.StockChart({
       chart: {
         renderTo: "chart-container-" + strid,
-        height: str.chartHeight - 4,
+        height: str.chartHeightPx - 4,
         events: {
           load: function () {
             serieses = this.series;

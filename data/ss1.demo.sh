@@ -47,7 +47,7 @@ function add_str1() {
 	     description="Description of Stream one" \
 	     chartStyle:='{
 	       "useChartPopup": true,
-	       "height": "500px",
+	       "height": 500,
             "yAxis": [{
 	             "height": "50%",
 	             "title": {"text": "baz (m)"},

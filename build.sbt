@@ -97,7 +97,6 @@ lazy val gpdvizJVM = gpdviz.jvm.settings(
 
 // Puts some js resources under jvm's classpath so they can be resolved.
 // Execute 'package' to trigger this.
-// TODO how to include this as part or 'gpdvizJVM/runMain gpdviz.server.GpdvizServer`?
 resourceGenerators in Compile += Def.task {
   val parentDir = (fastOptJS in Compile in gpdvizJS).value.data.getParentFile
 
