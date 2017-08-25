@@ -348,6 +348,8 @@ function setupLLMap(center, zoom, hoveredPoint, clickHandler) {
     map.setZoom(zoom);
   }
 
+  prepareAdjustMapUponWindowResize();
+
   return {
     sensorSystemRegistered:    sensorSystemRegistered,
     sensorSystemUnregistered:  sensorSystemUnregistered,
@@ -361,5 +363,40 @@ function setupLLMap(center, zoom, hoveredPoint, clickHandler) {
 
   function getSizeStr(size) {
     return typeof size === 'number' ? size + 'px' : size;
+  }
+
+  function prepareAdjustMapUponWindowResize() {
+    var minHeight = 350;
+    var mapContainer = document.getElementById('mapid');
+    var marginBottom = 5;
+
+    function updateWindowSize() {
+      var rect = mapContainer.getBoundingClientRect();
+      // console.log("getBoundingClientRect=", rect.top, rect.right, rect.bottom, rect.left);
+      // console.log("window.innerHeight=", window.innerHeight, " - rect.top=", rect.top);
+
+      var restWindowHeight = window.innerHeight - rect.top - marginBottom;
+      //console.log("restWindowHeight=", restWindowHeight);
+
+      if (restWindowHeight < minHeight) {
+        restWindowHeight = minHeight;
+      }
+      updateMapSize(restWindowHeight);
+    }
+
+    function updateMapSize(windowHeight) {
+      if (windowHeight) {
+        $('#mapid').css("height", windowHeight);
+      }
+      L.Util.requestAnimFrame(function () {
+        map.invalidateSize({debounceMoveend: true}); }, map);
+    }
+
+    setTimeout(function () {
+      updateWindowSize();
+      $(window).resize(function () {
+        updateWindowSize();
+      });
+    }, 0);
   }
 }
