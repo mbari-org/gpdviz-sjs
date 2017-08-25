@@ -26,22 +26,23 @@ class WebSocketPublisher()(implicit materializer: ActorMaterializer,
   // - https://stackoverflow.com/a/35313963/830737
   // - https://groups.google.com/d/msg/akka-user/aA7RD2On_K0/6SJDgOPpAAAJ
 
-  private val dataSource: Source[Notif, ActorRef] = Source.actorPublisher[Notif](MyActorPublisher.props)
-
-  val wsHandler: Flow[Any, TextMessage.Strict, NotUsed] = Flow
-    .fromSinkAndSource(Sink.ignore, dataSource map { notif ⇒
+  def wsHandler(sysid: String): Flow[Any, TextMessage.Strict, NotUsed] = {
+    val dataSource: Source[Notif, ActorRef] = Source.actorPublisher[Notif](MyActorPublisher.props(sysid))
+    Flow.fromSinkAndSource(Sink.ignore, dataSource map { notif ⇒
       TextMessage.Strict(upickle.default.write(notif))
     })
+  }
 }
 
-class MyActorPublisher extends ActorPublisher[Notif] {
+class MyActorPublisher(sysid: String) extends ActorPublisher[Notif] {
   override def preStart: Unit = context.system.eventStream.subscribe(self, classOf[Notif])
 
   override def receive: Receive = {
-    case msg: Notif ⇒
+    case notif: Notif ⇒
       if (isActive && totalDemand > 0) {
         // Pushes the message onto the stream
-        onNext(msg)
+        if (sysid == notif.sysid)
+          onNext(notif)
       }
 
     //case x ⇒ println("RECEIVE: " + x + " " +x.getClass.getName)
@@ -49,5 +50,5 @@ class MyActorPublisher extends ActorPublisher[Notif] {
 }
 
 object MyActorPublisher {
-  def props(implicit ctx: ExecutionContext): Props = Props(new MyActorPublisher())
+  def props(sysid: String)(implicit ctx: ExecutionContext): Props = Props(new MyActorPublisher(sysid))
 }

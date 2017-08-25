@@ -26,8 +26,8 @@ object GpdvizServer extends GpdvizService {
 
     case None     ⇒
       val wsp = new WebSocketPublisher
-      val wsRoute = path("ws") {
-        handleWebSocketMessages(wsp.wsHandler)
+      val wsRoute = pathPrefix("ws" / Segment) { sysid ⇒
+        handleWebSocketMessages(wsp.wsHandler(sysid))
       }
       (wsp, routes ~ wsRoute)
   }

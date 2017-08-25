@@ -9,7 +9,7 @@ import scala.scalajs.js
 import scala.scalajs.js.timers._
 
 
-class WsListener(handleNotification: (Notif) ⇒ Unit) {
+class WsListener(sysid: String, handleNotification: (Notif) ⇒ Unit) {
 
   private val connectButton = button("connect") { (event: MouseEvent) ⇒
     connect()
@@ -43,10 +43,8 @@ class WsListener(handleNotification: (Notif) ⇒ Unit) {
       closed()
     }
     ws.onmessage = { (event: MessageEvent) ⇒
-      val n = upickle.default.read[Notif](event.data.toString)
-      //import pprint.PPrinter.BlackWhite.{apply ⇒ pp}
-      //println("onmessage: n = " + pp(n))
-      handleNotification(n)
+      val notif = upickle.default.read[Notif](event.data.toString)
+      handleNotification(notif)
     }
     ws.onclose = { _ ⇒
       closed()
@@ -68,7 +66,7 @@ class WsListener(handleNotification: (Notif) ⇒ Unit) {
 
   private def getWebSocketUri: String = {
     val wsProtocol = if (dom.document.location.protocol == "https:") "wss" else "ws"
-    s"$wsProtocol://${dom.document.location.host}/ws"
+    s"$wsProtocol://${dom.document.location.host}/ws/$sysid"
   }
 
   private def button(label: String)(onClick: js.Function1[MouseEvent, _]): HTMLButtonElement = {

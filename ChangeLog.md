@@ -2,6 +2,7 @@
 
 2017-08-25
 
+- publish websocket messages for the specific sysid
 - simplify details panel
 - restore window resize handling
 - some investigation re "Websocket handler failed with Processor actor" when exiting the server 

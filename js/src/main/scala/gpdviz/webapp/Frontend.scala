@@ -96,7 +96,7 @@ class WebApp(cc: ClientConfig) {
 
     cc.pusher match {
       case None ⇒
-        new WsListener(handleNotification)
+        new WsListener(sysid, handleNotification)
 
       case Some(pc) ⇒
         val pusherChannel = s"${cc.serverName}-$sysid-2"
