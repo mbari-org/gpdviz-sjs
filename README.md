@@ -1,18 +1,15 @@
-[![Build Status](https://travis-ci.org/carueda/gpdviz2.svg?branch=master)](https://travis-ci.org/carueda/gpdviz2)
+[![Build Status](https://travis-ci.org/carueda/gpdviz.svg?branch=master)](https://travis-ci.org/carueda/gpdviz)
 
-# gpdviz2
+# gpdviz
 
 Web-based visualization of geo-located point data streams in real-time.
 
-This is a preliminary revisit of the [initial idea](https://github.com/carueda/gpdviz).
-
-Implementation currently based on:
+Implementation based on:
 
 - [Akka-HTTP](http://doc.akka.io/docs/akka-http/current/scala/http/)
 - [ScalaJS](https://www.scala-js.org/)
 - [Leaflet](http://leafletjs.com/)
 - [Highcharts](http://www.highcharts.com/)
-- [Pusher](https://pusher.com/)
 
 
 ## build and run
@@ -30,7 +27,7 @@ On another terminal (this requires [httpie](https://httpie.org/)):
 	$ data/ss1.demo.sh
 
 
-![](https://github.com/carueda/gpdviz2/blob/master/static/gpdviz2.gif)
+![](https://github.com/carueda/gpdviz/blob/master/static/gpdviz2.gif)
 
 
 ## dist and run
@@ -41,7 +38,9 @@ On another terminal (this requires [httpie](https://httpie.org/)):
 
 ## model
 
-- model very ad hoc still
-- currently only associated with a stream
-- could also be associated with concrete feature
-- ...
+Model still very ad hoc.
+
+
+## history
+
+This is a reimplementation of the [original idea](https://github.com/carueda/gpdviz0).

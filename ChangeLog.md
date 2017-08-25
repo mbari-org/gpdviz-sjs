@@ -1,7 +1,9 @@
-# gpdviz2
+# gpdviz
 
 2017-08-25
 
+- repo renamed to https://github.com/carueda/gpdviz.
+  (old one to https://github.com/carueda/gpdviz0)
 - publish websocket messages for the specific sysid
 - simplify details panel
 - restore window resize handling
