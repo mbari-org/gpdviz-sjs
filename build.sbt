@@ -1,4 +1,4 @@
-val gpdvizVersion = "0.1.0"
+val gpdvizVersion = "0.2.0"
 
 val scalaV        = "2.12.2"
 val akkaHttpV     = "10.0.9"
