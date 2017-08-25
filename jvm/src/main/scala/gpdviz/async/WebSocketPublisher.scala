@@ -22,6 +22,7 @@ class WebSocketPublisher()(implicit materializer: ActorMaterializer,
   }
 
   // Some refs:
+  // - https://stackoverflow.com/a/41359874/830737 -- possible mechanism to track connected clients
   // - https://stackoverflow.com/a/35313963/830737
   // - https://groups.google.com/d/msg/akka-user/aA7RD2On_K0/6SJDgOPpAAAJ
 
@@ -42,6 +43,8 @@ class MyActorPublisher extends ActorPublisher[Notif] {
         // Pushes the message onto the stream
         onNext(msg)
       }
+
+    //case x ⇒ println("RECEIVE: " + x + " " +x.getClass.getName)
   }
 }
 

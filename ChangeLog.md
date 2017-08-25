@@ -2,6 +2,8 @@
 
 2017-08-25
 
+- some investigation re "Websocket handler failed with Processor actor" when exiting the server 
+  while some client currently connected. TODO check https://stackoverflow.com/a/41359874/830737 
 - handle chart height and minWidth
 - handle map center and zoom
 - enable the new scalajs based dispatch
