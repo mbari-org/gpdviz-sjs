@@ -14,6 +14,7 @@ val pprintV       = "0.5.2"
 val scalaJsDomV      = "0.9.3"
 val bindingV         = "10.0.2"
 val macrosParadiseV  = "2.1.0"
+val momentScalaJsV   = "0.9.0"
 
 
 def commonSettings = Seq(
@@ -76,7 +77,8 @@ lazy val gpdviz = crossProject
     libraryDependencies ++= Seq(
       "org.scala-js"              %%%  "scalajs-dom"        %  scalaJsDomV,
       "com.thoughtworks.binding"  %%%  "dom"                %  bindingV,
-      "com.thoughtworks.binding"  %%%  "futurebinding"      %  bindingV
+      "com.thoughtworks.binding"  %%%  "futurebinding"      %  bindingV,
+      "ru.pavkin"                 %%%  "scala-js-momentjs"  %  momentScalaJsV
     ),
     addCompilerPlugin("org.scalamacros" % "paradise" % macrosParadiseV cross CrossVersion.full),
     jsDependencies += RuntimeDOM % "test",

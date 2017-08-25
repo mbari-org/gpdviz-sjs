@@ -3,6 +3,7 @@ package gpdviz.webapp
 import com.thoughtworks.binding.Binding.Constants
 import com.thoughtworks.binding.{Binding, dom}
 import gpdviz.model.VmDataStream
+import moment.Moment
 import org.scalajs.dom.raw.Node
 
 case class ChartDiv(
@@ -46,10 +47,10 @@ class View(vm: VModel) {
     </div>
 
   @dom private def streamsBinding: Binding[Node] =
-    <ul>
+    <ul style="margin-left:-20px">
       {
-      for (str <- Constants(vm.ss.bind.streams: _*))
-        yield <li>{ streamBinding(str).bind } </li>
+      for (str <- Constants(vm.ss.bind.streams.sortBy(_.strid): _*))
+        yield <li style="margin-bottom:10px">{ streamBinding(str).bind } </li>
       }
     </ul>
 
@@ -80,7 +81,11 @@ class View(vm: VModel) {
           val obss = str.observations.getOrElse(Map.empty)
           val timestamps = Constants(obss.keys.toSeq.sorted: _*)
           <div>Observations: { timestamps.bind.length.toString }</div>
-          <div>Latest: { timestamps.bind.last }</div>
+          <div style="font-size:small">
+            Latest: {
+            timestamps.bind.lastOption.map(m ⇒ Moment(m.toLong).toISOString()).getOrElse("")
+            }
+          </div>
           <!--ul>
             {
             for (timestamp <- timestamps)
