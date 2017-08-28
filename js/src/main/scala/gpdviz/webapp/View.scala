@@ -83,7 +83,7 @@ class View(vm: VModel) {
           <div>Observations: { timestamps.bind.length.toString }</div>
           <div style="font-size:small">
             Latest: {
-            timestamps.bind.lastOption.map(m ⇒ Moment(m.toLong).toISOString()).getOrElse("")
+            timestamps.bind.lastOption.map(m ⇒ Moment(m.toDouble.toLong).toISOString()).getOrElse("")
             }
           </div>
           <!--ul>

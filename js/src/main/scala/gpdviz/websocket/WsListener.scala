@@ -1,6 +1,7 @@
 package gpdviz.websocket
 
 import gpdviz.Notif
+import gpdviz.webapp.Util
 import org.scalajs.dom
 import org.scalajs.dom.raw._
 import org.scalajs.dom.window.console
@@ -39,7 +40,7 @@ class WsListener(sysid: String, handleNotification: (Notif) ⇒ Unit) {
       event
     }
     ws.onerror = { (event: ErrorEvent) ⇒
-      console.error(s"Failed: code: ${event.colno}")
+      console.error(s"Failed: code: ${event.message}")
       closed()
     }
     ws.onmessage = { (event: MessageEvent) ⇒
@@ -65,8 +66,8 @@ class WsListener(sysid: String, handleNotification: (Notif) ⇒ Unit) {
   }
 
   private def getWebSocketUri: String = {
-    val wsProtocol = if (dom.document.location.protocol == "https:") "wss" else "ws"
-    s"$wsProtocol://${dom.document.location.host}/ws/$sysid"
+    val wsProtocol = if (dom.document.location.protocol == "https:") "wss:" else "ws:"
+    s"${Util.baseUrl(wsProtocol)}/ws/$sysid"
   }
 
   private def button(label: String)(onClick: js.Function1[MouseEvent, _]): HTMLButtonElement = {

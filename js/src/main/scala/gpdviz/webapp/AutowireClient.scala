@@ -11,9 +11,11 @@ object AutowireClient extends autowire.Client[String, upickle.default.Reader, up
   def read[Result: upickle.default.Reader](p: String): Result = upickle.default.read[Result](p)
 
   override def doCall(req: Request): Future[String] = {
-    //println("doCall: req=" + req)
+    val url = s"${Util.baseUrl()}/ajax/${req.path.mkString("/")}"
+    // url = /gpdviz/ajax/gpdviz/Api/clientConfig
+    println("doCall: url=" + url)
     dom.ext.Ajax.post(
-      url = "/ajax/" + req.path.mkString("/"),
+      url = url,
       data = upickle.default.write(req.args)
     ).map(_.responseText)
   }
