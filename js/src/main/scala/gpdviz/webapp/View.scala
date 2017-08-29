@@ -42,7 +42,10 @@ class View(vm: VModel) {
 
   @dom private def sysActivity(): Binding[Node] =
     <div>
-      <div>{ vm.ss.bind.center.map("Center: " + _).getOrElse("") }</div>
+      <div style="font-size:small;color:gray">
+        <div>{ vm.ss.bind.center.map(c ⇒ "Center: lat=%.3f, lon=%.3f" format (c.lat, c.lon)).getOrElse("") }</div>
+        <div title="clickListener">{ vm.ss.bind.clickListener.getOrElse("") }</div>
+      </div>
       <div>{ streamsBinding.bind }</div>
     </div>
 
