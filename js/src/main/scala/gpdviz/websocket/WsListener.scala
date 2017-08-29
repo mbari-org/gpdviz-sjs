@@ -67,7 +67,9 @@ class WsListener(sysid: String, handleNotification: (Notif) ⇒ Unit) {
 
   private def getWebSocketUri: String = {
     val wsProtocol = if (dom.document.location.protocol == "https:") "wss:" else "ws:"
-    s"${Util.baseUrl(wsProtocol)}/ws/$sysid"
+    val res = s"${Util.baseUrl(wsProtocol)}ws/$sysid"
+    console.log("ws uri: " + res)
+    res
   }
 
   private def button(label: String)(onClick: js.Function1[MouseEvent, _]): HTMLButtonElement = {

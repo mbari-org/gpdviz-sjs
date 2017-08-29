@@ -1,6 +1,7 @@
 package gpdviz.webapp
 
 import org.scalajs.dom
+import org.scalajs.dom.window.console
 
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
@@ -11,9 +12,9 @@ object AutowireClient extends autowire.Client[String, upickle.default.Reader, up
   def read[Result: upickle.default.Reader](p: String): Result = upickle.default.read[Result](p)
 
   override def doCall(req: Request): Future[String] = {
-    val url = s"${Util.baseUrl()}/ajax/${req.path.mkString("/")}"
+    val url = s"${Util.baseUrl()}ajax/${req.path.mkString("/")}"
     // url = /gpdviz/ajax/gpdviz/Api/clientConfig
-    println("doCall: url=" + url)
+    console.log("doCall: url=" + url + " req.path=" + req.path.mkString("/"))
     dom.ext.Ajax.post(
       url = url,
       data = upickle.default.write(req.args)

@@ -2,6 +2,12 @@
 
 2017-08-25
 
+- various adjustments while testing on okeanids and back in local mode.
+  okeanids working well with pusher. 
+  TODO: proper apache config to support websocket.
+
+2017-08-25
+
 - version 0.2.0
 - repo renamed to https://github.com/carueda/gpdviz.
   (old one to https://github.com/carueda/gpdviz0)
