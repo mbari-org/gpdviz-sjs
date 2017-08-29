@@ -1,10 +1,9 @@
 # gpdviz
 
-2017-08-25
+2017-08-29
 
-- various adjustments while testing on okeanids and back in local mode.
-  okeanids working well with pusher. 
-  TODO: proper apache config to support websocket.
+- apache config to support websocket per https://stackoverflow.com/a/29823699/830737
+- various adjustments while testing on external servers and back in local mode.
 
 2017-08-25
 
