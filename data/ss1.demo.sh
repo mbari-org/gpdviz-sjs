@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-GPDVIZ=http://localhost:5050
+GPDVIZ="${GPDVIZ_SERVER:-http://localhost:5050}"
 
 SS=ss1
 
