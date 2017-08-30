@@ -1,5 +1,9 @@
 # gpdviz
 
+2017-08-30
+
+- make data interfaces non-blocking
+
 2017-08-29
 
 - apache config to support websocket per https://stackoverflow.com/a/29823699/830737

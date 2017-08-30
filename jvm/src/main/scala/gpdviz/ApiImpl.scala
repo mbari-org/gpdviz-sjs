@@ -6,18 +6,24 @@ import gpdviz.model._
 import gpdviz.server.JsonImplicits
 import spray.json._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+
 
 class ApiImpl(db: DbInterface) extends Api with JsonImplicits {
 
-  def clientConfig(): ClientConfig = ClientConfig(
-    serverName = cfg.serverName,
-    center = LatLon(cfg.map.center.lat, cfg.map.center.lon),
-    zoom = cfg.map.zoom,
-    pusher = cfg.pusher.map(p ⇒ ClientPusherConfig(p.key))
-  )
+  def clientConfig(): Future[ClientConfig] = Future {
+    ClientConfig(
+      serverName = cfg.serverName,
+      center = LatLon(cfg.map.center.lat, cfg.map.center.lon),
+      zoom = cfg.map.zoom,
+      pusher = cfg.pusher.map(p ⇒ ClientPusherConfig(p.key))
+    )
+  }
 
-  def refresh(sysid: String): Option[VmSensorSystem] = {
-    db.getSensorSystem(sysid) map { ss ⇒
+  def refresh(sysid: String): Future[Option[VmSensorSystem]] = {
+    db.getSensorSystem(sysid) map {
+      case Some(ss) ⇒ Some(
       VmSensorSystem(
         sysid = sysid,
         name = ss.name,
@@ -50,7 +56,9 @@ class ApiImpl(db: DbInterface) extends Api with JsonImplicits {
         center = ss.center,
         zoom = ss.zoom,
         clickListener = ss.clickListener
-      )
+      ))
+
+      case None ⇒ None
     }
   }
 }

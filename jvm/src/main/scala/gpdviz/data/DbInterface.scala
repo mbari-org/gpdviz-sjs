@@ -3,16 +3,18 @@ package gpdviz.data
 import gpdviz.model.{SensorSystem, SensorSystemSummary}
 import gpdviz.server.GnError
 
+import scala.concurrent.Future
+
 
 trait DbInterface {
 
   def details: String
 
-  def listSensorSystems(): Seq[SensorSystemSummary]
+  def listSensorSystems(): Future[Seq[SensorSystemSummary]]
 
-  def getSensorSystem(sysid: String): Option[SensorSystem]
+  def getSensorSystem(sysid: String): Future[Option[SensorSystem]]
 
-  def saveSensorSystem(ss: SensorSystem): Either[GnError, SensorSystem]
+  def saveSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystem]]
 
-  def deleteSensorSystem(sysid: String): Either[GnError, SensorSystem]
+  def deleteSensorSystem(sysid: String): Future[Either[GnError, SensorSystem]]
 }
