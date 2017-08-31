@@ -2,6 +2,7 @@
 
 2017-08-31
 
+- expose tool version in web page
 - preliminaries to enable support for mongo as db
 
 2017-08-30

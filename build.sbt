@@ -1,5 +1,4 @@
-val gpdvizVersion = "0.2.0"
-
+lazy val gpdvizVersion = setVersion("0.3.0")
 val scalaV        = "2.12.2"
 val akkaHttpV     = "10.0.9"
 val akkaHttpCorsV = "0.2.1"
@@ -117,3 +116,12 @@ resourceGenerators in Compile += Def.task {
     copy("gpdviz-jsdeps.js")
   )
 }.taskValue
+
+def setVersion(version: String): String = {
+  println(s"setting version $version")
+  val indexFile = file("jvm/src/main/resources/web/index.html")
+  val contents = IO.readLines(indexFile).mkString("\n")
+  val updated = contents.replaceAll("<!--v-->[^<]*<!--v-->", s"<!--v-->$version<!--v-->")
+  IO.write(indexFile, updated)
+  version
+}

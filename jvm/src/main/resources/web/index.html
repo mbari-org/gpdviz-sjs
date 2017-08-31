@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>#sysid - Gpdviz</title>
+  <title>#sysid - gpdviz</title>
   <link rel="stylesheet" href="//unpkg.com/leaflet@1.0.0/dist/leaflet.css" />
   <link rel="stylesheet" href="leaflet/Leaflet.MousePosition/src/L.Control.MousePosition.css" />
   <link rel="stylesheet" href="leaflet/Leaflet.MagnifyingGlass/leaflet.magnifyingglass.css" />
@@ -29,36 +29,45 @@
   </style>
 </head>
 <body>
-  <div id="websocket">
+<div style="width: 100%;text-align: right">
+  <div id="websocket" style="float: left">
   </div>
-  <div id="scalajs">
-    <div style="text-align: center">
-      <div style="background-color: #ebfaf5">
-        <span style="font-weight: bold">
-          <code>#sysid</code>
-          <span id="sysName"></span>
-        </span>
-        <span id="sysDesc"></span>
-      </div>
+  <div style="font-size: small">
+    <a style="color:gray;text-decoration: none" target="_blank"
+       href="https://github.com/carueda/gpdviz">gpdviz</a>
+    <a style="color:gray;text-decoration: none" target="_blank"
+       href="https://github.com/carueda/gpdviz/blob/master/ChangeLog.md"><!--v-->0.3.0<!--v--></a>
+  </div>
+</div>
+
+<div id="scalajs">
+  <div style="text-align: center">
+    <div style="background-color: #ebfaf5">
+      <span style="font-weight: bold">
+        <code>#sysid</code>
+        <span id="sysName"></span>
+      </span>
+      <span id="sysDesc"></span>
     </div>
-
-    <table style="width: 100%">
-      <tbody>
-      <tr>
-        <td style="vertical-align: top">
-          <div id="mapid" style="height:800px">
-            <div id="absoluteCharts"></div>
-          </div>
-        </td>
-        <td style="width: 300px; vertical-align: top">
-          <div id="sysActivity"></div>
-        </td>
-      </tr>
-      </tbody>
-    </table>
   </div>
 
-  <script src="gpdviz-fastopt.js"></script>
+  <table style="width: 100%">
+    <tbody>
+    <tr>
+      <td style="vertical-align: top">
+        <div id="mapid" style="height:800px">
+          <div id="absoluteCharts"></div>
+        </div>
+      </td>
+      <td style="width: 300px; vertical-align: top">
+        <div id="sysActivity"></div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<script src="gpdviz-fastopt.js"></script>
 
 </body>
 </html>
