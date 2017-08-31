@@ -2,6 +2,8 @@
 
 GPDVIZ="${GPDVIZ_SERVER:-http://localhost:5050}"
 
+echo "Using gpdviz server = ${GPDVIZ}"
+
 SS=ss1
 
 BASE_TIMESTAMP_MS=1503090553000

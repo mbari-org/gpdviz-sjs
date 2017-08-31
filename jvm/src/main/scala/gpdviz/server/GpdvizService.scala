@@ -3,7 +3,7 @@ package gpdviz.server
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.marshalling.ToResponseMarshallable
 import akka.http.scaladsl.model.StatusCodes.{Conflict, InternalServerError, NotFound}
-import akka.http.scaladsl.model.{ContentType, HttpCharsets, HttpEntity, MediaTypes}
+import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives.cors
 import com.cloudera.science.geojson.GeoJsonProtocol
@@ -12,7 +12,9 @@ import gpdviz.async.Notifier
 import gpdviz.data.DbInterface
 import gpdviz.model._
 import spray.json.{DefaultJsonProtocol, JsObject}
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{Future, Promise}
 
 // generic error for now
 case class GnError(code: Int,
@@ -184,8 +186,9 @@ trait GpdvizService extends Directives with JsonImplicits  {
     ajax ~ staticRoute ~ oneStr2Route ~ oneStrRoute ~ oneSsRoute ~ ssRoute
   }
 
-  private def registerSensorSystem(ssr: SSRegister): ToResponseMarshallable = {
-    db.getSensorSystem(ssr.sysid) match {
+  private def registerSensorSystem(ssr: SSRegister): Future[ToResponseMarshallable] = {
+    val p = Promise[ToResponseMarshallable]()
+    db.getSensorSystem(ssr.sysid) map {
       case None ⇒
         val ss = SensorSystem(ssr.sysid,
           name = ssr.name,
@@ -194,20 +197,24 @@ trait GpdvizService extends Directives with JsonImplicits  {
           center = ssr.center,
           clickListener = ssr.clickListener
         )
-        db.saveSensorSystem(ss) match {
+        db.saveSensorSystem(ss) map {
           case Right(rss) ⇒
             notifier.notifySensorSystemRegistered(rss)
-            rss
-          case Left(error) ⇒ InternalServerError -> error
+            p.success(rss)
+          case Left(error) ⇒
+            p.success(InternalServerError -> error)
         }
 
-      case Some(ss) ⇒ Conflict -> GnError(409, "Already registered", sysid = Some(ssr.sysid))
+      case Some(_) ⇒
+        p.success(Conflict -> GnError(409, "Already registered", sysid = Some(ssr.sysid)))
     }
+
+    p.future
   }
 
-  private def getSensorSystem(sysid: String): ToResponseMarshallable = withSensorSystem(sysid) { ss ⇒ ss }
+  private def getSensorSystem(sysid: String): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒ Future(ss) }
 
-  private def updateSensorSystem(sysid: String, ssu: SSUpdate): ToResponseMarshallable = withSensorSystem(sysid) { ss ⇒
+  private def updateSensorSystem(sysid: String, ssu: SSUpdate): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒
     //println(s"updateSensorSystem: sysid=$sysid ssu=$ssu")
 
     var updated = ss.copy()
@@ -218,7 +225,7 @@ trait GpdvizService extends Directives with JsonImplicits  {
       updated = updated.copy(center = ssu.center)
     }
 
-    db.saveSensorSystem(updated) match {
+    db.saveSensorSystem(updated) map {
       case Right(uss) ⇒
         notifier.notifySensorSystemUpdated(uss)
         if (ssu.refresh.getOrElse(false)) {
@@ -229,8 +236,8 @@ trait GpdvizService extends Directives with JsonImplicits  {
     }
   }
 
-  private def unregisterSensorSystem(sysid: String): ToResponseMarshallable = withSensorSystem(sysid) { ss ⇒
-    db.deleteSensorSystem(sysid) match {
+  private def unregisterSensorSystem(sysid: String): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒
+    db.deleteSensorSystem(sysid) map {
       case Right(s) ⇒
         notifier.notifySensorSystemUnregistered(s)
         s
@@ -238,7 +245,7 @@ trait GpdvizService extends Directives with JsonImplicits  {
     }
   }
 
-  private def addStream(sysid: String, strr: StreamRegister): ToResponseMarshallable = withSensorSystem(sysid) { ss ⇒
+  private def addStream(sysid: String, strr: StreamRegister): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒
     ss.streams.get(strr.strid) match {
       case None ⇒
         val ds = DataStream(
@@ -251,18 +258,18 @@ trait GpdvizService extends Directives with JsonImplicits  {
           chartStyle  = strr.chartStyle
         )
         val updated = ss.copy(streams = ss.streams.updated(strr.strid, ds))
-        db.saveSensorSystem(updated) match {
+        db.saveSensorSystem(updated) map {
           case Right(uss) ⇒
             notifier.notifyStreamAdded(uss, ds)
             uss
           case Left(error) ⇒ InternalServerError -> error
         }
 
-      case Some(_) ⇒ streamAlreadyDefined(sysid, strr.strid)
+      case Some(_) ⇒ Future(streamAlreadyDefined(sysid, strr.strid))
     }
   }
 
-  private def addObservations(sysid: String, strid: String, obssr: ObservationsRegister): ToResponseMarshallable = withSensorSystem(sysid) { ss ⇒
+  private def addObservations(sysid: String, strid: String, obssr: ObservationsRegister): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒
     println(s"addObservations: sysid=$sysid, strid=$strid, obssr=${obssr.observations.size}")
     ss.streams.get(strid) match {
       case Some(str) ⇒
@@ -277,7 +284,7 @@ trait GpdvizService extends Directives with JsonImplicits  {
         }
         val strUpdated = str.copy(observations = Some(obsUpdated))
         val ssUpdated = ss.copy(streams = ss.streams.updated(strid, strUpdated))
-        db.saveSensorSystem(ssUpdated) match {
+        db.saveSensorSystem(ssUpdated) map {
           case Right(uss) ⇒
             notifier.notifyObservations2Added(uss, strid, newObs)
             newObs
@@ -285,14 +292,16 @@ trait GpdvizService extends Directives with JsonImplicits  {
           case Left(error) ⇒ InternalServerError -> error
         }
 
-      case None ⇒ streamUndefined(sysid, strid)
+      case None ⇒ Future(streamUndefined(sysid, strid))
     }
   }
 
-  private def getStream(sysid: String, strid: String): ToResponseMarshallable = withSensorSystem(sysid) { ss ⇒
-    ss.streams.get(strid) match {
-      case Some(str) ⇒ str
-      case None ⇒ streamUndefined(sysid, strid)
+  private def getStream(sysid: String, strid: String): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒
+    Future {
+      ss.streams.get(strid) match {
+        case Some(str) ⇒ str
+        case None ⇒ streamUndefined(sysid, strid)
+      }
     }
   }
 
@@ -300,33 +309,34 @@ trait GpdvizService extends Directives with JsonImplicits  {
     ss.streams.get(strid) match {
       case Some(_) ⇒
         val updated = ss.copy(streams = ss.streams - strid)
-        db.saveSensorSystem(updated) match {
+        db.saveSensorSystem(updated) map {
           case Right(uss) ⇒
             notifier.notifyStreamRemoved(uss, strid)
             uss
           case Left(error) ⇒ InternalServerError -> error
         }
 
-      case None ⇒ streamUndefined(sysid, strid)
+      case None ⇒ Future(streamUndefined(sysid, strid))
     }
   }
 
-  private def withSensorSystem(sysid: String)(p : SensorSystem ⇒ ToResponseMarshallable): ToResponseMarshallable = {
-    db.getSensorSystem(sysid) match {
+  private def withSensorSystem(sysid: String)(p : SensorSystem ⇒ Future[ToResponseMarshallable]): Future[ToResponseMarshallable] = {
+    db.getSensorSystem(sysid) map {
       case Some(ss) ⇒ p(ss)
       case None ⇒ NotFound -> GnError(404, "not registered", sysid = Some(sysid))
     }
   }
 
-  private def getSensorSystemIndex(sysid: String): ToResponseMarshallable = {
-    val ssOpt = db.getSensorSystem(sysid)
-    val ssIndex = notifier.getSensorSystemIndex(sysid, ssOpt)
-    HttpEntity(ContentType(MediaTypes.`text/html`, HttpCharsets.`UTF-8`), ssIndex.getBytes("UTF-8"))
+  private def getSensorSystemIndex(sysid: String): Future[ToResponseMarshallable] = {
+    db.getSensorSystem(sysid) map { ssOpt ⇒
+      val ssIndex = notifier.getSensorSystemIndex(sysid, ssOpt)
+      HttpEntity(ContentType(MediaTypes.`text/html`, HttpCharsets.`UTF-8`), ssIndex.getBytes("UTF-8"))
+    }
   }
 
   private def streamUndefined(sysid: String, strid: String) =
     NotFound -> GnError(404, "stream undefined", sysid = Some(sysid), strid = Some(strid))
 
-  private def streamAlreadyDefined(sysid: String, strid: String) =
+  private def streamAlreadyDefined(sysid: String, strid: String): (StatusCodes.ClientError, GnError) =
     Conflict -> GnError(409, "stream already defined", sysid = Some(sysid), strid = Some(strid))
 }

@@ -3,6 +3,8 @@ package gpdviz.data
 import gpdviz.config.PostgresCfg
 import gpdviz.model.{SensorSystem, SensorSystemSummary}
 import gpdviz.server.GnError
+
+import scala.concurrent.Future
 /*
 import doobie.imports._
 import doobie.postgres.imports._
@@ -19,7 +21,7 @@ class PostgresDb(pgCfg: PostgresCfg) extends DbInterface {
 
   val details: String = s"PostgreSQL-based database (url: ${pgCfg.url})"
 
-  def listSensorSystems(): Seq[SensorSystemSummary] = ???
+  def listSensorSystems(): Future[Seq[SensorSystemSummary]] = ???
 /*
   def listSensorSystems(): Seq[SensorSystemSummary] = {
     val q = sql"""
@@ -32,11 +34,11 @@ class PostgresDb(pgCfg: PostgresCfg) extends DbInterface {
   }
 */
 
-  def getSensorSystem(sysid: String): Option[SensorSystem] = ???
+  def getSensorSystem(sysid: String): Future[Option[SensorSystem]] = ???
 
-  def saveSensorSystem(ss: SensorSystem): Either[GnError, SensorSystem] = ???
+  def saveSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystem]] = ???
 
-  def deleteSensorSystem(sysid: String): Either[GnError, SensorSystem] = ???
+  def deleteSensorSystem(sysid: String): Future[Either[GnError, SensorSystem]] = ???
 
 /*
   createTables()

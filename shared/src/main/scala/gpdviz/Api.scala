@@ -2,6 +2,8 @@ package gpdviz
 
 import gpdviz.model.{LatLon, VmSensorSystem}
 
+import scala.concurrent.Future
+
 case class ClientConfig(
                          serverName: String,
                          center:     LatLon,
@@ -15,7 +17,7 @@ case class ClientPusherConfig(
 
 trait Api {
 
-  def clientConfig(): ClientConfig
+  def clientConfig(): Future[ClientConfig]
 
-  def refresh(sysid: String): Option[VmSensorSystem]
+  def refresh(sysid: String): Future[Option[VmSensorSystem]]
 }

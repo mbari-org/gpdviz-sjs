@@ -7,6 +7,9 @@ import gpdviz.model.{SensorSystem, SensorSystemSummary}
 import gpdviz.server.{GnError, JsonImplicits}
 import spray.json._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
+import scala.concurrent.Future
 import scala.util.control.NonFatal
 
 
@@ -14,7 +17,7 @@ class FileDb(dataDir: String) extends JsonImplicits with DbInterface {
 
   val details: String = s"File-based database (dir: $dataDir)"
 
-  def listSensorSystems(): Seq[SensorSystemSummary] = {
+  def listSensorSystems(): Future[Seq[SensorSystemSummary]] = Future {
     val files = dataPath.toFile.listFiles.filter(_.getName.endsWith(".ss.json"))
     val systems: Seq[Option[SensorSystem]] = files.toSeq.map { f =>
       getSensorSystemByFilename(f.getName)
@@ -24,16 +27,16 @@ class FileDb(dataDir: String) extends JsonImplicits with DbInterface {
     }
   }
 
-  def getSensorSystem(sysid: String): Option[SensorSystem] = {
+  def getSensorSystem(sysid: String): Future[Option[SensorSystem]] = Future {
     getSensorSystemByFilename(sysid + ".ss.json")
   }
 
-  def saveSensorSystem(ss: SensorSystem): Either[GnError, SensorSystem] = {
+  def saveSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystem]] = Future {
     doSave(ss)
   }
 
-  def deleteSensorSystem(sysid: String): Either[GnError, SensorSystem] = {
-    getSensorSystem(sysid) match {
+  def deleteSensorSystem(sysid: String): Future[Either[GnError, SensorSystem]] = {
+    getSensorSystem(sysid) map {
       case Some(ss) =>
         val filename = sysid + ".ss.json"
         val ssPath = Paths.get(dataDir, filename)
