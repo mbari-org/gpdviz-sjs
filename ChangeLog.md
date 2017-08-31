@@ -1,5 +1,9 @@
 # gpdviz
 
+2017-08-31
+
+- preliminaries to enable support for mongo as db
+
 2017-08-30
 
 - make data interfaces non-blocking

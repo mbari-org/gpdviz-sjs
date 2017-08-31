@@ -5,16 +5,16 @@ import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import gpdviz.async._
 import gpdviz.config.cfg
-import gpdviz.data.{DbInterface, FileDb, PostgresDb}
+import gpdviz.data.{DbInterface, FileDb, MongoDb, PostgresDb}
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.io.StdIn
 
 object GpdvizServer extends GpdvizService {
-  val db: DbInterface = cfg.postgres match {
-    case None     ⇒ new FileDb("data")
-    case Some(pg) ⇒ new PostgresDb(pg)
-  }
+//  val db: DbInterface = new FileDb("data")
+  val db: DbInterface = cfg.mongo.map(new MongoDb(_))
+    .getOrElse(cfg.postgres.map(new PostgresDb(_))
+    .getOrElse(new FileDb("data")))
 
   implicit val system: ActorSystem = ActorSystem()
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher

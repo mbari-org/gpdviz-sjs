@@ -4,7 +4,8 @@ import akka.http.scaladsl.model.ContentTypes._
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import gpdviz.async.{Notifier, NullPublisher}
-import gpdviz.data.FileDb
+import gpdviz.config.MongoCfg
+import gpdviz.data.{FileDb, MongoDb}
 import gpdviz.model._
 import gpdviz.server._
 import org.scalatest.{Matchers, WordSpec}
@@ -13,7 +14,8 @@ import org.scalatest.{Matchers, WordSpec}
 class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with GpdvizService {
   val notifier: Notifier = new Notifier(NullPublisher)
 
-  val db = new FileDb("data_test")
+  val db = new MongoDb(new MongoCfg(collection = "ss_test"))
+  //val db = new FileDb("data_test")
 
   var sysid: Option[String] = None
   val strid = "aStrId"
