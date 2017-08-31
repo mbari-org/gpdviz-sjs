@@ -9,6 +9,7 @@ case class GpdvizCfg(
                       httpPort:      Int    = 5050,
                       map:           MapCfg = MapCfg(),
                       pusher:        Option[PusherCfg],
+                      mongo:         Option[MongoCfg],
                       postgres:      Option[PostgresCfg]
                     )
 
@@ -30,6 +31,13 @@ case class PusherCfg(
                       key:     String,
                       secret:  String
                     )
+
+@Cfg
+case class MongoCfg(
+                     uri: String        = "mongodb://localhost",
+                     database: String   = "gpdviz",
+                     collection: String = "ss"
+                   )
 
 @Cfg
 case class PostgresCfg(

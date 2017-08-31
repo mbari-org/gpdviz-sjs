@@ -10,6 +10,7 @@ val pusherV       = "1.0.0"
 val autowireV     = "0.2.6"
 val upickleV      = "0.4.4"
 val pprintV       = "0.5.2"
+val mongoV        = "2.1.0"
 
 val scalaJsDomV      = "0.9.3"
 val bindingV         = "10.0.2"
@@ -61,6 +62,7 @@ lazy val gpdviz = crossProject
       "com.esri.geometry"     % "esri-geometry-api"    % esriV,
       "com.pusher"            % "pusher-http-java"     % pusherV
 
+      ,"org.mongodb.scala"   %% "mongo-scala-driver"   % mongoV
       /*
       ,"org.tpolecat"   %%  "doobie-core"                % "0.4.1"
       ,"org.tpolecat"   %%  "doobie-postgres"            % "0.4.1"
