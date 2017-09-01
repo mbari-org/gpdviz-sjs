@@ -55,9 +55,14 @@ class FileDb(dataDir: String) extends JsonImplicits with DbInterface {
   private def getSensorSystemByFilename(filename: String): Option[SensorSystem] = {
     val ssPath = Paths.get(dataDir, filename)
     val ssFile = ssPath.toFile
-    if (ssFile.exists()) {
-      val contents = io.Source.fromFile(ssFile).mkString
+    if (ssFile.exists()) try {
+      val contents = scala.io.Source.fromFile(ssFile).mkString
       Option(contents.parseJson.convertTo[SensorSystem])
+    }
+    catch {
+      case NonFatal(e) ⇒
+        println(s"WARN: error trying to load $ssFile: $e")
+        None
     }
     else None
   }
