@@ -948,12 +948,6 @@
             "vals": [64.0]
           }
         }],
-        "1503090563000": [{
-          "scalarData": {
-            "vars": ["temperature"],
-            "vals": [1.0]
-          }
-        }],
         "1503090555000": [{
           "scalarData": {
             "vars": ["temperature"],

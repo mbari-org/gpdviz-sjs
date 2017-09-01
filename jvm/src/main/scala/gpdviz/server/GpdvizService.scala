@@ -1,68 +1,193 @@
 package gpdviz.server
 
-import akka.http.scaladsl.marshalling.ToResponseMarshallable
-import akka.http.scaladsl.model.StatusCodes.{Conflict, InternalServerError, NotFound}
-import akka.http.scaladsl.model._
+import javax.ws.rs.Path
+
 import akka.http.scaladsl.server.{Directives, Route}
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives.cors
-import gpdviz.async.Notifier
-import gpdviz.data.DbInterface
 import gpdviz.model._
-import gpdviz.{Api, ApiImpl, AutowireServer}
-
+import gpdviz.{ApiImpl, AutowireServer}
+import io.swagger.annotations._
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Future, Promise}
 
-trait SSService extends GpdvizServiceImpl with Directives {
+trait GpdvizService extends
+  SsService with OneSsService with OneStrService with ObsService
+  with StaticAndAjaxService {
+
+  def routes: Route = {
+    cors()(SwaggerSpecService.routes) ~
+      swaggerUi ~
+      staticAndAjaxRoute ~
+      obsRoute ~ oneStrRoute ~ oneSsRoute ~ ssRoute
+  }
+
+  private val swaggerUi: Route =
+    path("api-docs") { getFromResource("swaggerui/index.html") } ~
+      getFromResourceDirectory("swaggerui")
+}
+
+
+@Api(produces = "application/json")
+@Path("/ss")
+trait SsService extends GpdvizServiceImpl with Directives {
   def ssRoute: Route = {
-    path("api" / "ss") {
-      (post & entity(as[SSRegister])) { ssr ⇒
+    ssAdd ~ ssList
+  }
+
+  @ApiOperation(value = "Register sensor system", nickname = "addSs",
+    tags = Array("sensor system"),
+    httpMethod = "POST", response = classOf[SensorSystem])
+  @ApiImplicitParams(Array(
+    new ApiImplicitParam(
+      name = "body", value = "sensor system definition", required = true,
+      dataTypeClass = classOf[SSRegister], paramType = "body")
+  ))
+  @ApiResponses(Array(
+    new ApiResponse(code = 500, message = "Internal server error")
+  ))
+  def ssAdd: Route = path("api" / "ss") {
+    (post & entity(as[SSRegister])) { ssr ⇒
+      complete {
+        registerSensorSystem(ssr)
+      }
+    }
+  }
+
+  @ApiOperation(value = "List all registered sensor systems", nickname = "listSs",
+    tags = Array("sensor system"),
+    httpMethod = "GET", response = classOf[Seq[SensorSystemSummary]])
+  @ApiResponses(Array(
+    new ApiResponse(code = 500, message = "Internal server error")
+  ))
+  def ssList: Route = path("api" / "ss") {
+    cors() {
+      get {
         complete {
-          registerSensorSystem(ssr)
+          db.listSensorSystems()
         }
-      } ~
-        cors() {
-          get {
-            complete {
-              db.listSensorSystems()
-            }
-          }
-        }
+      }
     }
   }
 }
 
+@Api(produces = "application/json")
+@Path("/ss")
 trait OneSsService extends GpdvizServiceImpl with Directives {
+
   def oneSsRoute: Route = {
-    pathPrefix("api" / "ss" / Segment) { sysid ⇒
-      (post & entity(as[StreamRegister])) { strr ⇒
+    strAdd ~ ssGet ~ ssUpdate ~ ssDelete
+  }
+
+  @Path("/{sysid}")
+  @ApiOperation(value = "Add a stream", nickname = "addStr",
+    tags = Array("sensor system", "data stream"),
+    httpMethod = "POST", response = classOf[SensorSystem])
+  @ApiImplicitParams(Array(
+    new ApiImplicitParam(
+      name = "sysid", value = "sensor system id", required = true,
+      dataType = "string", paramType = "path"),
+    new ApiImplicitParam(
+      name = "body", value = "stream definition", required = true,
+      dataTypeClass = classOf[StreamRegister], paramType = "body")
+  ))
+  @ApiResponses(Array(
+    new ApiResponse(code = 500, message = "Internal server error")
+  ))
+  def strAdd: Route = pathPrefix("api" / "ss" / Segment) { sysid ⇒
+    (post & entity(as[StreamRegister])) { strr ⇒
+      complete {
+        addStream(sysid, strr)
+      }
+    }
+  }
+
+  @Path("/{sysid}")
+  @ApiOperation(value = "Get a sensor system", nickname = "getSs",
+    tags = Array("sensor system"),
+    httpMethod = "GET", response = classOf[SensorSystem])
+  @ApiImplicitParams(Array(
+    new ApiImplicitParam(
+      name = "sysid", value = "sensor system id", required = true,
+      dataType = "string", paramType = "path")
+  ))
+  @ApiResponses(Array(
+    new ApiResponse(code = 500, message = "Internal server error")
+  ))
+  def ssGet: Route = pathPrefix("api" / "ss" / Segment) { sysid ⇒
+    cors() {
+      get {
         complete {
-          addStream(sysid, strr)
+          getSensorSystem(sysid)
         }
-      } ~
-        cors() {
-          get {
-            complete {
-              getSensorSystem(sysid)
-            }
-          }
-        } ~
-        (put & entity(as[SSUpdate])) { ssu ⇒
-          complete {
-            updateSensorSystem(sysid, ssu)
-          }
-        } ~
-        delete {
-          complete {
-            unregisterSensorSystem(sysid)
-          }
-        }
+      }
+    }
+  }
+
+  @Path("/{sysid}")
+  @ApiOperation(value = "Update a sensor system", nickname = "updateSs",
+    tags = Array("sensor system"),
+    httpMethod = "PUT", response = classOf[SensorSystem])
+  @ApiImplicitParams(Array(
+    new ApiImplicitParam(
+      name = "sysid", value = "sensor system id", required = true,
+      dataType = "string", paramType = "path"),
+    new ApiImplicitParam(
+      name = "body", value = "Properties to update", required = true,
+      dataTypeClass = classOf[SSUpdate], paramType = "body")
+  ))
+  @ApiResponses(Array(
+    new ApiResponse(code = 500, message = "Internal server error")
+  ))
+  def ssUpdate: Route = pathPrefix("api" / "ss" / Segment) { sysid ⇒
+    (put & entity(as[SSUpdate])) { ssu ⇒
+      complete {
+        updateSensorSystem(sysid, ssu)
+      }
+    }
+  }
+
+  @Path("/{sysid}")
+  @ApiOperation(value = "Unregister a sensor system", nickname = "deleteSs",
+    tags = Array("sensor system"),
+    httpMethod = "DELETE", response = classOf[SensorSystem])
+  @ApiImplicitParams(Array(
+    new ApiImplicitParam(
+      name = "sysid", value = "sensor system id", required = true,
+      dataType = "string", paramType = "path")
+  ))
+  @ApiResponses(Array(
+    new ApiResponse(code = 500, message = "Internal server error")
+  ))
+  def ssDelete: Route = pathPrefix("api" / "ss" / Segment) { sysid ⇒
+    delete {
+      complete {
+        unregisterSensorSystem(sysid)
+      }
     }
   }
 }
 
+@Api(produces = "application/json", tags = Array("data stream"))
+@Path("/ss")
 trait OneStrService extends GpdvizServiceImpl with Directives {
   def oneStrRoute: Route = {
+    strGet ~ strDelete
+  }
+
+  @Path("/{sysid}/{strid}")
+  @ApiOperation(value = "Get a data stream", nickname = "getStr",
+    httpMethod = "GET", response = classOf[DataStream])
+  @ApiImplicitParams(Array(
+    new ApiImplicitParam(
+      name = "sysid", value = "sensor system id", required = true,
+      dataType = "string", paramType = "path"),
+    new ApiImplicitParam(
+      name = "strid", value = "data stream id", required = true,
+      dataType = "string", paramType = "path")
+  ))
+  @ApiResponses(Array(
+    new ApiResponse(code = 500, message = "Internal server error")
+  ))
+  def strGet: Route = {
     pathPrefix("api" / "ss" / Segment / Segment) { case (sysid, strid) ⇒
       cors() {
         get {
@@ -70,18 +195,60 @@ trait OneStrService extends GpdvizServiceImpl with Directives {
             getStream(sysid, strid)
           }
         }
-      } ~
-        delete {
-          complete {
-            deleteStream(sysid, strid)
-          }
+      }
+    }
+  }
+
+  @Path("/{sysid}/{strid}")
+  @ApiOperation(value = "Delete a data stream", nickname = "deleteStr",
+    httpMethod = "DELETE", response = classOf[SensorSystem])
+  @ApiImplicitParams(Array(
+    new ApiImplicitParam(
+      name = "sysid", value = "sensor system id", required = true,
+      dataType = "string", paramType = "path"),
+    new ApiImplicitParam(
+      name = "strid", value = "data stream id", required = true,
+      dataType = "string", paramType = "path")
+  ))
+  @ApiResponses(Array(
+    new ApiResponse(code = 500, message = "Internal server error")
+  ))
+  def strDelete: Route = {
+    pathPrefix("api" / "ss" / Segment / Segment) { case (sysid, strid) ⇒
+      delete {
+        complete {
+          deleteStream(sysid, strid)
         }
+      }
     }
   }
 }
 
+@Api(produces = "application/json", tags = Array("observations"))
+@Path("/ss")
 trait ObsService extends GpdvizServiceImpl with Directives {
   def obsRoute: Route = {
+    obsAdd
+  }
+
+  @Path("/{sysid}/{strid}/ops")
+  @ApiOperation(value = "Add observations", nickname = "addObs",
+    httpMethod = "POST", response = classOf[Map[String, List[ObsData]]])
+  @ApiImplicitParams(Array(
+    new ApiImplicitParam(
+      name = "sysid", value = "sensor system id", required = true,
+      dataType = "string", paramType = "path"),
+    new ApiImplicitParam(
+      name = "strid", value = "data stream id", required = true,
+      dataType = "string", paramType = "path"),
+    new ApiImplicitParam(
+      name = "body", value = "The observations", required = true,
+      dataTypeClass = classOf[ObservationsRegister], paramType = "body")
+  ))
+  @ApiResponses(Array(
+    new ApiResponse(code = 500, message = "Internal server error")
+  ))
+  def obsAdd: Route = {
     pathPrefix("api" / "ss" / Segment / Segment / "obs") { case (sysid, strid) ⇒
       (post & entity(as[ObservationsRegister])) { obssr ⇒
         complete {
@@ -132,7 +299,7 @@ trait StaticAndAjaxService extends GpdvizServiceImpl with Directives {
       path("ajax" / Segments) { s ⇒
         entity(as[String]) { e ⇒
           complete {
-            autowireServer.route[Api](apiImpl)(
+            autowireServer.route[gpdviz.Api](apiImpl)(
               autowire.Core.Request(
                 s,
                 upickle.default.read[Map[String, String]](e)
@@ -145,171 +312,4 @@ trait StaticAndAjaxService extends GpdvizServiceImpl with Directives {
 
     ajax ~ staticRoute
   }
-}
-
-trait GpdvizService extends
-  SSService with OneSsService with OneStrService with ObsService with StaticAndAjaxService {
-
-  def routes: Route = {
-    staticAndAjaxRoute ~ obsRoute ~ oneStrRoute ~ oneSsRoute ~ ssRoute
-  }
-}
-
-trait GpdvizServiceImpl extends JsonImplicits  {
-  def db: DbInterface
-  def notifier: Notifier
-
-  def registerSensorSystem(ssr: SSRegister): Future[ToResponseMarshallable] = {
-    val p = Promise[ToResponseMarshallable]()
-    db.getSensorSystem(ssr.sysid) map {
-      case None ⇒
-        val ss = SensorSystem(ssr.sysid,
-          name = ssr.name,
-          description = ssr.description,
-          pushEvents = ssr.pushEvents.getOrElse(true),
-          center = ssr.center,
-          clickListener = ssr.clickListener
-        )
-        db.saveSensorSystem(ss) map {
-          case Right(rss) ⇒
-            notifier.notifySensorSystemRegistered(rss)
-            p.success(rss)
-          case Left(error) ⇒
-            p.success(InternalServerError -> error)
-        }
-
-      case Some(_) ⇒
-        p.success(Conflict -> GnError(409, "Already registered", sysid = Some(ssr.sysid)))
-    }
-
-    p.future
-  }
-
-  def getSensorSystem(sysid: String): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒ Future(ss) }
-
-  def updateSensorSystem(sysid: String, ssu: SSUpdate): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒
-    //println(s"updateSensorSystem: sysid=$sysid ssu=$ssu")
-
-    var updated = ss.copy()
-    ssu.pushEvents foreach {
-      pe ⇒ updated = updated.copy(pushEvents = pe)
-    }
-    ssu.center foreach { _ ⇒
-      updated = updated.copy(center = ssu.center)
-    }
-
-    db.saveSensorSystem(updated) map {
-      case Right(uss) ⇒
-        notifier.notifySensorSystemUpdated(uss)
-        if (ssu.refresh.getOrElse(false)) {
-          notifier.notifySensorSystemRefresh(uss)
-        }
-        uss
-      case Left(error) ⇒ InternalServerError -> error
-    }
-  }
-
-  def unregisterSensorSystem(sysid: String): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒
-    db.deleteSensorSystem(sysid) map {
-      case Right(s) ⇒
-        notifier.notifySensorSystemUnregistered(s)
-        s
-      case Left(error) ⇒ InternalServerError -> error
-    }
-  }
-
-  def addStream(sysid: String, strr: StreamRegister): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒
-    ss.streams.get(strr.strid) match {
-      case None ⇒
-        val ds = DataStream(
-          strid       = strr.strid,
-          name        = strr.name,
-          description = strr.description,
-          mapStyle    = strr.mapStyle,
-          zOrder      = strr.zOrder.getOrElse(0),
-          variables   = strr.variables,
-          chartStyle  = strr.chartStyle
-        )
-        val updated = ss.copy(streams = ss.streams.updated(strr.strid, ds))
-        db.saveSensorSystem(updated) map {
-          case Right(uss) ⇒
-            notifier.notifyStreamAdded(uss, ds)
-            uss
-          case Left(error) ⇒ InternalServerError -> error
-        }
-
-      case Some(_) ⇒ Future(streamAlreadyDefined(sysid, strr.strid))
-    }
-  }
-
-  def addObservations(sysid: String, strid: String, obssr: ObservationsRegister): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒
-    println(s"addObservations: sysid=$sysid, strid=$strid, obssr=${obssr.observations.size}")
-    ss.streams.get(strid) match {
-      case Some(str) ⇒
-        val newObs = obssr.observations
-        val previous = str.observations.getOrElse(Map.empty)
-        var obsUpdated = previous
-        newObs foreach { case (k, v) ⇒
-          //v.map(_.geometry).filter(_.isDefined).map(_.get) foreach {geometry ⇒
-          //  println(s"::: geometry: type=${geometry.getType}: $geometry")
-          //}
-          obsUpdated = obsUpdated.updated(k, v)
-        }
-        val strUpdated = str.copy(observations = Some(obsUpdated))
-        val ssUpdated = ss.copy(streams = ss.streams.updated(strid, strUpdated))
-        db.saveSensorSystem(ssUpdated) map {
-          case Right(uss) ⇒
-            notifier.notifyObservations2Added(uss, strid, newObs)
-            newObs
-
-          case Left(error) ⇒ InternalServerError -> error
-        }
-
-      case None ⇒ Future(streamUndefined(sysid, strid))
-    }
-  }
-
-  def getStream(sysid: String, strid: String): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒
-    Future {
-      ss.streams.get(strid) match {
-        case Some(str) ⇒ str
-        case None ⇒ streamUndefined(sysid, strid)
-      }
-    }
-  }
-
-  def deleteStream(sysid: String, strid: String): ToResponseMarshallable = withSensorSystem(sysid) { ss ⇒
-    ss.streams.get(strid) match {
-      case Some(_) ⇒
-        val updated = ss.copy(streams = ss.streams - strid)
-        db.saveSensorSystem(updated) map {
-          case Right(uss) ⇒
-            notifier.notifyStreamRemoved(uss, strid)
-            uss
-          case Left(error) ⇒ InternalServerError -> error
-        }
-
-      case None ⇒ Future(streamUndefined(sysid, strid))
-    }
-  }
-
-  def withSensorSystem(sysid: String)(p : SensorSystem ⇒ Future[ToResponseMarshallable]): Future[ToResponseMarshallable] = {
-    db.getSensorSystem(sysid) map {
-      case Some(ss) ⇒ p(ss)
-      case None ⇒ NotFound -> GnError(404, "not registered", sysid = Some(sysid))
-    }
-  }
-
-  def getSensorSystemIndex(sysid: String): Future[ToResponseMarshallable] = {
-    db.getSensorSystem(sysid) map { ssOpt ⇒
-      val ssIndex = notifier.getSensorSystemIndex(sysid, ssOpt)
-      HttpEntity(ContentType(MediaTypes.`text/html`, HttpCharsets.`UTF-8`), ssIndex.getBytes("UTF-8"))
-    }
-  }
-
-  def streamUndefined(sysid: String, strid: String): (StatusCodes.ClientError, GnError) =
-    NotFound -> GnError(404, "stream undefined", sysid = Some(sysid), strid = Some(strid))
-
-  def streamAlreadyDefined(sysid: String, strid: String): (StatusCodes.ClientError, GnError) =
-    Conflict -> GnError(409, "stream already defined", sysid = Some(sysid), strid = Some(strid))
 }

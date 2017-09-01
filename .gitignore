@@ -1,5 +1,6 @@
 setenv.sh
 data_test/
+jvm/src/main/resources/swaggerui/
 project/project/
 project/target/
 target/

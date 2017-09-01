@@ -2,6 +2,10 @@
 
 2017-08-31
 
+- use swagger to generate openApi spec and api-docs ui
+  - generated spec at `.../api-docs/swagger.json`, eg., http://localhost:5050/api-docs/swagger.json
+  - Swagger UI at `.../api-docs/`, eg., http://localhost:5050/api-docs
+    
 - some refact - separation of rest services
 - expose tool version in web page
 - preliminaries to enable support for mongo as db
