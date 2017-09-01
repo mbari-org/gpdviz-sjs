@@ -4,7 +4,9 @@ import carueda.cfg._
 
 @Cfg
 case class GpdvizCfg(
-                      serverName:    String = "mygpdviz",
+                      version:       String,
+                      serverName:    String,
+                      externalUrl:   String,
                       httpInterface: String = "0.0.0.0",
                       httpPort:      Int    = 5050,
                       map:           MapCfg = MapCfg(),

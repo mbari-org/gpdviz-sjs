@@ -126,5 +126,6 @@ def setVersion(version: String): String = {
   val contents = IO.readLines(indexFile).mkString("\n")
   val updated = contents.replaceAll("<!--v-->[^<]*<!--v-->", s"<!--v-->$version<!--v-->")
   IO.write(indexFile, updated)
+  IO.write(file("jvm/src/main/resources/reference.conf"), s"gpdviz.version = $version")
   version
 }
