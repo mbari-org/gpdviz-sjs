@@ -2,6 +2,7 @@
 
 2017-08-31
 
+- some refact - separation of rest services
 - expose tool version in web page
 - preliminaries to enable support for mongo as db
 
