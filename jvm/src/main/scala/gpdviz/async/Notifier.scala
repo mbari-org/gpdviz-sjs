@@ -12,7 +12,7 @@ class Notifier(pub: Publisher) extends JsonImplicits {
 
   def getSensorSystemIndex(sysid: String, ssOpt: Option[SensorSystem],
                            indexResource: String = "web/index.html"): String = {
-    val template = io.Source.fromResource(indexResource).mkString
+    val template = scala.io.Source.fromResource(indexResource).mkString
     template.replace("#sysid", sysid)
   }
 
