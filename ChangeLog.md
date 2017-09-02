@@ -1,7 +1,8 @@
 # gpdviz
 
-2017-09-01
+2017-09-01 0.3.0
 
+- include link to api-docs
 - capture externalUrl in configuration
 - use reference.conf to expose version to app
 - use swagger to generate openApi spec and api-docs ui
