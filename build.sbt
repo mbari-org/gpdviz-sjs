@@ -2,7 +2,7 @@ lazy val gpdvizVersion = setVersion("0.3.0")
 val scalaV        = "2.12.2"
 val akkaHttpV     = "10.0.9"
 val akkaHttpCorsV = "0.2.1"
-val cfgV          = "0.0.5"
+val cfgV          = "0.0.7"
 val scalatestV    = "3.0.3"
 val esriV         = "1.2.1"
 val pusherV       = "1.0.0"
@@ -10,6 +10,7 @@ val autowireV     = "0.2.6"
 val upickleV      = "0.4.4"
 val pprintV       = "0.5.2"
 val mongoV        = "2.1.0"
+val swaggerAkkaV  = "0.11.0"
 
 val scalaJsDomV      = "0.9.3"
 val bindingV         = "10.0.2"
@@ -68,6 +69,8 @@ lazy val gpdviz = crossProject
       ,"org.tpolecat"   %%  "doobie-contrib-postgresql"  % "0.3.0a"
       ,"org.postgis"     %  "postgis-jdbc"               % "1.3.3"
       */
+      ,"com.github.swagger-akka-http" %% "swagger-akka-http" % swaggerAkkaV
+      ,"org.slf4j"                     % "slf4j-simple"      % "1.7.25" // used by swagger-akka-http
     ),
     addCompilerPlugin(
       ("org.scalameta" % "paradise" % "3.0.0-M8").cross(CrossVersion.full)
@@ -123,5 +126,6 @@ def setVersion(version: String): String = {
   val contents = IO.readLines(indexFile).mkString("\n")
   val updated = contents.replaceAll("<!--v-->[^<]*<!--v-->", s"<!--v-->$version<!--v-->")
   IO.write(indexFile, updated)
+  IO.write(file("jvm/src/main/resources/reference.conf"), s"gpdviz.version = $version")
   version
 }
