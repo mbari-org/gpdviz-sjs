@@ -34,7 +34,7 @@ trait SsService extends GpdvizServiceImpl with Directives {
   }
 
   @ApiOperation(value = "Register sensor system", nickname = "addSs",
-    tags = Array("sensor system"),
+    tags = Array("system"),
     httpMethod = "POST", response = classOf[SensorSystem])
   @ApiImplicitParams(Array(
     new ApiImplicitParam(
@@ -53,7 +53,7 @@ trait SsService extends GpdvizServiceImpl with Directives {
   }
 
   @ApiOperation(value = "List all registered sensor systems", nickname = "listSs",
-    tags = Array("sensor system"),
+    tags = Array("system"),
     httpMethod = "GET", response = classOf[Seq[SensorSystemSummary]])
   @ApiResponses(Array(
     new ApiResponse(code = 500, message = "Internal server error")
@@ -78,8 +78,8 @@ trait OneSsService extends GpdvizServiceImpl with Directives {
   }
 
   @Path("/{sysid}")
-  @ApiOperation(value = "Add a stream", nickname = "addStr",
-    tags = Array("sensor system", "data stream"),
+  @ApiOperation(value = "Add a data stream", nickname = "addStr",
+    tags = Array("system", "stream"),
     httpMethod = "POST", response = classOf[SensorSystem])
   @ApiImplicitParams(Array(
     new ApiImplicitParam(
@@ -102,7 +102,7 @@ trait OneSsService extends GpdvizServiceImpl with Directives {
 
   @Path("/{sysid}")
   @ApiOperation(value = "Get a sensor system", nickname = "getSs",
-    tags = Array("sensor system"),
+    tags = Array("system"),
     httpMethod = "GET", response = classOf[SensorSystem])
   @ApiImplicitParams(Array(
     new ApiImplicitParam(
@@ -124,7 +124,7 @@ trait OneSsService extends GpdvizServiceImpl with Directives {
 
   @Path("/{sysid}")
   @ApiOperation(value = "Update a sensor system", nickname = "updateSs",
-    tags = Array("sensor system"),
+    tags = Array("system"),
     httpMethod = "PUT", response = classOf[SensorSystem])
   @ApiImplicitParams(Array(
     new ApiImplicitParam(
@@ -147,7 +147,7 @@ trait OneSsService extends GpdvizServiceImpl with Directives {
 
   @Path("/{sysid}")
   @ApiOperation(value = "Unregister a sensor system", nickname = "deleteSs",
-    tags = Array("sensor system"),
+    tags = Array("system"),
     httpMethod = "DELETE", response = classOf[SensorSystem])
   @ApiImplicitParams(Array(
     new ApiImplicitParam(
@@ -166,7 +166,7 @@ trait OneSsService extends GpdvizServiceImpl with Directives {
   }
 }
 
-@Api(produces = "application/json", tags = Array("data stream"))
+@Api(produces = "application/json", tags = Array("stream"))
 @Path("/ss")
 trait OneStrService extends GpdvizServiceImpl with Directives {
   def oneStrRoute: Route = {
@@ -231,7 +231,7 @@ trait ObsService extends GpdvizServiceImpl with Directives {
     obsAdd
   }
 
-  @Path("/{sysid}/{strid}/ops")
+  @Path("/{sysid}/{strid}/obs")
   @ApiOperation(value = "Add observations", nickname = "addObs",
     httpMethod = "POST", response = classOf[Map[String, List[ObsData]]])
   @ApiImplicitParams(Array(

@@ -3,7 +3,10 @@ package gpdviz.server
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import com.cloudera.science.geojson.GeoJsonProtocol
 import gpdviz.model._
+import io.swagger.annotations.ApiModelProperty
 import spray.json.{DefaultJsonProtocol, JsObject}
+
+import scala.annotation.meta.field
 
 // generic error for now
 case class GnError(code: Int,
@@ -15,6 +18,7 @@ case class GnError(code: Int,
 case class SSRegister(sysid: String,
                       name: Option[String] = None,
                       description: Option[String] = None,
+                     @(ApiModelProperty @field)(dataType = "boolean")
                       pushEvents: Option[Boolean] = None,
                       center: Option[LatLon] = None,
                       clickListener: Option[String] = None
