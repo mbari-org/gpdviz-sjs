@@ -1,5 +1,9 @@
 # gpdviz
 
+2017-09-11 0.3.0
+
+- dispatch root request with list of registered systems
+
 2017-09-01 0.3.0
 
 - include link to api-docs
