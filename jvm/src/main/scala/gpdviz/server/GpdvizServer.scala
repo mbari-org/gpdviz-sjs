@@ -10,8 +10,13 @@ import gpdviz.data.{DbInterface, FileDb, MongoDb, PostgresDb}
 import scala.concurrent.ExecutionContextExecutor
 import scala.io.StdIn
 
-object GpdvizServer extends GpdvizService {
-//  val db: DbInterface = new FileDb("data")
+object GpdvizServer {
+  def main(args: Array[String]) {
+    new GpdvizServer().run(!args.contains("-d"))
+  }
+}
+
+class GpdvizServer extends GpdvizService {
   val db: DbInterface = cfg.mongo.map(new MongoDb(_))
     .getOrElse(cfg.postgres.map(new PostgresDb(_))
     .getOrElse(new FileDb("data")))
@@ -34,13 +39,11 @@ object GpdvizServer extends GpdvizService {
 
   val notifier = new Notifier(publisher)
 
-  def main(args: Array[String]) {
+  def run(keyToStop: Boolean): Unit = {
     println(s"Gpdviz using: DB: ${db.details}  Async Notifications: ${publisher.details}")
-
     val bindingFuture = Http().bindAndHandle(route, cfg.httpInterface, cfg.httpPort)
-
     println(s"Gpdviz server '${cfg.serverName}' online at ${cfg.httpInterface}:${cfg.httpPort}/")
-    if (!args.contains("-d")) {
+    if (keyToStop) {
       println("Press RETURN to stop...")
       StdIn.readLine()
       bindingFuture
