@@ -7,6 +7,7 @@ import akka.http.scaladsl.server.{Directives, Route}
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives.cors
 import gpdviz.model._
 import gpdviz.{ApiImpl, AutowireServer}
+import gpdviz.config.cfg
 import io.swagger.annotations._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -320,7 +321,7 @@ trait StaticAndAjaxService extends GpdvizServiceImpl with Directives {
               s"""
                  |<tr>
                  |  <td style="white-space: nowrap;font-size:small">
-                 |    <a href="${ss.sysid}/">
+                 |    <a href="${cfg.externalUrl.replaceAll("/+$", "") + "/" + ss.sysid}/">
                  |    ${ss.sysid}
                  |    </a>
                  |  </td>
