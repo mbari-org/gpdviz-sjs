@@ -2,24 +2,23 @@ package gpdviz.server
 
 import javax.ws.rs.Path
 
-import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.{Directives, Route}
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives.cors
 import gpdviz.model._
 import gpdviz.{ApiImpl, AutowireServer}
-import gpdviz.config.cfg
 import io.swagger.annotations._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait GpdvizService extends
   SsService with OneSsService with OneStrService with ObsService
-  with StaticAndAjaxService {
+  with StaticAndAjaxService with RootIndexService {
 
   def routes: Route = {
     cors()(SwaggerSpecService.routes) ~
       swaggerUi ~
       staticAndAjaxRoute ~
+      rootIndexRoute ~
       obsRoute ~ oneStrRoute ~ oneSsRoute ~ ssRoute
   }
 
@@ -313,68 +312,6 @@ trait StaticAndAjaxService extends GpdvizServiceImpl with Directives {
       }
     }
 
-    val root = get {
-      pathEndOrSingleSlash {
-        complete {
-          db.listSensorSystems() map { list ⇒
-            val items = list map { ss ⇒
-              s"""
-                 |<tr>
-                 |  <td style="white-space: nowrap;font-size:small">
-                 |    <a href="${cfg.externalUrl.replaceAll("/+$", "") + "/" + ss.sysid}/">
-                 |    ${ss.sysid}
-                 |    </a>
-                 |  </td>
-                 |  <td>
-                 |    ${ss.name.getOrElse("")}
-                 |  </td>
-                 |  <td>
-                 |    ${ss.description.getOrElse("")}
-                 |  </td>
-                 |  <td>
-                 |    ${ss.streamIds.mkString(", ")}
-                 |  </td>
-                 |</tr>
-                 |""".stripMargin
-            }
-            HttpResponse(entity = HttpEntity(ContentType(MediaTypes.`text/html`, HttpCharsets.`UTF-8`),
-              s"""<html>
-                 |<head>
-                 |  <title>gpdviz</title>
-                 |  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-                 |</head>
-                 |<body style="margin:30px">
-                 |<label>Registered sensor systems</label>
-                 |<table class="table table-bordered table-condensed">
-                 |<thead>
-                 |<tr>
-                 |  <th>
-                 |    sysid
-                 |  </th>
-                 |  <th>
-                 |    Name
-                 |  </th>
-                 |  <th>
-                 |    Description
-                 |  </th>
-                 |  <th>
-                 |    Streams
-                 |  </th>
-                 |</tr>
-                 |</thead>
-                 |<tbody>
-                 |${items.mkString("\n")}
-                 |</tbody>
-                 |</table>
-                 |</body>
-                 |</html>
-                 |""".stripMargin
-            ))
-          }
-        }
-      }
-    }
-
-    ajax ~ staticRoute ~ root
+    ajax ~ staticRoute
   }
 }
