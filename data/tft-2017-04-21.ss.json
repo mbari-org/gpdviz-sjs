@@ -8,9 +8,8 @@
         "fillColor": "blue",
         "fillOpacity": 1
       },
-      "variables": {
-
-      },
+      "variables": [
+      ],
       "zOrder": 15,
       "strid": "initialPoint",
       "observations": {
@@ -29,9 +28,9 @@
         "fillColor": "green",
         "fillOpacity": 1
       },
-      "variables": {
+      "variables": [
 
-      },
+      ],
       "zOrder": 5,
       "strid": "waypoints",
       "observations": {
@@ -47,9 +46,9 @@
       "mapStyle": {
         "color": "blue"
       },
-      "variables": {
+      "variables": [
 
-      },
+      ],
       "zOrder": 20,
       "strid": "trajectory",
       "observations": {
@@ -73,9 +72,9 @@
         "color": "red"
       },
       "zOrder": 100,
-      "variables": {
+      "variables": [
 
-      }
+      ]
     },
     "boundary_polygon": {
       "mapStyle": {
@@ -85,8 +84,8 @@
         "fillOpacity": 0.25
       },
       "name": "Temperature front detection",
-      "variables": {
-        "acc_distance": {
+      "variables": [ {
+        "name": "acc_distance",
           "units": "m",
           "chartStyle": {
             "dataGrouping": {
@@ -95,8 +94,8 @@
             "type": "column",
             "yAxis": 2
           }
-        },
-        "temperature": {
+        }, {
+        "name": "temperature",
           "units": "°C",
           "chartStyle": {
             "dataGrouping": {
@@ -104,8 +103,8 @@
             },
             "yAxis": 0
           }
-        },
-        "change_temp": {
+        }, {
+        "name": "change_temp",
           "units": "°C",
           "chartStyle": {
             "dataGrouping": {
@@ -114,8 +113,8 @@
             "type": "column",
             "yAxis": 1
           }
-        },
-        "smoothed_temp": {
+        }, {
+          "name": "smoothed_temp",
           "units": "°C",
           "chartStyle": {
             "dataGrouping": {
@@ -124,7 +123,7 @@
             "yAxis": 0
           }
         }
-      },
+      ],
       "zOrder": 0,
       "strid": "boundary_polygon",
       "chartStyle": {
@@ -10227,9 +10226,9 @@
         "fillColor": "red",
         "fillOpacity": 1
       },
-      "variables": {
+      "variables": [
 
-      },
+      ],
       "zOrder": 30,
       "strid": "front_points",
       "observations": {
@@ -10246,9 +10245,9 @@
         "color": "gray",
         "radius": 1
       },
-      "variables": {
+      "variables": [
 
-      },
+      ],
       "zOrder": 19,
       "strid": "positions",
       "observations": {
@@ -16285,9 +16284,9 @@
         "fillColor": "blue",
         "fillOpacity": 1
       },
-      "variables": {
+      "variables": [
 
-      },
+      ],
       "zOrder": 25,
       "strid": "turn_points",
       "observations": {
@@ -16304,9 +16303,9 @@
         "color": "green",
         "dashArray": "5,5"
       },
-      "variables": {
+      "variables": [
 
-      },
+      ],
       "zOrder": 10,
       "strid": "to_waypoints",
       "observations": {
