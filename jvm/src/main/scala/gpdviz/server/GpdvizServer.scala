@@ -40,7 +40,7 @@ class GpdvizServer extends GpdvizService {
   val notifier = new Notifier(publisher)
 
   def run(keyToStop: Boolean): Unit = {
-    println(s"Gpdviz using: DB: ${db.details}  Async Notifications: ${publisher.details}")
+    println(s"Gpdviz ${cfg.version} using: DB: ${db.details}  Async Notifications: ${publisher.details}")
     val bindingFuture = Http().bindAndHandle(route, cfg.httpInterface, cfg.httpPort)
     println(s"Gpdviz server '${cfg.serverName}' online at ${cfg.httpInterface}:${cfg.httpPort}/")
     if (keyToStop) {

@@ -1,6 +1,6 @@
 # gpdviz
 
-2017-09-11 0.3.0
+2017-09-11 0.3.1
 
 - swagger adjustments
 - dispatch root request with list of registered systems
