@@ -2,6 +2,7 @@
 
 2017-09-11 0.3.0
 
+- swagger adjustments
 - dispatch root request with list of registered systems
 
 2017-09-01 0.3.0

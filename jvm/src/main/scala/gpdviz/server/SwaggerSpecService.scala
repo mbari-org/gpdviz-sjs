@@ -22,7 +22,7 @@ object SwaggerSpecService extends SwaggerHttpService {
   // Note that no scheme should be included.
   override val host: String = cfg.externalUrl.replaceFirst("^https?://", "")
 
-  override val basePath: String = "/api/"    //the basePath for the API you are exposing
+  override val basePath: String = "/api"    //the basePath for the API you are exposing
 
   override val apiDocsPath: String = "api-docs" //where you want the swagger-json endpoint exposed
 
