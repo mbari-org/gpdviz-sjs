@@ -1,8 +1,10 @@
 # gpdviz
 
-2017-09-11 0.3.1
+2017-09-12 0.3.1
 
-- swagger adjustments
+- swagger adjustments, in particular, use of `@(ApiModelProperty @field)(dataType = "object")`
+  to annotate fields with type involving `JsObject`, `Feature`, or `Geometry`, which are not
+  properly exposed; moreover, the `object` dataType gives good flexibility (for now).
 - dispatch root request with list of registered systems
 
 2017-09-01 0.3.0

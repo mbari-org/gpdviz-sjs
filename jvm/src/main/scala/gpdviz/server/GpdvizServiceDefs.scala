@@ -32,9 +32,11 @@ case class SSUpdate(pushEvents: Option[Boolean] = None,
 case class StreamRegister(strid:        String,
                           name:         Option[String] = None,
                           description:  Option[String] = None,
+                          @(ApiModelProperty @field)(dataType = "object")
                           mapStyle:     Option[JsObject] = None,
                           zOrder:       Option[Int] = None,
                           variables:    Option[List[VariableDef]] = None,
+                          @(ApiModelProperty @field)(dataType = "object")
                           chartStyle:   Option[JsObject] = None
                           )
 
