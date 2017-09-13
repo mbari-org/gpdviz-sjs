@@ -2,6 +2,7 @@
 
 2017-09-12 0.3.1
 
+- repo moved to gpdviz organization
 - swagger adjustments, in particular, use of `@(ApiModelProperty @field)(dataType = "object")`
   to annotate fields with type involving `JsObject`, `Feature`, or `Geometry`, which are not
   properly exposed; moreover, the `object` dataType gives good flexibility (for now).

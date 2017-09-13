@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/carueda/gpdviz.svg?branch=master)](https://travis-ci.org/carueda/gpdviz)
+[![Build Status](https://travis-ci.org/gpdviz/gpdviz.svg?branch=master)](https://travis-ci.org/gpdviz/gpdviz)
 
 # gpdviz
 
@@ -27,7 +27,7 @@ On another terminal (this requires [httpie](https://httpie.org/)):
 	$ data/ss1.demo.sh
 
 
-![](https://github.com/carueda/gpdviz/blob/master/static/gpdviz2.gif)
+![](https://github.com/gpdviz/gpdviz/blob/master/static/gpdviz2.gif)
 
 
 ## dist and run
