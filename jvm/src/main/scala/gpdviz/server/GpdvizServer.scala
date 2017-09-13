@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import gpdviz.async._
+import gpdviz.config.configFile
 import gpdviz.config.cfg
 import gpdviz.data.{DbInterface, FileDb, MongoDb, PostgresDb}
 
@@ -12,7 +13,38 @@ import scala.io.StdIn
 
 object GpdvizServer {
   def main(args: Array[String]) {
-    new GpdvizServer().run(!args.contains("-d"))
+    if (args.contains("generate-conf")) {
+      generateConf(args)
+    }
+    else if (args.contains("run")) {
+      if (!configFile.canRead) {
+        System.err.println(s"cannot access $configFile")
+      }
+      else new GpdvizServer().run(!args.contains("-d"))
+    }
+    else {
+      System.err.println(s"""
+        |Usage:
+        |   gpdviz generate-conf [--overwrite]
+        |   gpdviz run [-d]
+        """.stripMargin)
+    }
+  }
+
+  private def generateConf(args: Array[String]): Unit = {
+    if (configFile.exists() && !args.contains("--overwrite")) {
+      System.err.println(s"$configFile exists.  Use --overwrite to overwrite")
+    }
+    else {
+      val conf = scala.io.Source.fromInputStream(
+        getClass.getClassLoader.getResource("params_template.conf").openStream()
+      ).mkString
+      import java.nio.charset.StandardCharsets
+      import java.nio.file.Files
+      val bytes = conf.getBytes(StandardCharsets.UTF_8)
+      Files.write(configFile.toPath, bytes)
+      println(s" Configuration generated: $configFile\n")
+    }
   }
 }
 
@@ -40,7 +72,7 @@ class GpdvizServer extends GpdvizService {
   val notifier = new Notifier(publisher)
 
   def run(keyToStop: Boolean): Unit = {
-    println(s"Gpdviz ${cfg.version} using: DB: ${db.details}  Async Notifications: ${publisher.details}")
+    println(s"Gpdviz ${cfg.gpdviz.version} using: DB: ${db.details}  Async Notifications: ${publisher.details}")
     val bindingFuture = Http().bindAndHandle(route, cfg.httpInterface, cfg.httpPort)
     println(s"Gpdviz server '${cfg.serverName}' online at ${cfg.httpInterface}:${cfg.httpPort}/")
     if (keyToStop) {

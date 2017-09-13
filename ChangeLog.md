@@ -1,5 +1,9 @@
 # gpdviz
 
+2017-09-13 0.3.1
+
+- simplify execution via explicit `gpdviz.conf` file
+
 2017-09-12 0.3.1
 
 - add demo data entry generated from [gpdviz_python_client_example](https://github.com/gpdviz/gpdviz_python_client_example)

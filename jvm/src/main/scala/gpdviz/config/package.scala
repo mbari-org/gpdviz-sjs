@@ -1,8 +1,12 @@
 package gpdviz
 
+import java.io.File
+
 import com.typesafe.config.ConfigFactory
 
 package object config {
-  val cfg: GpdvizCfg = GpdvizCfg(ConfigFactory.load().resolve().getConfig("gpdviz"))
-  println(s"cfg = $cfg")
+  val configFile = new File("gpdviz.conf")
+  lazy val cfg: GpdvizCfg = {
+    GpdvizCfg(ConfigFactory.parseFile(configFile).withFallback(ConfigFactory.load()).resolve())
+  }
 }

@@ -6,7 +6,7 @@ import gpdviz.config.cfg
 
 object SwaggerSpecService extends SwaggerHttpService {
   override val info = Info(
-    version = cfg.version,
+    version = cfg.gpdviz.version,
     title = "Gpdviz REST API",
     description = "The Gpdviz REST API deals with three kinds of resources: " +
       "sensor systems, data streams, and observations."

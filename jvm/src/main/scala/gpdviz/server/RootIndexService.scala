@@ -44,7 +44,7 @@ trait RootIndexService extends GpdvizServiceImpl with Directives {
                |    <a style="color:gray;text-decoration: none" target="_blank"
                |       href="https://github.com/gpdviz/gpdviz">gpdviz</a>
                |    <a style="color:gray;text-decoration:none;font-size:smaller" target="_blank"
-               |       href="https://github.com/gpdviz/gpdviz/blob/master/ChangeLog.md">${cfg.version}</a>
+               |       href="https://github.com/gpdviz/gpdviz/blob/master/ChangeLog.md">${cfg.gpdviz.version}</a>
                |    |&nbsp;<a style="color:gray;text-decoration: none" target="_blank"
                |       href="../api-docs">api-docs</a>
                |  </div>

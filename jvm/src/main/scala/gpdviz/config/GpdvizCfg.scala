@@ -4,7 +4,6 @@ import carueda.cfg._
 
 @Cfg
 case class GpdvizCfg(
-                      version:       String,
                       serverName:    String,
                       externalUrl:   String,
                       httpInterface: String = "0.0.0.0",
@@ -13,7 +12,11 @@ case class GpdvizCfg(
                       pusher:        Option[PusherCfg],
                       mongo:         Option[MongoCfg],
                       postgres:      Option[PostgresCfg]
-                    )
+                    ) {
+  object gpdviz {
+    val version: String = $  // from reference.conf
+  }
+}
 
 @Cfg
 case class MapCfg(
