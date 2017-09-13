@@ -1,0 +1,960 @@
+{
+  "sysid": "py_demo1",
+  "name": "Generated from python client",
+  "streams": {
+    "str1": {
+      "mapStyle": {
+        "color": "green",
+        "dashArray": "5,5"
+      },
+      "name": "Stream one",
+      "description": "Description of Stream one",
+      "variables": [{
+        "name": "baz",
+        "units": "m",
+        "chartStyle": {
+          "type": "column",
+          "yAxis": 0
+        }
+      }, {
+        "name": "temperature",
+        "units": "°",
+        "chartStyle": {
+          "yAxis": 1
+        }
+      }],
+      "zOrder": 0,
+      "strid": "str1",
+      "chartStyle": {
+        "useChartPopup": true,
+        "height": 500,
+        "yAxis": [{
+          "height": "50%",
+          "title": {
+            "text": "baz (m)"
+          },
+          "opposite": false,
+          "offset": -10
+        }, {
+          "height": "45%",
+          "opposite": false,
+          "offset": -10,
+          "title": {
+            "text": "temperature (°)"
+          },
+          "top": "55%"
+        }]
+      },
+      "observations": {
+        "1503090507000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-445.0, 60.0],
+            "position": {
+              "lat": 36.8764,
+              "lon": -122.02149999999999
+            }
+          }
+        }],
+        "1503090539000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-438.0, 70.0],
+            "position": {
+              "lat": 36.821299999999994,
+              "lon": -122.062
+            }
+          }
+        }],
+        "1503090544000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [213.0, 48.0],
+            "position": {
+              "lat": 36.8627,
+              "lon": -122.086
+            }
+          }
+        }],
+        "1503090548000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [144.0, 96.0],
+            "position": {
+              "lat": 36.8617,
+              "lon": -122.09389999999999
+            }
+          }
+        }],
+        "1503090506000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-422.0, 6.0],
+            "position": {
+              "lat": 36.8625,
+              "lon": -122.0568
+            }
+          }
+        }],
+        "1503090518000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-196.0, 2.0],
+            "position": {
+              "lat": 36.802,
+              "lon": -122.09349999999999
+            }
+          }
+        }],
+        "1503090524000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-26.0, 9.0],
+            "position": {
+              "lat": 36.8227,
+              "lon": -122.085
+            }
+          }
+        }],
+        "1503090540000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [112.0, 69.0],
+            "position": {
+              "lat": 36.894999999999996,
+              "lon": -122.0103
+            }
+          }
+        }],
+        "1503090502000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-353.0, 74.0],
+            "position": {
+              "lat": 36.825799999999994,
+              "lon": -122.02109999999999
+            }
+          }
+        }],
+        "1503090510000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [433.0, 79.0],
+            "position": {
+              "lat": 36.822399999999995,
+              "lon": -122.04299999999999
+            }
+          }
+        }],
+        "1503090530000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-438.0, 48.0],
+            "position": {
+              "lat": 36.8632,
+              "lon": -122.0479
+            }
+          }
+        }],
+        "1503090516000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-319.0, 29.0],
+            "position": {
+              "lat": 36.8199,
+              "lon": -122.0075
+            }
+          }
+        }],
+        "1503090529000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-147.0, 34.0],
+            "position": {
+              "lat": 36.8338,
+              "lon": -122.09519999999999
+            }
+          }
+        }],
+        "1503090533000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-175.0, 87.0],
+            "position": {
+              "lat": 36.8818,
+              "lon": -122.02749999999999
+            }
+          }
+        }],
+        "1503090497000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-316.0, 1.0],
+            "position": {
+              "lat": 36.830799999999996,
+              "lon": -122.06389999999999
+            }
+          }
+        }],
+        "1503090504000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-184.0, 83.0],
+            "position": {
+              "lat": 36.87,
+              "lon": -122.04299999999999
+            }
+          }
+        }],
+        "1503090543000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [74.0, 85.0],
+            "position": {
+              "lat": 36.822199999999995,
+              "lon": -122.086
+            }
+          }
+        }],
+        "1503090514000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-119.0, 51.0],
+            "position": {
+              "lat": 36.8809,
+              "lon": -122.018
+            }
+          }
+        }],
+        "1503090499000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-445.0, 66.0],
+            "position": {
+              "lat": 36.8185,
+              "lon": -122.0127
+            }
+          }
+        }],
+        "1503090550000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [240.0, 34.0],
+            "position": {
+              "lat": 36.8227,
+              "lon": -122.024
+            }
+          }
+        }],
+        "1503090549000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-290.0, 71.0],
+            "position": {
+              "lat": 36.891,
+              "lon": -122.02759999999999
+            }
+          }
+        }],
+        "1503090522000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [487.0, 59.0],
+            "position": {
+              "lat": 36.805899999999994,
+              "lon": -122.00659999999999
+            }
+          }
+        }],
+        "1503090551000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [11.0, 61.0],
+            "position": {
+              "lat": 36.8343,
+              "lon": -122.0547
+            }
+          }
+        }],
+        "1503090552000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [87.0, 78.0],
+            "position": {
+              "lat": 36.8567,
+              "lon": -122.0401
+            }
+          }
+        }],
+        "1503090498000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [465.0, 31.0],
+            "position": {
+              "lat": 36.8163,
+              "lon": -122.0441
+            }
+          }
+        }],
+        "1503090511000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-125.0, 80.0],
+            "position": {
+              "lat": 36.823899999999995,
+              "lon": -122.00089999999999
+            }
+          }
+        }],
+        "1503090531000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [56.0, 73.0],
+            "position": {
+              "lat": 36.869499999999995,
+              "lon": -122.0594
+            }
+          }
+        }],
+        "1503090534000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-61.0, 93.0],
+            "position": {
+              "lat": 36.862199999999994,
+              "lon": -122.0225
+            }
+          }
+        }],
+        "1503090495000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-321.0, 72.0],
+            "position": {
+              "lat": 36.894999999999996,
+              "lon": -122.0004
+            }
+          }
+        }],
+        "1503090515000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-96.0, 55.0],
+            "position": {
+              "lat": 36.872,
+              "lon": -122.0008
+            }
+          }
+        }],
+        "1503090535000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-474.0, 23.0],
+            "position": {
+              "lat": 36.815,
+              "lon": -122.02539999999999
+            }
+          }
+        }],
+        "1503090537000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [211.0, 52.0],
+            "position": {
+              "lat": 36.849799999999995,
+              "lon": -122.0214
+            }
+          }
+        }],
+        "1503090500000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-123.0, 26.0],
+            "position": {
+              "lat": 36.8368,
+              "lon": -122.056
+            }
+          }
+        }],
+        "1503090545000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [96.0, 16.0],
+            "position": {
+              "lat": 36.8375,
+              "lon": -122.006
+            }
+          }
+        }],
+        "1503090493000": [{
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [[[-121.8564, 36.9], [-121.8674, 36.6858], [-122.0945, 36.6486], [-122.2217, 36.9574], [-121.8564, 36.9]]]
+          }
+        }],
+        "1503090494000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [342.0, 90.0],
+            "position": {
+              "lat": 36.8315,
+              "lon": -122.0033
+            }
+          }
+        }],
+        "1503090542000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-97.0, 46.0],
+            "position": {
+              "lat": 36.855999999999995,
+              "lon": -122.0595
+            }
+          }
+        }],
+        "1503090546000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-500.0, 38.0],
+            "position": {
+              "lat": 36.8428,
+              "lon": -122.0259
+            }
+          }
+        }],
+        "1503090526000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [182.0, 1.0],
+            "position": {
+              "lat": 36.8728,
+              "lon": -122.06139999999999
+            }
+          }
+        }],
+        "1503090513000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [252.0, 90.0],
+            "position": {
+              "lat": 36.8585,
+              "lon": -122.03999999999999
+            }
+          }
+        }],
+        "1503090536000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [286.0, 62.0],
+            "position": {
+              "lat": 36.8459,
+              "lon": -122.0563
+            }
+          }
+        }],
+        "1503090525000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-77.0, 35.0],
+            "position": {
+              "lat": 36.842999999999996,
+              "lon": -122.07679999999999
+            }
+          }
+        }],
+        "1503090527000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [288.0, 86.0],
+            "position": {
+              "lat": 36.806999999999995,
+              "lon": -122.06349999999999
+            }
+          }
+        }],
+        "1503090496000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [60.0, 69.0],
+            "position": {
+              "lat": 36.8711,
+              "lon": -122.06009999999999
+            }
+          }
+        }],
+        "1503090520000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-299.0, 54.0],
+            "position": {
+              "lat": 36.8824,
+              "lon": -122.002
+            }
+          }
+        }],
+        "1503090532000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [370.0, 16.0],
+            "position": {
+              "lat": 36.890499999999996,
+              "lon": -122.0718
+            }
+          }
+        }],
+        "1503090547000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-500.0, 19.0],
+            "position": {
+              "lat": 36.847899999999996,
+              "lon": -122.0783
+            }
+          }
+        }],
+        "1503090541000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [12.0, 64.0],
+            "position": {
+              "lat": 36.8931,
+              "lon": -122.02529999999999
+            }
+          }
+        }],
+        "1503090509000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [209.0, 58.0],
+            "position": {
+              "lat": 36.837599999999995,
+              "lon": -122.04759999999999
+            }
+          }
+        }],
+        "1503090508000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [214.0, 37.0],
+            "position": {
+              "lat": 36.870999999999995,
+              "lon": -122.05019999999999
+            }
+          }
+        }],
+        "1503090521000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-63.0, 25.0],
+            "position": {
+              "lat": 36.828399999999995,
+              "lon": -122.008
+            }
+          }
+        }],
+        "1503090519000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-141.0, 33.0],
+            "position": {
+              "lat": 36.877599999999994,
+              "lon": -122.0047
+            }
+          }
+        }],
+        "1503090538000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-500.0, 57.0],
+            "position": {
+              "lat": 36.8769,
+              "lon": -122.08539999999999
+            }
+          }
+        }],
+        "1503090512000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [481.0, 20.0],
+            "position": {
+              "lat": 36.8459,
+              "lon": -122.08539999999999
+            }
+          }
+        }],
+        "1503090528000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-277.0, 99.0],
+            "position": {
+              "lat": 36.814499999999995,
+              "lon": -122.0745
+            }
+          }
+        }],
+        "1503090517000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [-25.0, 63.0],
+            "position": {
+              "lat": 36.8782,
+              "lon": -122.0954
+            }
+          }
+        }],
+        "1503090505000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [210.0, 48.0],
+            "position": {
+              "lat": 36.8902,
+              "lon": -122.0411
+            }
+          }
+        }],
+        "1503090501000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [112.0, 54.0],
+            "position": {
+              "lat": 36.8456,
+              "lon": -122.02109999999999
+            }
+          }
+        }],
+        "1503090503000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [317.0, 70.0],
+            "position": {
+              "lat": 36.8786,
+              "lon": -122.0148
+            }
+          }
+        }],
+        "1503090523000": [{
+          "scalarData": {
+            "vars": ["baz", "temperature"],
+            "vals": [420.0, 2.0],
+            "position": {
+              "lat": 36.856199999999994,
+              "lon": -122.021
+            }
+          }
+        }]
+      }
+    },
+    "str2": {
+      "mapStyle": {
+        "color": "red",
+        "radius": 14
+      },
+      "variables": [{
+        "name": "foo"
+      }, {
+        "name": "bar"
+      }],
+      "zOrder": 10,
+      "strid": "str2",
+      "observations": {
+        "1503090539000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [6.0, 33.0]
+          }
+        }],
+        "1503090544000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [89.0, 86.0]
+          }
+        }],
+        "1503090548000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [1.0, 8.0]
+          }
+        }],
+        "1503090524000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [97.0, 62.0]
+          }
+        }],
+        "1503090540000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [10.0, 33.0]
+          }
+        }],
+        "1503090530000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [40.0, 84.0]
+          }
+        }],
+        "1503090529000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [12.0, 64.0]
+          }
+        }],
+        "1503090533000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [46.0, 12.0]
+          }
+        }],
+        "1503090543000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [43.0, 67.0]
+          }
+        }],
+        "1503090553000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [7.0, 3.0]
+          }
+        }],
+        "1503090550000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [22.0, 91.0]
+          }
+        }],
+        "1503090549000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [97.0, 87.0]
+          }
+        }],
+        "1503090551000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [34.0, 100.0]
+          }
+        }],
+        "1503090552000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [56.0, 50.0]
+          }
+        }],
+        "1503090531000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [18.0, 25.0]
+          }
+        }],
+        "1503090534000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [66.0, 32.0]
+          }
+        }],
+        "1503090535000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [67.0, 56.0]
+          }
+        }],
+        "1503090537000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [13.0, 91.0]
+          }
+        }],
+        "1503090545000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [71.0, 31.0]
+          }
+        }],
+        "1503090542000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [49.0, 33.0]
+          }
+        }],
+        "1503090546000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [39.0, 12.0]
+          }
+        }],
+        "1503090526000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [20.0, 76.0]
+          }
+        }],
+        "1503090536000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [64.0, 44.0]
+          }
+        }],
+        "1503090525000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [90.0, 39.0]
+          }
+        }],
+        "1503090527000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [1.0, 92.0]
+          }
+        }],
+        "1503090532000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [70.0, 15.0]
+          }
+        }],
+        "1503090547000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [86.0, 60.0]
+          }
+        }],
+        "1503090541000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [66.0, 63.0]
+          }
+        }],
+        "1503090538000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [31.0, 34.0]
+          }
+        }],
+        "1503090528000": [{
+          "scalarData": {
+            "vars": ["foo", "bar"],
+            "vals": [27.0, 9.0]
+          }
+        }],
+        "1503090523000": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-121.906, 36.882]
+          }
+        }, {
+          "feature": {
+            "type": "Feature",
+            "properties": {
+              "style": {
+                "color": "cyan",
+                "dashArray": "5,5",
+                "radius": 20
+              }
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [-121.965, 36.81]
+            }
+          }
+        }]
+      }
+    },
+    "str3": {
+      "strid": "str3",
+      "mapStyle": {
+        "color": "blue"
+      },
+      "zOrder": 0,
+      "observations": {
+        "1503090553000": [{
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[-122.123, 36.92], [-122.186, 36.774], [-121.9, 36.7]]
+          }
+        }]
+      }
+    },
+    "str4": {
+      "mapStyle": {
+        "color": "yellow",
+        "radius": 10
+      },
+      "variables": [{
+        "name": "temperature",
+        "units": "°C"
+      }],
+      "zOrder": 10,
+      "strid": "str4",
+      "observations": {
+        "1503090560000": [{
+          "scalarData": {
+            "vars": ["temperature"],
+            "vals": [98.0]
+          }
+        }],
+        "1503090559000": [{
+          "scalarData": {
+            "vars": ["temperature"],
+            "vals": [13.0]
+          }
+        }],
+        "1503090557000": [{
+          "scalarData": {
+            "vars": ["temperature"],
+            "vals": [63.0]
+          }
+        }],
+        "1503090558000": [{
+          "scalarData": {
+            "vars": ["temperature"],
+            "vals": [82.0]
+          }
+        }],
+        "1503090562000": [{
+          "scalarData": {
+            "vars": ["temperature"],
+            "vals": [56.0]
+          }
+        }],
+        "1503090553000": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.09, 36.865]
+          }
+        }],
+        "1503090554000": [{
+          "scalarData": {
+            "vars": ["temperature"],
+            "vals": [97.0]
+          }
+        }],
+        "1503090556000": [{
+          "scalarData": {
+            "vars": ["temperature"],
+            "vals": [46.0]
+          }
+        }],
+        "1503090561000": [{
+          "scalarData": {
+            "vars": ["temperature"],
+            "vals": [37.0]
+          }
+        }],
+        "1503090563000": [{
+          "scalarData": {
+            "vars": ["temperature"],
+            "vals": [49.0]
+          }
+        }],
+        "1503090555000": [{
+          "scalarData": {
+            "vars": ["temperature"],
+            "vals": [65.0]
+          }
+        }]
+      }
+    }
+  },
+  "pushEvents": true
+}

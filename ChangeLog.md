@@ -2,6 +2,7 @@
 
 2017-09-12 0.3.1
 
+- add demo data entry generated from [gpdviz_python_client_example](https://github.com/gpdviz/gpdviz_python_client_example)
 - repo moved to gpdviz organization
 - swagger adjustments, in particular, use of `@(ApiModelProperty @field)(dataType = "object")`
   to annotate fields with type involving `JsObject`, `Feature`, or `Geometry`, which are not
