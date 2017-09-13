@@ -1,4 +1,4 @@
-lazy val gpdvizVersion = setVersion("0.3.1")
+lazy val gpdvizVersion = setVersion("0.3.2")
 val scalaV        = "2.12.2"
 val akkaHttpV     = "10.0.9"
 val akkaHttpCorsV = "0.2.1"
@@ -36,7 +36,7 @@ def commonSettings = Seq(
   )
 )
 
-mainClass in assembly := Some("gpdviz.WebServer")
+mainClass in assembly := Some("gpdviz.server.GpdvizServer")
 assemblyJarName in assembly := s"gpdviz-$gpdvizVersion.jar"
 
 lazy val root = project.in(file("."))
@@ -81,7 +81,6 @@ lazy val gpdviz = crossProject
     libraryDependencies ++= Seq(
       "org.scala-js"              %%%  "scalajs-dom"        %  scalaJsDomV,
       "com.thoughtworks.binding"  %%%  "dom"                %  bindingV,
-      "com.thoughtworks.binding"  %%%  "futurebinding"      %  bindingV,
       "ru.pavkin"                 %%%  "scala-js-momentjs"  %  momentScalaJsV
     ),
     addCompilerPlugin("org.scalamacros" % "paradise" % macrosParadiseV cross CrossVersion.full),

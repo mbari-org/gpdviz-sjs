@@ -1,4 +1,8 @@
-# gpdviz
+# Gpdviz
+
+2017-09-13 0.3.2
+
+- update some doc
 
 2017-09-13 0.3.1
 
