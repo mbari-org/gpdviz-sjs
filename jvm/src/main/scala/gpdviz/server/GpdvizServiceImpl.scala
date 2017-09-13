@@ -43,7 +43,7 @@ trait GpdvizServiceImpl extends JsonImplicits  {
   def getSensorSystem(sysid: String): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒ Future(ss) }
 
   def updateSensorSystem(sysid: String, ssu: SSUpdate): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒
-    //println(s"updateSensorSystem: sysid=$sysid ssu=$ssu")
+    println(s"updateSensorSystem: sysid=$sysid ssu=$ssu")
 
     var updated = ss.copy()
     ssu.pushEvents foreach {
@@ -65,6 +65,7 @@ trait GpdvizServiceImpl extends JsonImplicits  {
   }
 
   def unregisterSensorSystem(sysid: String): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒
+    println(s"unregisterSensorSystem: sysid=$sysid")
     db.deleteSensorSystem(sysid) map {
       case Right(s) ⇒
         notifier.notifySensorSystemUnregistered(s)
@@ -74,6 +75,7 @@ trait GpdvizServiceImpl extends JsonImplicits  {
   }
 
   def addStream(sysid: String, strr: StreamRegister): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒
+    println(s"addStream: sysid=$sysid strid=${strr.strid}")
     ss.streams.get(strr.strid) match {
       case None ⇒
         val ds = DataStream(
@@ -134,6 +136,7 @@ trait GpdvizServiceImpl extends JsonImplicits  {
   }
 
   def deleteStream(sysid: String, strid: String): ToResponseMarshallable = withSensorSystem(sysid) { ss ⇒
+    println(s"deleteStream: sysid=$sysid strid=$strid")
     ss.streams.get(strid) match {
       case Some(_) ⇒
         val updated = ss.copy(streams = ss.streams - strid)
@@ -148,7 +151,7 @@ trait GpdvizServiceImpl extends JsonImplicits  {
     }
   }
 
-  def withSensorSystem(sysid: String)(p : SensorSystem ⇒ Future[ToResponseMarshallable]): Future[ToResponseMarshallable] = {
+  private def withSensorSystem(sysid: String)(p : SensorSystem ⇒ Future[ToResponseMarshallable]): Future[ToResponseMarshallable] = {
     db.getSensorSystem(sysid) map {
       case Some(ss) ⇒ p(ss)
       case None ⇒ NotFound -> GnError(404, "not registered", sysid = Some(sysid))
@@ -162,7 +165,7 @@ trait GpdvizServiceImpl extends JsonImplicits  {
     }
   }
 
-  def streamUndefined(sysid: String, strid: String): (StatusCodes.ClientError, GnError) =
+  private def streamUndefined(sysid: String, strid: String): (StatusCodes.ClientError, GnError) =
     NotFound -> GnError(404, "stream undefined", sysid = Some(sysid), strid = Some(strid))
 
   def streamAlreadyDefined(sysid: String, strid: String): (StatusCodes.ClientError, GnError) =
