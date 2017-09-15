@@ -1,5 +1,6 @@
 {
   "sysid": "waveglider-mock",
+  "name": "Front tracking exercise with given input file",
   "streams": {
     "initialPoint": {
       "mapStyle": {

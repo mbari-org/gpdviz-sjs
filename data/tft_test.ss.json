@@ -1,5 +1,6 @@
 {
   "sysid": "tft_test",
+  "name": "Preliminary front tracking test",
   "streams": {
     "q1.2": {
       "strid": "q1.2",

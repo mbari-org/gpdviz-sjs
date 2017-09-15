@@ -4,6 +4,7 @@
     "lon": -122.125
   },
   "sysid": "waypointer_demo",
+  "name": "Demo of waypointer helper for front tracking",
   "clickListener": "http://127.0.0.1:5000/click",
   "pushEvents": true,
   "streams": {

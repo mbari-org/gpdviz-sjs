@@ -1,5 +1,6 @@
 {
   "sysid": "tft",
+  "name": "Preliminary front tracking test",
   "streams": {
     "initialPoint": {
       "mapStyle": {
