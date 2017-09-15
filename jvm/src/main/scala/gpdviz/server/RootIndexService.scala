@@ -12,7 +12,7 @@ trait RootIndexService extends GpdvizServiceImpl with Directives {
     pathEndOrSingleSlash {
       complete {
         db.listSensorSystems() map { list ⇒
-          val items = list map { ss ⇒
+          val items = list.sortBy(_.sysid) map { ss ⇒
             s"""
                |<tr>
                |  <td style="white-space: nowrap;font-size:small">
