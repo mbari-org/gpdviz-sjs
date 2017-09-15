@@ -36,7 +36,7 @@ trait RootIndexService extends GpdvizServiceImpl with Directives {
             s"""<html>
                |<head>
                |  <title>gpdviz</title>
-               |  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+               |  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" rel="stylesheet">
                |</head>
                |<body style="margin:10px">
                |<div style="width: 100%;text-align: right">
@@ -51,7 +51,7 @@ trait RootIndexService extends GpdvizServiceImpl with Directives {
                |</div>
                |<div style="margin:20px">
                |<label>Registered sensor systems</label>
-               |<table class="table table-bordered table-condensed">
+               |<table class="table table-bordered table-sm table-responsive">
                |<thead>
                |<tr>
                |  <th>
