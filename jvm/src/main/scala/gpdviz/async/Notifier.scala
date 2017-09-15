@@ -1,6 +1,7 @@
 package gpdviz.async
 
 import gpdviz._
+import gpdviz.config.cfg
 import gpdviz.model._
 import gpdviz.server.JsonImplicits
 import spray.json._
@@ -14,6 +15,7 @@ class Notifier(pub: Publisher) extends JsonImplicits {
                            indexResource: String = "web/index.html"): String = {
     val template = scala.io.Source.fromResource(indexResource).mkString
     template.replace("#sysid", sysid)
+      .replace("#externalUrl", cfg.externalUrl)
   }
 
   def notifySensorSystemRegistered(ss: SensorSystem): Unit = {

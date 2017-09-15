@@ -1,7 +1,8 @@
 # Gpdviz
 
-2017-09-13 0.3.2
+2017-09-14 0.3.2
 
+- fix api-docs link
 - update some doc
 
 2017-09-13 0.3.1
