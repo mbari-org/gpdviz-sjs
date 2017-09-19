@@ -19,7 +19,7 @@ class FileDb(dataDir: String) extends JsonImplicits with DbInterface {
 
   def listSensorSystems(): Future[Seq[SensorSystemSummary]] = Future {
     val files = dataPath.toFile.listFiles.filter(_.getName.endsWith(".ss.json"))
-    val systems: Seq[Option[SensorSystem]] = files.toSeq.map { f =>
+    val systems: Seq[Option[SensorSystem]] = files.toSeq.map { f ⇒
       getSensorSystemByFilename(f.getName)
     }
     systems.flatten.map { sys ⇒
@@ -37,7 +37,7 @@ class FileDb(dataDir: String) extends JsonImplicits with DbInterface {
 
   def deleteSensorSystem(sysid: String): Future[Either[GnError, SensorSystem]] = {
     getSensorSystem(sysid) map {
-      case Some(ss) =>
+      case Some(ss) ⇒
         val filename = sysid + ".ss.json"
         val ssPath = Paths.get(dataDir, filename)
         try {
@@ -45,10 +45,10 @@ class FileDb(dataDir: String) extends JsonImplicits with DbInterface {
           Right(ss)
         }
         catch {
-          case NonFatal(e) => Left(GnError(500, s"error saving sensor system: ${e.getMessage}"))
+          case NonFatal(e) ⇒ Left(GnError(500, s"error deleting sensor system: ${e.getMessage}"))
         }
 
-      case None => Left(GnError(404, "Not registered", sysid = Some(sysid)))
+      case None ⇒ Left(GnError(404, "Not registered", sysid = Some(sysid)))
     }
   }
 
@@ -76,7 +76,7 @@ class FileDb(dataDir: String) extends JsonImplicits with DbInterface {
       Right(ss)
     }
     catch {
-      case NonFatal(e) => e.printStackTrace()
+      case NonFatal(e) ⇒ e.printStackTrace()
         Left(GnError(500, s"error saving sensor system: ${e.getMessage}"))
     }
   }
