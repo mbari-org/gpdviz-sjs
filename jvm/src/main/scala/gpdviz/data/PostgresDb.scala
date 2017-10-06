@@ -1,38 +1,98 @@
 package gpdviz.data
 
+import java.util.UUID
+
+import gpdviz.config
 import gpdviz.config.PostgresCfg
 import gpdviz.model.{SensorSystem, SensorSystemSummary}
 import gpdviz.server.GnError
+import io.getquill.{Embedded, LowerCase, PostgresJdbcContext}
 
 import scala.concurrent.Future
-/*
-import doobie.imports._
-import doobie.postgres.imports._
-import org.postgresql.geometric.PGpoint
 
-import scalaz._
-import Scalaz._
-*/
+case class PgLatLon(lat: Double, lon: Double) extends Embedded
 
-/**
-  * experimenting with doobie/postgres...
-  */
+case class PgSensorSystem(
+                          sysid:        String,
+                          name:         Option[String] = None,
+                          description:  Option[String] = None,
+                          // streams:      Map[String, MgDataStream] = Map.empty,
+                          pushEvents:   Boolean = true,
+                          center:       Option[PgLatLon] = None,
+                          zoom:         Option[Int] = None,
+                          clickListener: Option[String] = None
+                         )
+
+case class PgDataStream(
+                        sysid:        String,
+                        strid:        String,
+                        name:         Option[String] = None,
+                        description:  Option[String] = None,
+                        mapStyle:     Option[String] = None,
+                        zOrder:       Int = 0
+//                        variables:    Option[List[VmVariableDef]] = None,
+//                        chartStyle:   Option[String] = None,
+//                        observations: Option[Map[String, List[VmObsData]]] = None
+                       )
+
+case class PgVariableDef(
+                          sysid:         String,
+                          strid:         String,
+                          name:          String,
+                          units:         Option[String] = None,
+                          chartStyle:    Option[String] = None
+                        )
+
 class PostgresDb(pgCfg: PostgresCfg) extends DbInterface {
+
+  private lazy val ctx = new PostgresJdbcContext[LowerCase](config.tsConfig.getConfig("postgres.quill"))
+  import ctx._
+
+  private val sensorSystem = quote {
+    querySchema[PgSensorSystem]("sensorsystem",
+      _.center.map(_.lat) → "centerLat",
+      _.center.map(_.lon) → "centerLon"
+    )
+  }
+
+  private val dataStream = quote {
+    querySchema[PgDataStream]("datastream"
+    )
+  }
+
+  private val variableDef = quote {
+    querySchema[PgVariableDef]("variabledef"
+    )
+  }
+
+  val sysid = UUID.randomUUID().toString.substring(0, 8)
+
+  ctx.run(quote(sensorSystem.insert(lift(PgSensorSystem(
+    sysid = sysid,
+    name = Some("name here"),
+    pushEvents = false,
+    //center = Some(PgLatLon(36.3, -121.0)),
+    clickListener = Some("http://example/clickListener")
+  )))))
+
+  val strid = UUID.randomUUID().toString.substring(0, 8)
+
+  ctx.run(quote(dataStream.insert(lift(PgDataStream(
+    sysid = sysid,
+    strid = strid,
+    name = Some("str name here")
+  )))))
+
+  ctx.run(quote(variableDef.insert(lift(PgVariableDef(
+    sysid = sysid,
+    strid = strid,
+    name = "temperature",
+    units = Some("°C")
+  )))))
 
   val details: String = s"PostgreSQL-based database (url: ${pgCfg.url})"
 
   def listSensorSystems(): Future[Seq[SensorSystemSummary]] = ???
-/*
-  def listSensorSystems(): Seq[SensorSystemSummary] = {
-    val q = sql"""
-      select sysid, name, description from sensorsystem
-      """.query[(String, Option[String], Option[String])]
-
-    q.list.transact(xa).unsafePerformIO map { case (sysid, name, description) ⇒
-      SensorSystemSummary(sysid, name, description)
-    }
-  }
-*/
 
   def getSensorSystem(sysid: String): Future[Option[SensorSystem]] = ???
 
@@ -40,65 +100,4 @@ class PostgresDb(pgCfg: PostgresCfg) extends DbInterface {
 
   def deleteSensorSystem(sysid: String): Future[Either[GnError, SensorSystem]] = ???
 
-/*
-  createTables()
-  insertSomeStuff()
-
-  private def insertSomeStuff(): Unit = {
-    def insert1(sysid: String,
-                name: Option[String],
-                description: Option[String],
-                pushEvents: Boolean
-                //,center: Option[PointType]
-               ): Update0 =
-      sql"""
-        insert into sensorsystem (sysid, name, description, pushEvents)
-        values ($sysid, $name, $description, $pushEvents)
-        """.update
-
-    insert1("sysid1", Some("name of sysid1"), Some("sysid1 description"), pushEvents = false).run.transact(xa).unsafePerformIO
-    insert1("sysid2", Some("name of sysid2"), Some("sysid2 description"), pushEvents = true).run.transact(xa).unsafePerformIO
-  }
-
-  private def someSelects(): Unit = {
-
-  }
-
-  private def createTables(): Unit = {
-    val drop: Update0 = sql""" DROP TABLE IF EXISTS sensorsystem""".update
-
-    val create: Update0 =
-      sql"""
-        CREATE TABLE sensorsystem (
-          sysid        VARCHAR NOT NULL UNIQUE,
-          name         VARCHAR,
-          description  VARCHAR,
-          pushEvents   BOOLEAN,
-          center       geography(POINT,4326)
-        )
-      """.update
-
-    (drop.run *> create.run).transact(xa).unsafePerformIO
-  }
-
-  // A custom Point type with a Meta instance xmapped from the PostgreSQL native type (which
-  // would be weird to use directly in a data model). Note that the presence of this `Meta`
-  // instance precludes mapping `Point` to two columns. If you want two mappings you need two types.
-  case class Point(x: Double, y: Double)
-  object Point {
-    implicit val PointType: Meta[Point] =
-      Meta[PGpoint].xmap(p => new Point(p.x, p.y), p => new PGpoint(p.x, p.y))
-  }
-  // Point is now a perfectly cromulent input/output type
-  val q = sql"select '(1, 2)'::point".query[Point]
-  val a = q.list.transact(xa).unsafePerformIO
-  println(a) // List(Point(1.0,2.0))
-
-  private lazy val xa = DriverManagerTransactor[IOLite](
-    driver = pgCfg.driverName,
-    url    = pgCfg.url,
-    user   = pgCfg.userName,
-    pass   = pgCfg.password
-  )
-*/
 }

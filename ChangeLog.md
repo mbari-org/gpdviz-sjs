@@ -1,5 +1,14 @@
 # Gpdviz
 
+2017-10-05
+
+- experimenting with quill/postgres.
+  Define config property `gpdviz.postgres` to exercise it.
+  DB setup:
+
+        psql -c 'create database gpdviz;' -U postgres
+        psql -U postgres -d gpdviz < create_tables.sql
+
 2017-09-14 0.3.2
 
 - fix api-docs link

@@ -10,6 +10,7 @@ val autowireV     = "0.2.6"
 val upickleV      = "0.4.4"
 val pprintV       = "0.5.2"
 val mongoV        = "2.1.0"
+val quillV        = "1.4.0"
 val swaggerAkkaV  = "0.11.0"
 
 val scalaJsDomV      = "0.9.3"
@@ -63,12 +64,9 @@ lazy val gpdviz = crossProject
       "com.pusher"            % "pusher-http-java"     % pusherV
 
       ,"org.mongodb.scala"   %% "mongo-scala-driver"   % mongoV
-      /*
-      ,"org.tpolecat"   %%  "doobie-core"                % "0.4.1"
-      ,"org.tpolecat"   %%  "doobie-postgres"            % "0.4.1"
-      ,"org.tpolecat"   %%  "doobie-contrib-postgresql"  % "0.3.0a"
-      ,"org.postgis"     %  "postgis-jdbc"               % "1.3.3"
-      */
+      ,"org.postgresql"       % "postgresql"           % "9.4.1208"
+      ,"io.getquill"         %% "quill-jdbc"           % quillV
+
       ,"com.github.swagger-akka-http" %% "swagger-akka-http" % swaggerAkkaV
       ,"org.slf4j"                     % "slf4j-simple"      % "1.7.25" // used by swagger-akka-http
     ),
