@@ -4,10 +4,11 @@ import java.util.UUID
 
 import gpdviz.config
 import gpdviz.config.PostgresCfg
-import gpdviz.model.{SensorSystem, SensorSystemSummary}
+import gpdviz.model.{LatLon, SensorSystem, SensorSystemSummary}
 import gpdviz.server.GnError
 import io.getquill.{Embedded, LowerCase, PostgresJdbcContext}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 case class PgLatLon(lat: Double, lon: Double) extends Embedded
@@ -92,9 +93,36 @@ class PostgresDb(pgCfg: PostgresCfg) extends DbInterface {
 
   val details: String = s"PostgreSQL-based database (url: ${pgCfg.url})"
 
-  def listSensorSystems(): Future[Seq[SensorSystemSummary]] = ???
+  def listSensorSystems(): Future[Seq[SensorSystemSummary]] = {
+    val r = ctx.run(quote(sensorSystem.filter(_ ⇒ true)))
+    Future {
+      r.map { p ⇒
+        SensorSystemSummary(
+          p.sysid,
+          p.name,
+          p.description
+          // TODO stream ids...
+        )
+      }
+    }
+  }
 
-  def getSensorSystem(sysid: String): Future[Option[SensorSystem]] = ???
+  def getSensorSystem(sysid: String): Future[Option[SensorSystem]] = {
+    val r = ctx.run(quote(sensorSystem.filter(_.sysid == lift(sysid))))
+    Future {
+      r.headOption.map { p ⇒
+        SensorSystem(
+          p.sysid,
+          p.name,
+          p.description,
+          // TODO streams...
+          pushEvents = p.pushEvents,
+          center = p.center.map(c ⇒ LatLon(c.lat, c.lon)),
+          zoom = p.zoom
+        )
+      }
+    }
+  }
 
   def saveSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystem]] = ???
 
