@@ -96,9 +96,8 @@ class Notifier(pub: Publisher) extends JsonImplicits {
     }
   }
 
-  def notifySensorSystemUnregistered(ss: SensorSystem): Unit = {
-    if (ss.pushEvents) {
-      pub.publish(SensorSystemUnregistered(ss.sysid))
-    }
+  def notifySensorSystemUnregistered(sysid: String): Unit = {
+    // TODO should check pushEvents flag as before?
+    pub.publish(SensorSystemUnregistered(sysid))
   }
 }

@@ -3,12 +3,11 @@ package gpdviz.data
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
 
-import gpdviz.model.{SensorSystem, SensorSystemSummary}
+import gpdviz.model._
 import gpdviz.server.{GnError, JsonImplicits}
 import spray.json._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 
@@ -31,18 +30,34 @@ class FileDb(dataDir: String) extends JsonImplicits with DbInterface {
     getSensorSystemByFilename(sysid + ".ss.json")
   }
 
-  def saveSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystem]] = Future {
+  override def registerSensorSystem(ss: SensorSystem): Future[Either[GnError, String]] = {
+    saveSensorSystem(ss)
+  }
+
+  override def registerDataStream(sysid: String)(ds: DataStream): Future[Either[GnError, String]] = Future {
+    Right(ds.strid)
+  }
+
+  override def registerVariableDef(sysid: String, strid: String)(vd: VariableDef): Future[Either[GnError, String]] = Future {
+    Right(vd.name)
+  }
+
+  override def registerObservation(sysid: String, strid: String, time: String)(obsData: ObsData): Future[Either[GnError, String]] = Future {
+    Right(time)
+  }
+
+  override def saveSensorSystem(ss: SensorSystem): Future[Either[GnError, String]] = Future {
     doSave(ss)
   }
 
-  def deleteSensorSystem(sysid: String): Future[Either[GnError, SensorSystem]] = {
+  override def deleteSensorSystem(sysid: String): Future[Either[GnError, String]] = {
     getSensorSystem(sysid) map {
       case Some(ss) ⇒
         val filename = sysid + ".ss.json"
         val ssPath = Paths.get(dataDir, filename)
         try {
           Files.delete(ssPath)
-          Right(ss)
+          Right(ss.sysid)
         }
         catch {
           case NonFatal(e) ⇒ Left(GnError(500, s"error deleting sensor system: ${e.getMessage}"))
@@ -67,13 +82,13 @@ class FileDb(dataDir: String) extends JsonImplicits with DbInterface {
     else None
   }
 
-  private def doSave(ss: SensorSystem): Either[GnError, SensorSystem] = {
+  private def doSave(ss: SensorSystem): Either[GnError, String] = {
     val filename = ss.sysid + ".ss.json"
     //println(s"SAVE $filename")
     val ssPath = Paths.get(dataDir, filename)
     try {
       Files.write(ssPath, ss.toJson.prettyPrint.getBytes(StandardCharsets.UTF_8))
-      Right(ss)
+      Right(ss.sysid)
     }
     catch {
       case NonFatal(e) ⇒ e.printStackTrace()

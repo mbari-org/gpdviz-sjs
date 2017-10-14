@@ -78,9 +78,13 @@ class GpdvizServer extends GpdvizService {
     if (keyToStop) {
       println("Press RETURN to stop...")
       StdIn.readLine()
+      // trigger unbinding from the port and shutdown when done
       bindingFuture
-        .flatMap(_.unbind()) // trigger unbinding from the port
-        .onComplete(_ ⇒ system.terminate()) // and shutdown when done
+        .flatMap(_.unbind())
+        .onComplete { _ ⇒
+          db.close()
+          system.terminate()
+        }
     }
   }
 }

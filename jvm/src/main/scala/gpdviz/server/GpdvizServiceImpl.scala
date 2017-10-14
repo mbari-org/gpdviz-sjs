@@ -16,8 +16,8 @@ trait GpdvizServiceImpl extends JsonImplicits  {
 
   def registerSensorSystem(ssr: SSRegister): Future[ToResponseMarshallable] = {
     val p = Promise[ToResponseMarshallable]()
-    db.getSensorSystem(ssr.sysid) map {
-      case None ⇒
+    db.existsSensorSystem(ssr.sysid) map {
+      case false ⇒
         val ss = SensorSystem(ssr.sysid,
           name = ssr.name,
           description = ssr.description,
@@ -25,15 +25,15 @@ trait GpdvizServiceImpl extends JsonImplicits  {
           center = ssr.center,
           clickListener = ssr.clickListener
         )
-        db.saveSensorSystem(ss) map {
-          case Right(rss) ⇒
-            notifier.notifySensorSystemRegistered(rss)
-            p.success(rss)
+        db.registerSensorSystem(ss) map {
+          case Right(sysid) ⇒
+            notifier.notifySensorSystemRegistered(ss)
+            p.success(sysid)
           case Left(error) ⇒
             p.success(InternalServerError -> error)
         }
 
-      case Some(_) ⇒
+      case true ⇒
         p.success(Conflict -> GnError(409, "Already registered", sysid = Some(ssr.sysid)))
     }
 
@@ -54,12 +54,12 @@ trait GpdvizServiceImpl extends JsonImplicits  {
     }
 
     db.saveSensorSystem(updated) map {
-      case Right(uss) ⇒
-        notifier.notifySensorSystemUpdated(uss)
+      case Right(_) ⇒
+        notifier.notifySensorSystemUpdated(updated)
         if (ssu.refresh.getOrElse(false)) {
-          notifier.notifySensorSystemRefresh(uss)
+          notifier.notifySensorSystemRefresh(updated)
         }
-        uss
+        updated
       case Left(error) ⇒ InternalServerError -> error
     }
   }
@@ -70,7 +70,11 @@ trait GpdvizServiceImpl extends JsonImplicits  {
       case Right(s) ⇒
         notifier.notifySensorSystemUnregistered(s)
         s
-      case Left(error) ⇒ InternalServerError -> error
+      case Left(error) ⇒
+        if (error.code < 500)
+          StatusCodes.custom(error.code, error.msg)
+        else
+          InternalServerError -> error
     }
   }
 
@@ -88,10 +92,10 @@ trait GpdvizServiceImpl extends JsonImplicits  {
           chartStyle  = strr.chartStyle
         )
         val updated = ss.copy(streams = ss.streams.updated(strr.strid, ds))
-        db.saveSensorSystem(updated) map {
-          case Right(uss) ⇒
-            notifier.notifyStreamAdded(uss, ds)
-            uss
+        db.registerDataStream(sysid)(ds) map {
+          case Right(_) ⇒
+            notifier.notifyStreamAdded(updated, ds)
+            updated
           case Left(error) ⇒ InternalServerError -> error
         }
 
@@ -100,7 +104,7 @@ trait GpdvizServiceImpl extends JsonImplicits  {
   }
 
   def addObservations(sysid: String, strid: String, obssr: ObservationsRegister): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒
-    println(s"addObservations: sysid=$sysid, strid=$strid, obssr=${obssr.observations.size}")
+    //println(s"addObservations: sysid=$sysid, strid=$strid, obssr=${obssr.observations.size}")
     ss.streams.get(strid) match {
       case Some(str) ⇒
         val newObs = obssr.observations
@@ -115,8 +119,8 @@ trait GpdvizServiceImpl extends JsonImplicits  {
         val strUpdated = str.copy(observations = Some(obsUpdated))
         val ssUpdated = ss.copy(streams = ss.streams.updated(strid, strUpdated))
         db.saveSensorSystem(ssUpdated) map {
-          case Right(uss) ⇒
-            notifier.notifyObservations2Added(uss, strid, newObs)
+          case Right(_) ⇒
+            notifier.notifyObservations2Added(ssUpdated, strid, newObs)
             newObs
 
           case Left(error) ⇒ InternalServerError -> error
@@ -141,9 +145,9 @@ trait GpdvizServiceImpl extends JsonImplicits  {
       case Some(_) ⇒
         val updated = ss.copy(streams = ss.streams - strid)
         db.saveSensorSystem(updated) map {
-          case Right(uss) ⇒
-            notifier.notifyStreamRemoved(uss, strid)
-            uss
+          case Right(_) ⇒
+            notifier.notifyStreamRemoved(updated, strid)
+            updated
           case Left(error) ⇒ InternalServerError -> error
         }
 

@@ -98,16 +98,16 @@ class MongoDb(mCfg: MongoCfg) extends DbInterface {
     )
   }
 
-  def saveSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystem]] = {
+  override def saveSensorSystem(ss: SensorSystem): Future[Either[GnError, String]] = {
 
-    val p = Promise[Either[GnError, SensorSystem]]()
+    val p = Promise[Either[GnError, String]]()
 
     def insert(ss: SensorSystem): Unit = {
       //println(s"MongoDb: saveSensorSystem: saving ...")
       collection.insertOne(ss2mss(ss)).subscribe(new Observer[Completed] {
         override def onNext(result: Completed): Unit = {
           println(s"MongoDb: saveSensorSystem: saved.")
-          p.success(Right(ss))
+          p.success(Right(ss.sysid))
         }
 
         override def onError(e: Throwable): Unit = {
@@ -135,12 +135,12 @@ class MongoDb(mCfg: MongoCfg) extends DbInterface {
     p.future
   }
 
-  def deleteSensorSystem(sysid: String): Future[Either[GnError, SensorSystem]] = {
-    val p = Promise[Either[GnError, SensorSystem]]()
+  def deleteSensorSystem(sysid: String): Future[Either[GnError, String]] = {
+    val p = Promise[Either[GnError, String]]()
     getSensorSystem(sysid) map {
       case Some(ss) ⇒
         collection.deleteOne(equal("sysid", sysid)).toFuture().map { x ⇒
-          p.success(Right(ss))
+          p.success(Right(ss.sysid))
         }
 
       case None ⇒

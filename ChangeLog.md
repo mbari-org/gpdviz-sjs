@@ -1,8 +1,9 @@
 # Gpdviz
 
-2017-10-05
+2017-10-14
 
-- experimenting with quill/postgres.
+- enabling quill/postgres as database. 
+  (some tests, which are still based on FileDb, ignored for now.)
   Define config property `gpdviz.postgres` to exercise it.
   DB setup:
 

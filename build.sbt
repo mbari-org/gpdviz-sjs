@@ -10,7 +10,7 @@ val autowireV     = "0.2.6"
 val upickleV      = "0.4.4"
 val pprintV       = "0.5.2"
 val mongoV        = "2.1.0"
-val quillV        = "1.4.0"
+val quillV        = "2.0.0"
 val swaggerAkkaV  = "0.11.0"
 
 val scalaJsDomV      = "0.9.3"
