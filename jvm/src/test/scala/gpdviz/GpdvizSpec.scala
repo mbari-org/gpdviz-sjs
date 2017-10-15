@@ -3,8 +3,9 @@ package gpdviz
 import akka.http.scaladsl.model.ContentTypes._
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.testkit.ScalatestRouteTest
+import com.typesafe.config.ConfigFactory
 import gpdviz.async.{Notifier, NullPublisher}
-import gpdviz.data.FileDb
+import gpdviz.data.{DbInterface, PostgresDb}
 import gpdviz.model._
 import gpdviz.server._
 import org.scalatest.{Matchers, WordSpec}
@@ -13,7 +14,20 @@ import org.scalatest.{Matchers, WordSpec}
 class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with GpdvizService {
   val notifier: Notifier = new Notifier(NullPublisher)
 
-  val db = new FileDb("data_test")
+  private val tsConfig = ConfigFactory.parseString(
+    s"""
+       |postgres.quill {
+       |  dataSourceClassName     = org.postgresql.ds.PGSimpleDataSource
+       |  dataSource.user         = postgres
+       |  dataSource.password     = ""
+       |  dataSource.databaseName = gpdviz_test
+       |  dataSource.portNumber   = 5432
+       |  dataSource.serverName   = localhost
+       |}
+     """.stripMargin
+  ).withFallback(ConfigFactory.load()).resolve()
+
+  val db: DbInterface = new PostgresDb(tsConfig)
 
   var sysid: Option[String] = None
   val strid = "aStrId"
@@ -60,7 +74,7 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
       }
     }
 
-    "update an existing sensor system" in {
+    "update an existing sensor system" ignore {
       val ssUpdate = SSUpdate(center = Some(LatLon(36, -122)), pushEvents = Some(false))
       Put(s"/api/ss/${sysid.get}", ssUpdate) ~> routes ~> check {
         status shouldBe OK

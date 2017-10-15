@@ -6,8 +6,7 @@ import java.util.concurrent.TimeUnit
 
 import com.cloudera.science.geojson.{Feature, GeoJsonProtocol}
 import com.esri.core.geometry.Geometry
-import gpdviz.config
-import gpdviz.config.PostgresCfg
+import com.typesafe.config.Config
 import gpdviz.model._
 import gpdviz.server.GnError
 import io.getquill.{Embedded, LowerCase, PostgresJdbcContext}
@@ -62,9 +61,9 @@ case class PgObservation(
                           scalarData:    Option[PgScalarData] = None
                         )
 
-class PostgresDb(pgCfg: PostgresCfg) extends DbInterface {
+class PostgresDb(tsConfig: Config) extends DbInterface {
 
-  private val ctx = new PostgresJdbcContext(LowerCase, config.tsConfig.getConfig("postgres.quill"))
+  private val ctx = new PostgresJdbcContext(LowerCase, tsConfig.getConfig("postgres.quill"))
   import ctx._
 
   private val sensorSystem = quote {
@@ -144,7 +143,7 @@ class PostgresDb(pgCfg: PostgresCfg) extends DbInterface {
   //initStuff()
 
 
-  val details: String = s"PostgreSQL-based database (url: ${pgCfg.url})"
+  val details: String = s"PostgreSQL-based database"
 
   def listSensorSystems(): Future[Seq[SensorSystemSummary]] = Future {
     ctx.run(quote(sensorSystem)) map { pss ⇒

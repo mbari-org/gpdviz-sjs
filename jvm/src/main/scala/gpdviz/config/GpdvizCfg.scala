@@ -9,9 +9,7 @@ case class GpdvizCfg(
                       httpInterface: String = "0.0.0.0",
                       httpPort:      Int    = 5050,
                       map:           MapCfg = MapCfg(),
-                      pusher:        Option[PusherCfg],
-                      mongo:         Option[MongoCfg],
-                      postgres:      Option[PostgresCfg]
+                      pusher:        Option[PusherCfg]
                     ) {
   object gpdviz {
     val version: String = $  // from reference.conf
@@ -36,18 +34,3 @@ case class PusherCfg(
                       key:     String,
                       secret:  String
                     )
-
-@Cfg
-case class MongoCfg(
-                     uri: String        = "mongodb://localhost",
-                     database: String   = "gpdviz",
-                     collection: String = "ss"
-                   )
-
-@Cfg
-case class PostgresCfg(
-                        url: String        = "jdbc:postgresql:gpdviz",
-                        userName: String   = "postgres",
-                        password: String   = "",
-                        driverName: String = "org.postgresql.Driver"
-                      )

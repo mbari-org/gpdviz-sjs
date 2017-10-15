@@ -2,8 +2,8 @@
 
 2017-10-14
 
-- enabling quill/postgres as database. 
-  (some tests, which are still based on FileDb, ignored for now.)
+- focus on quill/postgres as the database system. 
+  Some tests ignored for now.
   Define config property `gpdviz.postgres` to exercise it.
   DB setup:
 

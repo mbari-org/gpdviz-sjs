@@ -4,12 +4,20 @@ scala:
 
 jdk: oraclejdk8
 
+services:
+  - postgresql
+
 install:
   - . $HOME/.nvm/nvm.sh
   - nvm install stable
   - nvm use stable
   - npm install
   - npm install jsdom
+
 before_script:
+- psql -c 'create database gpdviz_test;' -U postgres
+- psql -U postgres -d gpdviz_test < create_tables.sql
 - sbt clean "gpdvizJVM/runMain gpdviz.server.GpdvizServer generate-conf --overwrite"
+- echo "postgres.quill.dataSource.databaseName = gpdviz_test" >> gpdviz.conf
+
 script: sbt test
