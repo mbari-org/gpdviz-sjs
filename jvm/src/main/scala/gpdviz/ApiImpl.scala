@@ -22,6 +22,7 @@ class ApiImpl(db: DbInterface) extends Api with JsonImplicits {
   }
 
   def refresh(sysid: String): Future[Option[VmSensorSystem]] = {
+    println(s"ApiImpl.refresh calling getSensorSystem sysid=$sysid")
     db.getSensorSystem(sysid) map {
       case Some(ss) ⇒ Some(
       VmSensorSystem(
