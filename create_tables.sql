@@ -11,8 +11,8 @@ CREATE TABLE "sensorsystem" (
     name              VARCHAR(255),
     description       TEXT,
     pushEvents        BOOLEAN,
-    centerLat         REAL,
-    centerLon         REAL,
+    centerLat         double precision,
+    centerLon         double precision,
     zoom              INTEGER,
     clickListener     VARCHAR(255)
 );
@@ -40,17 +40,16 @@ CREATE TABLE "variabledef" (
 );
 
 CREATE TABLE "observation" (
-    sysid             VARCHAR(255),
-    strid             VARCHAR(255),
+    sysid             VARCHAR(255) NOT NULL,
+    strid             VARCHAR(255) NOT NULL,
     time              VARCHAR(255) NOT NULL,
     feature           TEXT,
     geometry          TEXT,
     -- scalarData:
     vars    VARCHAR(255)[],
-    vals    REAL[],
-    lat     REAL,
-    lon     REAL,
+    vals    double precision[],
+    lat     double precision,
+    lon     double precision,
     --
-    PRIMARY KEY (sysid, strid),
     constraint fk_ds_ss foreign key (sysid, strid) references datastream (sysid, strid)
 );

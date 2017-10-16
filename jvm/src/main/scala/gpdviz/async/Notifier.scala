@@ -31,25 +31,23 @@ class Notifier(pub: Publisher) extends JsonImplicits {
     }
   }
 
-  def notifyStreamAdded(ss: SensorSystem, str: DataStream): Unit = {
-    if (ss.pushEvents) {
-      pub.publish(StreamAdded(
-        sysid = ss.sysid,
-        str = VmDataStream(
-          str.strid,
-          str.name,
-          str.description,
-          mapStyle = str.mapStyle.map(_.toJson.compactPrint),
-          str.zOrder,
-          chartStyle = str.chartStyle.map(_.toJson.compactPrint),
-          variables = str.variables.map(_.map(v ⇒ VmVariableDef(v.name, v.units, v.chartStyle.map(_.toJson.compactPrint))))
-          // TODO NOTE observations not captured at time of stream registration
-        )
-      ))
-    }
+  def notifyStreamAdded(sysid: String, str: DataStream): Unit = {
+    pub.publish(StreamAdded(
+      sysid = sysid,
+      str = VmDataStream(
+        str.strid,
+        str.name,
+        str.description,
+        mapStyle = str.mapStyle.map(_.toJson.compactPrint),
+        str.zOrder,
+        chartStyle = str.chartStyle.map(_.toJson.compactPrint),
+        variables = str.variables.map(_.map(v ⇒ VmVariableDef(v.name, v.units, v.chartStyle.map(_.toJson.compactPrint))))
+        // TODO NOTE observations not captured at time of stream registration
+      )
+    ))
   }
 
-  def notifyObservations2Added(ss: SensorSystem, strid: String, observations: Map[String, List[ObsData]]): Unit = if (ss.pushEvents) {
+  def notifyObservations2Added(sysid: String, strid: String, observations: Map[String, List[ObsData]]): Unit = {
     val obs = observations mapValues { list ⇒
       val obsDataList = collection.mutable.ListBuffer[VmObsData]()
       list foreach  { o ⇒
@@ -68,7 +66,7 @@ class Notifier(pub: Publisher) extends JsonImplicits {
         val next = Math.min(from + 15, obs.size)
         val slice = obs.slice(from, next)
         pub.publish(Observations2Added(
-          sysid = ss.sysid,
+          sysid = sysid,
           strid = strid,
           obss = slice
         ))
@@ -78,22 +76,16 @@ class Notifier(pub: Publisher) extends JsonImplicits {
     rec(0)
   }
 
-  def notifyStreamRemoved(ss: SensorSystem, strid: String): Unit = {
-    if (ss.pushEvents) {
-      pub.publish(StreamRemoved(ss.sysid, strid))
-    }
+  def notifyStreamRemoved(sysid: String, strid: String): Unit = {
+    pub.publish(StreamRemoved(sysid, strid))
   }
 
-  def notifySensorSystemUpdated(ss: SensorSystem): Unit = {
-    if (ss.pushEvents) {
-      pub.publish(SensorSystemUpdated(ss.sysid))
-    }
+  def notifySensorSystemUpdated(sysid: String): Unit = {
+    pub.publish(SensorSystemUpdated(sysid))
   }
 
-  def notifySensorSystemRefresh(ss: SensorSystem): Unit = {
-    if (ss.pushEvents) {
-      pub.publish(SensorSystemRefresh(ss.sysid))
-    }
+  def notifySensorSystemRefresh(sysid: String): Unit = {
+    pub.publish(SensorSystemRefresh(sysid))
   }
 
   def notifySensorSystemUnregistered(sysid: String): Unit = {

@@ -1,7 +1,7 @@
 package gpdviz.data
 
 import gpdviz.model._
-import gpdviz.server.GnError
+import gpdviz.server.{GnError, ObservationsRegister, SSUpdate}
 
 import scala.concurrent.Future
 
@@ -12,27 +12,29 @@ trait DbInterface {
 
   def listSensorSystems(): Future[Seq[SensorSystemSummary]]
 
-  def existsSensorSystem(sysid: String): Future[Boolean] = {
-    import scala.concurrent.ExecutionContext.Implicits.global
-    getSensorSystem(sysid).map(_.isDefined)
-  }
+  def existsSensorSystem(sysid: String): Future[Boolean]
 
   def getSensorSystem(sysid: String): Future[Option[SensorSystem]]
 
-  def registerSensorSystem(ss: SensorSystem): Future[Either[GnError, String]] = ???
+  def registerSensorSystem(ss: SensorSystem): Future[Either[GnError, String]]
 
-  def registerDataStream(sysid: String)(ds: DataStream): Future[Either[GnError, String]] = ???
+  def updateSensorSystem(sysid: String, ssu: SSUpdate): Future[Either[GnError, String]]
 
-  def registerVariableDef(sysid: String, strid: String)(vd: VariableDef): Future[Either[GnError, String]] = ???
+  def registerDataStream(sysid: String)
+                        (ds: DataStream): Future[Either[GnError, String]]
 
-  def registerObservation(sysid: String, strid: String, time: String)(obsData: ObsData): Future[Either[GnError, String]] = ???
+  def registerVariableDef(sysid: String, strid: String)
+                         (vd: VariableDef): Future[Either[GnError, String]]
+
+  def registerObservations(sysid: String, strid: String)
+                          (obssr: ObservationsRegister): Future[Either[GnError, String]]
+
+  def registerObservation(sysid: String, strid: String, time: String,
+                          obsData: ObsData): Future[Either[GnError, String]]
 
   def deleteSensorSystem(sysid: String): Future[Either[GnError, String]]
 
-  def close(): Unit = ()
+  def deleteDataStream(sysid: String, strid: String): Future[Either[GnError, String]]
 
-
-  // TODO remove...
-  def saveSensorSystem(ss: SensorSystem): Future[Either[GnError, String]] = ???
-
+  def close(): Unit
 }

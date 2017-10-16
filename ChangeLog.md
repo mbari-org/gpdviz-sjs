@@ -4,6 +4,7 @@
 
 - focus on quill/postgres as the database system. 
   Some tests ignored for now.
+  ss1.demo.sh working.
   Define config property `gpdviz.postgres` to exercise it.
   DB setup:
 

@@ -92,11 +92,9 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
       Post(s"/api/ss/${sysid.get}", streamRegister) ~> routes ~> check {
         status shouldBe OK
         contentType shouldBe `application/json`
-        val ss = responseAs[SensorSystem]
-        ss.streams.size shouldBe 1
-        ss.streams.contains(strid) === true
-        ss.streams(strid).strid === strid
-        ss.streams(strid).variables === variables
+        val ds = responseAs[DataStream]
+        ds.strid === strid
+        ds.variables === variables
       }
     }
 
