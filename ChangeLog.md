@@ -2,6 +2,7 @@
 
 2017-10-19
 
+- do not forget to also update the swagger response types!
 - adjustments to API mainly in terms of responses (so they are all objects)
 - tests re-enabled (except for one involving quill's update operation) 
 

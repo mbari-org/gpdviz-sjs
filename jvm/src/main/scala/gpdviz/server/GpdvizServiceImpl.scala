@@ -28,9 +28,9 @@ trait GpdvizServiceImpl extends JsonImplicits  {
           clickListener = ssr.clickListener
         )
         db.registerSensorSystem(ss) map {
-          case Right(sysid) ⇒
+          case Right(ssSum) ⇒
             notifier.notifySensorSystemRegistered(ss)
-            p.success(sysid)
+            p.success(ssSum)
           case Left(error) ⇒
             p.success(InternalServerError -> error)
         }
