@@ -183,7 +183,7 @@ class PostgresDb(tsConfig: Config) extends DbInterface {
     ctx.run(sensorSystem.filter(_.sysid == lift(sysid))).nonEmpty
   }
 
-  def registerSensorSystem(ss: SensorSystem): Future[Either[GnError, String]] = Future {
+  def registerSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystemSummary]] = Future {
     ctx.run(sensorSystem.insert(lift(PgSensorSystem(
       sysid = ss.sysid,
       name = ss.name,
@@ -195,20 +195,26 @@ class PostgresDb(tsConfig: Config) extends DbInterface {
     val regStream = registerDataStream(ss.sysid) _
     ss.streams.values foreach regStream
 
-    Right(ss.sysid)
+    Right(SensorSystemSummary(
+      ss.sysid,
+      name = ss.name,
+      description = ss.description
+    ))
   }
 
-  def updateSensorSystem(sysid: String, ssu: SSUpdate): Future[Either[GnError, String]] = Future {
+  // TODO seems like quill's update operation is also affected by the nested Embedding issue.
+  // The test is currently ignored in GpdvizSpec
+  def updateSensorSystem(sysid: String, ssu: SSUpdate): Future[Either[GnError, SensorSystemSummary]] = Future {
     ctx.run(sensorSystem.filter(_.sysid == lift(sysid)).update { ss ⇒
       ss.pushEvents → lift(ssu.pushEvents getOrElse ss.pushEvents)
       ss.center → lift(ssu.center orElse ss.center)
       // TODO 'refresh'?
     })
-    Right(sysid)
+    Right(SensorSystemSummary(sysid))
   }
 
   def registerDataStream(sysid: String)
-                        (ds: DataStream): Future[Either[GnError, String]] = Future {
+                        (ds: DataStream): Future[Either[GnError, DataStreamSummary]] = Future {
     ctx.run(dataStream.insert(lift(PgDataStream(
       sysid = sysid,
       strid = ds.strid,
@@ -232,11 +238,11 @@ class PostgresDb(tsConfig: Config) extends DbInterface {
       list.foreach(registerObservation(sysid, ds.strid, time, _))
     }
 
-    Right(ds.strid)
+    Right(DataStreamSummary(sysid, ds.strid))
   }
 
   def registerVariableDef(sysid: String, strid: String)
-                         (vd: VariableDef): Future[Either[GnError, String]] = Future {
+                         (vd: VariableDef): Future[Either[GnError, VariableDefSummary]] = Future {
     println(s"  *** registerVariableDef ${vd.name}")
     ctx.run(variableDef.insert(lift(PgVariableDef(
       sysid = sysid,
@@ -244,11 +250,11 @@ class PostgresDb(tsConfig: Config) extends DbInterface {
       name = vd.name,
       units = vd.units
     ))))
-    Right(vd.name)
+    Right(VariableDefSummary(sysid, strid, vd.name, vd.units))
   }
 
   def registerObservations(sysid: String, strid: String)
-                          (obssr: ObservationsRegister): Future[Either[GnError, String]] = Future {
+                          (obssr: ObservationsRegister): Future[Either[GnError, ObservationsSummary]] = Future {
 
     var num = 0
     obssr.observations foreach { case (time, list) ⇒
@@ -258,11 +264,11 @@ class PostgresDb(tsConfig: Config) extends DbInterface {
       list.foreach(registerObservation(sysid, strid, time, _))
       num += list.length
     }
-    Right(s"observations added: $num")
+    Right(ObservationsSummary(sysid, strid, added = Some(num)))
   }
 
   def registerObservation(sysid: String, strid: String, time: String,
-                          obsData: ObsData): Future[Either[GnError, String]] = Future {
+                          obsData: ObsData): Future[Either[GnError, ObservationsSummary]] = Future {
 
     val feature = obsData.feature.map(utl.toJsonString)
     val geometry = obsData.geometry.map(utl.toJsonString)
@@ -288,7 +294,7 @@ class PostgresDb(tsConfig: Config) extends DbInterface {
     )
     println(s"  *** registerObservation sysid=$sysid strid=$strid pgObservation=" + pp(pgObservation))
     ctx.run(observation.insert(lift(pgObservation)))
-    Right(time)
+    Right(ObservationsSummary(sysid, strid, time = Some(time), added = Some(1)))
   }
 
   private def getPgObservations(sysid: String, strid: String): List[PgObservation] = {
@@ -364,23 +370,23 @@ class PostgresDb(tsConfig: Config) extends DbInterface {
     }
   }
 
-  def deleteSensorSystem(sysid: String): Future[Either[GnError, String]] = Future {
+  def deleteSensorSystem(sysid: String): Future[Either[GnError, SensorSystemSummary]] = Future {
     ctx.transaction {
       ctx.run(observation.filter(_.sysid  == lift(sysid)).delete)
       ctx.run(variableDef.filter(_.sysid  == lift(sysid)).delete)
       ctx.run(dataStream.filter(_.sysid   == lift(sysid)).delete)
       ctx.run(sensorSystem.filter(_.sysid == lift(sysid)).delete)
     }
-    Right(sysid)
+    Right(SensorSystemSummary(sysid))
   }
 
-  def deleteDataStream(sysid: String, strid: String): Future[Either[GnError, String]] = Future {
+  def deleteDataStream(sysid: String, strid: String): Future[Either[GnError, DataStreamSummary]] = Future {
     ctx.transaction {
       ctx.run(observation.filter(x ⇒ x.sysid == lift(sysid) && x.strid == lift(strid)).delete)
       ctx.run(variableDef.filter(x ⇒ x.sysid == lift(sysid) && x.strid == lift(strid)).delete)
       ctx.run(dataStream.filter( x ⇒ x.sysid == lift(sysid) && x.strid == lift(strid)).delete)
     }
-    Right(sysid)
+    Right(DataStreamSummary(sysid, strid))
   }
 
   def close(): Unit = ctx.close()

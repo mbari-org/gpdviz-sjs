@@ -16,25 +16,25 @@ trait DbInterface {
 
   def getSensorSystem(sysid: String): Future[Option[SensorSystem]]
 
-  def registerSensorSystem(ss: SensorSystem): Future[Either[GnError, String]]
+  def registerSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystemSummary]]
 
-  def updateSensorSystem(sysid: String, ssu: SSUpdate): Future[Either[GnError, String]]
+  def updateSensorSystem(sysid: String, ssu: SSUpdate): Future[Either[GnError, SensorSystemSummary]]
 
   def registerDataStream(sysid: String)
-                        (ds: DataStream): Future[Either[GnError, String]]
+                        (ds: DataStream): Future[Either[GnError, DataStreamSummary]]
 
   def registerVariableDef(sysid: String, strid: String)
-                         (vd: VariableDef): Future[Either[GnError, String]]
+                         (vd: VariableDef): Future[Either[GnError, VariableDefSummary]]
 
   def registerObservations(sysid: String, strid: String)
-                          (obssr: ObservationsRegister): Future[Either[GnError, String]]
+                          (obssr: ObservationsRegister): Future[Either[GnError, ObservationsSummary]]
 
   def registerObservation(sysid: String, strid: String, time: String,
-                          obsData: ObsData): Future[Either[GnError, String]]
+                          obsData: ObsData): Future[Either[GnError, ObservationsSummary]]
 
-  def deleteSensorSystem(sysid: String): Future[Either[GnError, String]]
+  def deleteSensorSystem(sysid: String): Future[Either[GnError, SensorSystemSummary]]
 
-  def deleteDataStream(sysid: String, strid: String): Future[Either[GnError, String]]
+  def deleteDataStream(sysid: String, strid: String): Future[Either[GnError, DataStreamSummary]]
 
   def close(): Unit
 }

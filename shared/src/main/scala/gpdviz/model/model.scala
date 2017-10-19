@@ -6,6 +6,23 @@ case class SensorSystemSummary(sysid:        String,
                                streamIds:    Set[String] = Set.empty
                               )
 
+case class DataStreamSummary(sysid:        String,
+                             strid:        String
+                            )
+
+case class VariableDefSummary(sysid:        String,
+                              strid:        String,
+                              name:         String,
+                              units:        Option[String] = None
+                             )
+
+case class ObservationsSummary(sysid:        String,
+                               strid:        String,
+                               time:         Option[String] = None,
+                               added:        Option[Int] = None,
+                               removed:      Option[Int] = None
+                              )
+
 case class LatLon(lat: Double, lon: Double)
 
 case class ScalarData(vars:      List[String],

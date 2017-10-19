@@ -1,5 +1,10 @@
 # Gpdviz
 
+2017-10-19
+
+- adjustments to API mainly in terms of responses (so they are all objects)
+- tests re-enabled (except for one involving quill's update operation) 
+
 2017-10-14
 
 - focus on quill/postgres as the database system. 

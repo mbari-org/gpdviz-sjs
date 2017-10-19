@@ -32,6 +32,11 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
   var sysid: Option[String] = None
   val strid = "aStrId"
 
+  override def afterAll(): Unit = {
+    db.close()
+    super.afterAll()
+  }
+
   "sensor system service " should {
     "respond with all sensor systems" in {
       Get("/api/ss") ~> routes ~> check {
@@ -55,16 +60,13 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
       )
       Post(s"/api/ss", ssRegister) ~> routes ~> check {
         status shouldBe OK
-        // TODO revisit all of this.
-        //contentType shouldBe `application/json`
-        //contentType shouldBe `text/plain(UTF-8)`
-        val resSysid = responseAs[String]
-        resSysid shouldBe sysid.get
-//        val ss = responseAs[SensorSystem]
-//        ss.name shouldBe Some("test ss")
-//        ss.description shouldBe Some("test description")
-//        ss.center shouldBe Some(LatLon(36.8, -122.04))
-//        ss.pushEvents shouldBe true
+        contentType shouldBe `application/json`
+        val ss = responseAs[SensorSystemSummary]
+        ss.sysid shouldBe sysid.get
+        ss.name shouldBe Some("test ss")
+        ss.description shouldBe Some("test description")
+        //ss.center shouldBe Some(LatLon(36.8, -122.04))
+        //ss.pushEvents shouldBe true
       }
     }
 
@@ -79,10 +81,10 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
       Put(s"/api/ss/${sysid.get}", ssUpdate) ~> routes ~> check {
         status shouldBe OK
         contentType shouldBe `application/json`
-        val ss = responseAs[SensorSystem]
+        val ss = responseAs[SensorSystemSummary]
         ss.sysid shouldBe sysid.get
-        ss.center shouldBe Some(LatLon(36, -122))
-        ss.pushEvents shouldBe false
+        //ss.center shouldBe Some(LatLon(36, -122))
+        //ss.pushEvents shouldBe false
       }
     }
 
@@ -92,13 +94,14 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
       Post(s"/api/ss/${sysid.get}", streamRegister) ~> routes ~> check {
         status shouldBe OK
         contentType shouldBe `application/json`
-        val ds = responseAs[DataStream]
+        val ds = responseAs[DataStreamSummary]
+        ds.sysid === sysid.get
         ds.strid === strid
-        ds.variables === variables
+        //ds.variables === variables
       }
     }
 
-    "add observations" ignore {
+    "add observations" in {
       val vars = List("temperature")
       val obsRegister = ObservationsRegister(observations = Map(
         "0" → List(ObsData(
@@ -126,23 +129,23 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
       Post(s"/api/ss/${sysid.get}/$strid/obs", obsRegister) ~> routes ~> check {
         status shouldBe OK
         contentType shouldBe `application/json`
-        val map = responseAs[Map[String, List[ObsData]]]
-        map.size shouldBe 4
-        map.contains("1") === true
-        map.get("1").head.length === 1
+        val map = responseAs[ObservationsSummary]
+        map.sysid === sysid.get
+        map.strid === strid
+        map.added shouldBe Some(4)
       }
     }
 
-    "delete an existing sensor system" ignore {
+    "delete an existing sensor system" in {
       Delete(s"/api/ss/${sysid.get}") ~> routes ~> check {
         status shouldBe OK
         contentType shouldBe `application/json`
-        val ss = responseAs[SensorSystem]
+        val ss = responseAs[SensorSystemSummary]
         ss.sysid shouldBe sysid.get
       }
     }
 
-    "not find unregistered sensor system" ignore {
+    "not find unregistered sensor system" in {
       Get(s"/api/ss/${sysid.get}") ~> routes ~> check {
         status shouldBe NotFound
       }

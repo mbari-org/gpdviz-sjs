@@ -47,12 +47,12 @@ trait GpdvizServiceImpl extends JsonImplicits  {
   def updateSensorSystem(sysid: String, ssu: SSUpdate): Future[ToResponseMarshallable] = {
     println(s"updateSensorSystem: sysid=$sysid ssu=$ssu")
     db.updateSensorSystem(sysid, ssu) map {
-      case Right(_) ⇒
+      case Right(ssSum) ⇒
         notifier.notifySensorSystemUpdated(sysid)
         if (ssu.refresh.getOrElse(false)) {
           notifier.notifySensorSystemRefresh(sysid)
         }
-        sysid
+        ssSum
 
       case Left(error) ⇒ InternalServerError -> error
     }
@@ -61,9 +61,9 @@ trait GpdvizServiceImpl extends JsonImplicits  {
   def unregisterSensorSystem(sysid: String): Future[ToResponseMarshallable] = {
     println(s"unregisterSensorSystem: sysid=$sysid")
     db.deleteSensorSystem(sysid) map {
-      case Right(s) ⇒
-        notifier.notifySensorSystemUnregistered(s)
-        s
+      case Right(ssSum) ⇒
+        notifier.notifySensorSystemUnregistered(sysid)
+        ssSum
       case Left(error) ⇒
         if (error.code < 500)
           StatusCodes.custom(error.code, error.msg)
@@ -84,9 +84,9 @@ trait GpdvizServiceImpl extends JsonImplicits  {
       chartStyle  = strr.chartStyle
     )
     db.registerDataStream(sysid)(ds) map {
-      case Right(_) ⇒
+      case Right(dsSum) ⇒
         notifier.notifyStreamAdded(sysid, ds)
-        ds
+        dsSum
       case Left(error) ⇒ InternalServerError -> error
     }
   }
@@ -94,9 +94,9 @@ trait GpdvizServiceImpl extends JsonImplicits  {
   def addObservations(sysid: String, strid: String, obssr: ObservationsRegister): Future[ToResponseMarshallable] = Future {
     println(s"addObservations: sysid=$sysid, strid=$strid, obssr=${pp(obssr.observations)}")
     try {
-      db.registerObservations(sysid, strid)(obssr) map { _ ⇒
+      db.registerObservations(sysid, strid)(obssr) map { obsSum ⇒
         notifier.notifyObservations2Added(sysid, strid, obssr.observations)
-        obssr
+        obsSum
       }
     }
     catch {
@@ -118,9 +118,9 @@ trait GpdvizServiceImpl extends JsonImplicits  {
   def deleteStream(sysid: String, strid: String): Future[ToResponseMarshallable] = {
     println(s"deleteStream: sysid=$sysid strid=$strid")
     db.deleteDataStream(sysid, strid) map {
-      case Right(_) ⇒
+      case Right(dsSum) ⇒
         notifier.notifyStreamRemoved(sysid, strid)
-        strid
+        dsSum
       case Left(error) ⇒ InternalServerError -> error
     }
   }
