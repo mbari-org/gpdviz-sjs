@@ -1,5 +1,9 @@
 # Gpdviz
 
+2017-10-20
+
+- nested embedded with intermediate Option still not handled by quill 
+
 2017-10-19
 
 - do not forget to also update the swagger response types!
