@@ -1,8 +1,5 @@
 package gpdviz.data
 
-import java.util.UUID
-import java.util.concurrent.TimeUnit
-
 import com.typesafe.config.Config
 import gpdviz.model._
 import gpdviz.server.{GnError, ObservationsRegister, SSUpdate}
@@ -12,7 +9,6 @@ import spray.json._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.concurrent.duration.Duration
 
 case class PgLatLon(lat: Double, lon: Double) extends Embedded
 
@@ -62,9 +58,9 @@ case class PgObservation(
                           scalarData:    Option[PgScalarData] = None
                         )
 
-class PostgresDb(tsConfig: Config) extends DbInterface {
+class PostgresDbQuill(quillConfig: Config) extends DbInterface {
 
-  private val ctx = new PostgresJdbcContext(LowerCase, tsConfig.getConfig("postgres.quill"))
+  private val ctx = new PostgresJdbcContext(LowerCase, quillConfig)
   import ctx._
 
   private val sensorSystem = quote {
@@ -94,73 +90,6 @@ class PostgresDb(tsConfig: Config) extends DbInterface {
       //_.scalarData.map(_.position.map(_.lon)) → "scalarDataLon",
     )
   }
-
-  def initStuff() : Unit = {
-    val sysid = UUID.randomUUID().toString.substring(0, 8)
-    val strid1 = "STR1"
-    val strid2 = "STR2"
-
-    val ss = SensorSystem(
-      sysid = sysid,
-      name = Some(s"ss name of $sysid"),
-      pushEvents = false,
-      center = Some(LatLon(36.785, -122.0)),
-      clickListener = Some(s"http://clickListener/$sysid"),
-      streams = Map(
-        strid1 → DataStream(
-          strid = strid1,
-          name = Some(s"str name of $strid1"),
-          variables = Some(List(
-            VariableDef(
-              name = "temperature",
-              units = Some("°C")
-            ),
-            VariableDef(
-              name = "distance",
-              units = Some("m")
-            )
-          )),
-          observations = Some(Map(
-            "1503090553000" → List(
-              ObsData(
-                scalarData = Some(ScalarData(
-                  vars = List("temperature", "distance"),
-                  vals = List(14.51, 1201.0),
-                  position = Some(LatLon(36.71, -122.11))
-                ))
-              ),
-              ObsData(
-                scalarData = Some(ScalarData(
-                  vars = List("temperature", "distance"),
-                  vals = List(14.52, 1202.0),
-                  position = Some(LatLon(36.72, -122.12))
-                ))
-              )
-            ),
-            "1503090555000" → List(
-              ObsData(
-                scalarData = Some(ScalarData(
-                  vars = List("temperature", "distance"),
-                  vals = List(14.53, 1203.0),
-                  position = Some(LatLon(36.73, -122.13))
-                ))
-              )
-            )
-          ))
-        )
-        , strid2 → DataStream(
-          strid = strid2,
-          name = Some(s"str name of $strid2")
-        )
-      )
-    )
-
-    import scala.concurrent.Await
-    Await.ready(registerSensorSystem(ss), Duration(3, TimeUnit.SECONDS))
-  }
-
-  initStuff()
-
 
   val details: String = s"PostgreSQL-based database"
 

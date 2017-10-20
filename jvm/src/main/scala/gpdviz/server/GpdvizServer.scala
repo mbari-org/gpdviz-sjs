@@ -50,6 +50,8 @@ object GpdvizServer {
 class GpdvizServer extends GpdvizService {
   val db: DbInterface = DbFactory.db
 
+  DbFactory.initStuff(db)
+
   implicit val system: ActorSystem = ActorSystem()
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
   implicit val materializer: ActorMaterializer = ActorMaterializer()
