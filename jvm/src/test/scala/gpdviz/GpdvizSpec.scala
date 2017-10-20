@@ -3,9 +3,8 @@ package gpdviz
 import akka.http.scaladsl.model.ContentTypes._
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import com.typesafe.config.ConfigFactory
 import gpdviz.async.{Notifier, NullPublisher}
-import gpdviz.data.{DbInterface, PostgresDb}
+import gpdviz.data.{DbFactory, DbInterface}
 import gpdviz.model._
 import gpdviz.server._
 import org.scalatest.{Matchers, WordSpec}
@@ -13,21 +12,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with GpdvizService {
   val notifier: Notifier = new Notifier(NullPublisher)
-
-  private val tsConfig = ConfigFactory.parseString(
-    s"""
-       |postgres.quill {
-       |  dataSourceClassName     = org.postgresql.ds.PGSimpleDataSource
-       |  dataSource.user         = postgres
-       |  dataSource.password     = ""
-       |  dataSource.databaseName = gpdviz_test
-       |  dataSource.portNumber   = 5432
-       |  dataSource.serverName   = localhost
-       |}
-     """.stripMargin
-  ).withFallback(ConfigFactory.load()).resolve()
-
-  val db: DbInterface = new PostgresDb(tsConfig)
+  val db: DbInterface = DbFactory.testDb
 
   var sysid: Option[String] = None
   val strid = "aStrId"

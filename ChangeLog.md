@@ -2,6 +2,7 @@
 
 2017-10-20
 
+- some db-related refact
 - nested embedded with intermediate Option still not handled by quill 
 
 2017-10-19

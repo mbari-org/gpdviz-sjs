@@ -4,10 +4,8 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import gpdviz.async._
-import gpdviz.config
-import gpdviz.config.configFile
-import gpdviz.config.cfg
-import gpdviz.data.{DbInterface, PostgresDb}
+import gpdviz.config.{cfg, configFile}
+import gpdviz.data.{DbFactory, DbInterface}
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.io.StdIn
@@ -50,7 +48,7 @@ object GpdvizServer {
 }
 
 class GpdvizServer extends GpdvizService {
-  val db: DbInterface = new PostgresDb(config.tsConfig)
+  val db: DbInterface = DbFactory.db
 
   implicit val system: ActorSystem = ActorSystem()
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
