@@ -36,7 +36,7 @@ CREATE TABLE "variabledef" (
     units             VARCHAR(255),
     chartStyle        TEXT,
     PRIMARY KEY (sysid, strid, name),
-    constraint fk_ds_ss foreign key (sysid, strid) references datastream (sysid, strid)
+    constraint fk_vd_ds foreign key (sysid, strid) references datastream (sysid, strid)
 );
 
 CREATE TABLE "observation" (
@@ -51,5 +51,5 @@ CREATE TABLE "observation" (
     lat     double precision,
     lon     double precision,
     --
-    constraint fk_ds_ss foreign key (sysid, strid) references datastream (sysid, strid)
+    constraint fk_obs_ds foreign key (sysid, strid) references datastream (sysid, strid)
 );
