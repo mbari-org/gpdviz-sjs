@@ -70,6 +70,11 @@ lazy val gpdviz = crossProject
       ,"org.tpolecat"        %% "doobie-postgres"      % doobieVersion
       ,"org.tpolecat"        %% "doobie-specs2"        % doobieVersion
 
+      ,"com.typesafe.slick"  %% "slick"                % "3.2.1"
+      ,"com.typesafe.slick"  %% "slick-hikaricp"       % "3.2.1"
+      ,"org.slf4j"            % "slf4j-nop"            % "1.6.4"
+      ,"com.github.tminglei" %% "slick-pg"             % "0.15.3"
+
       ,"com.github.swagger-akka-http" %% "swagger-akka-http" % swaggerAkkaV
       ,"org.slf4j"                     % "slf4j-simple"      % "1.7.25" // used by swagger-akka-http
     ),
