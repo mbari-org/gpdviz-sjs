@@ -10,6 +10,7 @@ val autowireV     = "0.2.6"
 val upickleV      = "0.4.4"
 val pprintV       = "0.5.2"
 val quillV        = "2.0.0"
+val doobieVersion = "0.5.0-M8"
 val swaggerAkkaV  = "0.11.0"
 
 val scalaJsDomV      = "0.9.3"
@@ -64,6 +65,10 @@ lazy val gpdviz = crossProject
 
       ,"org.postgresql"       % "postgresql"           % "9.4.1208"
       ,"io.getquill"         %% "quill-jdbc"           % quillV
+
+      ,"org.tpolecat"        %% "doobie-core"          % doobieVersion
+      ,"org.tpolecat"        %% "doobie-postgres"      % doobieVersion
+      ,"org.tpolecat"        %% "doobie-specs2"        % doobieVersion
 
       ,"com.github.swagger-akka-http" %% "swagger-akka-http" % swaggerAkkaV
       ,"org.slf4j"                     % "slf4j-simple"      % "1.7.25" // used by swagger-akka-http

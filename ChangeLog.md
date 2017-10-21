@@ -2,6 +2,7 @@
 
 2017-10-20
 
+- due to quill issues, trying again with doobie
 - some db-related refact
 - nested embedded with intermediate Option still not handled by quill 
 
