@@ -10,6 +10,8 @@ trait DbInterface {
 
   def details: String
 
+  def createTables(): Unit
+
   def listSensorSystems(): Future[Seq[SensorSystemSummary]]
 
   def existsSensorSystem(sysid: String): Future[Boolean]

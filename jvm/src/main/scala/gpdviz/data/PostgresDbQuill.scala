@@ -10,19 +10,19 @@ import spray.json._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-case class PgLatLon(lat: Double, lon: Double) extends Embedded
+case class PgQLatLon(lat: Double, lon: Double) extends Embedded
 
-case class PgSensorSystem(
+case class PgQSensorSystem(
                           sysid:        String,
                           name:         Option[String] = None,
                           description:  Option[String] = None,
                           pushEvents:   Boolean = true,
-                          center:       Option[PgLatLon] = None,
+                          center:       Option[PgQLatLon] = None,
                           zoom:         Option[Int] = None,
                           clickListener: Option[String] = None
                          )
 
-case class PgDataStream(
+case class PgQDataStream(
                         sysid:        String,
                         strid:        String,
                         name:         Option[String] = None,
@@ -32,7 +32,7 @@ case class PgDataStream(
                         chartStyle:   Option[String] = None
                        )
 
-case class PgVariableDef(
+case class PgQVariableDef(
                           sysid:         String,
                           strid:         String,
                           name:          String,
@@ -40,22 +40,22 @@ case class PgVariableDef(
                           chartStyle:    Option[String] = None
                         )
 
-case class PgScalarData(
+case class PgQScalarData(
                          vars:      List[String],
                          vals:      List[Double],
                        // TODO quill#932
-                       //position:  Option[PgLatLon] = None
+                       //position:  Option[PgQLatLon] = None
                          lat:       Option[Double],
                          lon:       Option[Double]
                        ) extends Embedded
 
-case class PgObservation(
+case class PgQObservation(
                           sysid:         String,
                           strid:         String,
                           time:          String,
                           feature:       Option[String] = None,
                           geometry:      Option[String] = None,
-                          scalarData:    Option[PgScalarData] = None
+                          scalarData:    Option[PgQScalarData] = None
                         )
 
 class PostgresDbQuill(quillConfig: Config) extends DbInterface {
@@ -64,24 +64,24 @@ class PostgresDbQuill(quillConfig: Config) extends DbInterface {
   import ctx._
 
   private val sensorSystem = quote {
-    querySchema[PgSensorSystem]("sensorsystem",
+    querySchema[PgQSensorSystem]("sensorsystem",
       _.center.map(_.lat) → "centerLat",
       _.center.map(_.lon) → "centerLon"
     )
   }
 
   private val dataStream = quote {
-    querySchema[PgDataStream]("datastream"
+    querySchema[PgQDataStream]("datastream"
     )
   }
 
   private val variableDef = quote {
-    querySchema[PgVariableDef]("variabledef"
+    querySchema[PgQVariableDef]("variabledef"
     )
   }
 
   private val observation = quote {
-    querySchema[PgObservation]("observation"
+    querySchema[PgQObservation]("observation"
       // TODO quill#932
       //,
       //_.scalarData.map(_.vars) → "scalarDataVars",
@@ -92,6 +92,8 @@ class PostgresDbQuill(quillConfig: Config) extends DbInterface {
   }
 
   val details: String = s"PostgreSQL-based database"
+
+  def createTables(): Unit = ()
 
   def listSensorSystems(): Future[Seq[SensorSystemSummary]] = Future {
     ctx.run(sensorSystem) map { pss ⇒
@@ -110,11 +112,11 @@ class PostgresDbQuill(quillConfig: Config) extends DbInterface {
   }
 
   def registerSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystemSummary]] = Future {
-    ctx.run(sensorSystem.insert(lift(PgSensorSystem(
+    ctx.run(sensorSystem.insert(lift(PgQSensorSystem(
       sysid = ss.sysid,
       name = ss.name,
       pushEvents = ss.pushEvents,
-      center = ss.center.map(c ⇒ PgLatLon(c.lat, c.lon)),
+      center = ss.center.map(c ⇒ PgQLatLon(c.lat, c.lon)),
       clickListener = ss.clickListener
     ))))
 
@@ -141,7 +143,7 @@ class PostgresDbQuill(quillConfig: Config) extends DbInterface {
 
   def registerDataStream(sysid: String)
                         (ds: DataStream): Future[Either[GnError, DataStreamSummary]] = Future {
-    ctx.run(dataStream.insert(lift(PgDataStream(
+    ctx.run(dataStream.insert(lift(PgQDataStream(
       sysid = sysid,
       strid = ds.strid,
       name = ds.name,
@@ -170,7 +172,7 @@ class PostgresDbQuill(quillConfig: Config) extends DbInterface {
   def registerVariableDef(sysid: String, strid: String)
                          (vd: VariableDef): Future[Either[GnError, VariableDefSummary]] = Future {
     println(s"  *** registerVariableDef ${vd.name}")
-    ctx.run(variableDef.insert(lift(PgVariableDef(
+    ctx.run(variableDef.insert(lift(PgQVariableDef(
       sysid = sysid,
       strid = strid,
       name = vd.name,
@@ -200,17 +202,17 @@ class PostgresDbQuill(quillConfig: Config) extends DbInterface {
     val geometry = obsData.geometry.map(utl.toJsonString)
 
     val pgScalarData = obsData.scalarData map { s ⇒
-      PgScalarData(
+      PgQScalarData(
         vars = s.vars,
         vals = s.vals,
-      //position = s.position.map(p ⇒ PgLatLon(p.lat, p.lon))
+      //position = s.position.map(p ⇒ PgQLatLon(p.lat, p.lon))
         lat = s.position.map(_.lat),
         lon = s.position.map(_.lon)
       )
     }
     //pgScalarData foreach { x ⇒ println(s"  *** registerObservation sysid=$sysid strid=$strid time=$time pgScalarData=" + pp(x)) }
 
-    val pgObservation = PgObservation(
+    val pgObservation = PgQObservation(
       sysid = sysid,
       strid = strid,
       time = time,
@@ -223,7 +225,7 @@ class PostgresDbQuill(quillConfig: Config) extends DbInterface {
     Right(ObservationsSummary(sysid, strid, time = Some(time), added = Some(1)))
   }
 
-  private def getPgObservations(sysid: String, strid: String): List[PgObservation] = {
+  private def getPgObservations(sysid: String, strid: String): List[PgQObservation] = {
     ctx.run(observation
       .filter(o ⇒ o.sysid == lift(sysid) && o.strid == lift(strid))
     )
@@ -246,7 +248,7 @@ class PostgresDbQuill(quillConfig: Config) extends DbInterface {
 
         val observationsMap: Map[String, List[ObsData]] = {
 
-          def pgObs2ObsData(o: PgObservation): ObsData = {
+          def pgObs2ObsData(o: PgQObservation): ObsData = {
             ObsData(
               feature = o.feature.map(utl.toFeature),
               geometry = o.geometry.map(utl.toGeometry),
