@@ -259,13 +259,15 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
   }
 
   def registerObservations(sysid: String, strid: String)
-                          (obssr: ObservationsRegister): Future[Either[GnError, ObservationsSummary]] = Future {
+                          (obssr: ObservationsRegister): Future[Either[GnError, ObservationsSummary]] = {
     var num = 0
-    obssr.observations foreach { case (time, list) ⇒
-      list.foreach(registerObservation(sysid, strid, time, _))
+    val actions = obssr.observations flatMap { case (time, list) ⇒
       num += list.length
+      list.map(addObservationAction(sysid, strid, time, _))
     }
-    Right(ObservationsSummary(sysid, strid, added = Some(num)))
+    db.run(DBIO.seq(actions.toSeq: _*)) map { _ ⇒
+      Right(ObservationsSummary(sysid, strid, added = Some(num)))
+    }
   }
 
   private def addObservationAction(sysid: String, strid: String, time: String, obsData: ObsData) = {
@@ -277,8 +279,8 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
       geometry = obsData.geometry.map(utl.toJsonString),
       vars = obsData.scalarData.map(_.vars).getOrElse(List.empty),
       vals = obsData.scalarData.map(_.vals).getOrElse(List.empty),
-      lat = obsData.scalarData.map(_.position.map(_.lat)).head,
-      lon = obsData.scalarData.map(_.position.map(_.lon)).head,
+      lat = obsData.scalarData.flatMap(_.position.map(_.lat)),
+      lon = obsData.scalarData.flatMap(_.position.map(_.lon)),
     )
   }
 
