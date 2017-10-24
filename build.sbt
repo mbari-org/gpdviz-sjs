@@ -39,7 +39,7 @@ def commonSettings = Seq(
   )
 )
 
-mainClass in assembly := Some("gpdviz.server.GpdvizServer")
+mainClass in assembly := Some("gpdviz.Gpdviz")
 assemblyJarName in assembly := s"gpdviz-$gpdvizVersion.jar"
 
 lazy val root = project.in(file("."))
