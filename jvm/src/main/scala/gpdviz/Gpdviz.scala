@@ -2,7 +2,7 @@ package gpdviz
 
 import gpdviz.config.configFile
 import gpdviz.data.DbFactory
-import gpdviz.server.GpdvizServer
+import gpdviz.server.{GpdvizServer, JsonImplicits}
 
 object Gpdviz {
   def main(args: Array[String]) {
@@ -14,6 +14,9 @@ object Gpdviz {
     }
     else if (args.contains("add-some-data")) {
       addSomeData(args)
+    }
+    else if (args.contains("import")) {
+      importJson(args)
     }
     else if (args.contains("run-server")) {
       if (!configFile.canRead) {
@@ -59,5 +62,57 @@ object Gpdviz {
     val db = DbFactory.openDb
     DbFactory.addSomeDataSync(db)
     db.close()
+  }
+
+  private def importJson(args: Array[String]): Unit = {
+    import java.nio.file.Paths
+    import java.util.concurrent.TimeUnit
+
+    import gpdviz.model.SensorSystem
+
+    import scala.concurrent.Await
+    import scala.concurrent.duration.Duration
+    import scala.util.Failure
+    import scala.util.control.NonFatal
+
+    val dataDir = "data"
+
+    object getSensorSystemByFilename extends JsonImplicits {
+      def apply(filename: String): Option[SensorSystem] = {
+        val ssPath = Paths.get(dataDir, filename)
+        val ssFile = ssPath.toFile
+        if (ssFile.exists()) try {
+          import spray.json._
+          val contents = scala.io.Source.fromFile(ssFile).mkString
+          Option(contents.parseJson.convertTo[SensorSystem])
+        }
+        catch {
+          case NonFatal(e) ⇒
+            println(s"WARN: error trying to load $ssFile: $e")
+            None
+        }
+        else None
+      }
+    }
+
+    val dataPath = Paths.get(dataDir)
+    val files = dataPath.toFile.listFiles.filter(_.getName.endsWith(".ss.json"))
+    val systems: Seq[SensorSystem] = files.toSeq flatMap { f ⇒
+      getSensorSystemByFilename(f.getName)
+    }
+
+    if (systems.nonEmpty) {
+      import scala.concurrent.ExecutionContext.Implicits.global
+
+      val db = DbFactory.openDb
+      systems foreach { ss ⇒
+        println(s"Importing ${ss.sysid} ...")
+        Await.ready(db.registerSensorSystem(ss) andThen {
+          case Failure(e) ⇒ println("error registering data", e)
+        }, Duration(10, TimeUnit.SECONDS))
+      }
+      db.close()
+    }
+    else println(s"No models found under $dataDir")
   }
 }
