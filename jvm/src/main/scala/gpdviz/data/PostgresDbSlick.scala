@@ -189,7 +189,7 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
 
     val actions = List(ssAction) ++ dsActions
 
-    db.run(DBIO.seq(actions: _*)) map { _ ⇒
+    db.run(DBIO.seq(actions: _*).transactionally) map { _ ⇒
       Right(SensorSystemSummary(
         ss.sysid,
         name = ss.name,
@@ -235,7 +235,7 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
   def registerDataStream(sysid: String)
                         (ds: DataStream): Future[Either[GnError, DataStreamSummary]] = {
 
-    db.run(addDataStreamAction(sysid, ds)) map { _ ⇒
+    db.run(addDataStreamAction(sysid, ds).transactionally) map { _ ⇒
       Right(DataStreamSummary(sysid, ds.strid))
     }
   }
@@ -265,7 +265,7 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
       num += list.length
       list.map(addObservationAction(sysid, strid, time, _))
     }
-    db.run(DBIO.seq(actions.toSeq: _*)) map { _ ⇒
+    db.run(DBIO.seq(actions.toSeq: _*).transactionally) map { _ ⇒
       Right(ObservationsSummary(sysid, strid, added = Some(num)))
     }
   }
@@ -315,11 +315,9 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     val vds = variabledef.filter(_.sysid === sysid)
     val obs = observation.filter(_.sysid === sysid)
 
-    db.run((
-      obs.delete andThen
-      vds.delete andThen
-      dss.delete andThen
-      ss.delete).transactionally) map { _ ⇒
+    val action = obs.delete andThen vds.delete andThen dss.delete andThen ss.delete
+
+    db.run(action.transactionally) map { _ ⇒
       Right(SensorSystemSummary(sysid))
     }
   }
@@ -329,10 +327,9 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     val vds = variabledef.filter(_.sysid === sysid)
     val obs = observation.filter(_.sysid === sysid)
 
-    db.run((
-      obs.delete andThen
-        vds.delete andThen
-        dss.delete).transactionally) map { _ ⇒
+    val action = obs.delete andThen vds.delete andThen dss.delete
+
+    db.run(action.transactionally) map { _ ⇒
       Right(DataStreamSummary(sysid, strid))
     }
   }
