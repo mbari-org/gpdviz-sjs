@@ -1,6 +1,7 @@
 package gpdviz.data
 
 import com.typesafe.config.Config
+/*
 import gpdviz.model._
 import gpdviz.server.{GnError, ObservationsRegister, SSUpdate}
 import io.getquill.{Embedded, LowerCase, PostgresJdbcContext}
@@ -57,9 +58,11 @@ case class PgQObservation(
                           geometry:      Option[String] = None,
                           scalarData:    Option[PgQScalarData] = None
                         )
+*/
 
-class PostgresDbQuill(quillConfig: Config) extends DbInterface {
+abstract class PostgresDbQuill(quillConfig: Config) extends DbInterface {
 
+/*
   private val ctx = new PostgresJdbcContext(LowerCase, quillConfig)
   import ctx._
 
@@ -93,7 +96,7 @@ class PostgresDbQuill(quillConfig: Config) extends DbInterface {
 
   val details: String = s"PostgreSQL-based database"
 
-  def createTables(): Unit = ()
+  def createTables(): Future[Unit] = Future {}
 
   def listSensorSystems(): Future[Seq[SensorSystemSummary]] = Future {
     ctx.run(sensorSystem) map { pss ⇒
@@ -318,4 +321,5 @@ class PostgresDbQuill(quillConfig: Config) extends DbInterface {
   }
 
   def close(): Unit = ctx.close()
+*/
 }

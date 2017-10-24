@@ -1,31 +1,51 @@
 package gpdviz.data
 
+import java.util.concurrent.TimeUnit
+
 import com.typesafe.config.ConfigFactory
+import com.typesafe.scalalogging.{StrictLogging ⇒ Logging}
 import gpdviz.config
 
-object DbFactory {
+import scala.concurrent.Await
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
+import scala.util.Failure
 
-  def db: DbInterface = {
-    new PostgresDbQuill(config.tsConfig.getConfig("postgres.quill"))
+object DbFactory extends Logging {
+
+  def openDb: DbInterface = {
+    new PostgresDbSlick(config.tsConfig.getConfig("postgres.slick"))
   }
 
   def testDb: DbInterface = {
-    val quillConfig = ConfigFactory.parseString(
+    val config = ConfigFactory.parseString(
       s"""
-         |dataSourceClassName     = org.postgresql.ds.PGSimpleDataSource
-         |dataSource.user         = postgres
-         |dataSource.password     = ""
-         |dataSource.databaseName = gpdviz_test
-         |dataSource.portNumber   = 5432
-         |dataSource.serverName   = localhost
+         |dataSourceClass = "org.postgresql.ds.PGSimpleDataSource"
+         |properties = {
+         |  user         = postgres
+         |  password     = ""
+         |  databaseName = gpdviz_test
+         |  portNumber   = 5432
+         |  serverName   = localhost
+         |}
+         |numThreads = 10
      """.stripMargin
     ).resolve()
 
-    new PostgresDbQuill(quillConfig)
+    new PostgresDbSlick(config)
   }
 
-  def initStuff(db: DbInterface): Unit = {
+  def createTablesSync(db: DbInterface): Unit = {
+    logger.info("Creating tables")
+    Await.ready(db.createTables() andThen {
+      case Failure(e) ⇒ logger.error("error creating tables", e)
+    }, Duration(30, TimeUnit.SECONDS))
+  }
+
+  def addSomeDataSync(db: DbInterface): Unit = {
+    import pprint.PPrinter.Color.{apply ⇒ pp}
     import java.util.UUID
+
     import gpdviz.model._
 
     val sysid = UUID.randomUUID().toString.substring(0, 8)
@@ -87,9 +107,9 @@ object DbFactory {
       )
     )
 
-    import scala.concurrent.Await
-    import java.util.concurrent.TimeUnit
-    import scala.concurrent.duration.Duration
-    Await.ready(db.registerSensorSystem(ss), Duration(3, TimeUnit.SECONDS))
+    logger.info("Registering a sensor system...\n" + pp(ss, height = Int.MaxValue))
+    Await.ready(db.registerSensorSystem(ss) andThen {
+      case Failure(e) ⇒ logger.error("error registering data", e)
+    }, Duration(10, TimeUnit.SECONDS))
   }
 }

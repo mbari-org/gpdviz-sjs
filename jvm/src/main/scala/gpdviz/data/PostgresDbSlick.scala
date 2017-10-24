@@ -3,8 +3,7 @@ package gpdviz.data
 import com.typesafe.config.Config
 import gpdviz.model._
 import gpdviz.server.{GnError, ObservationsRegister, SSUpdate}
-import pprint.PPrinter.Color.{apply ⇒ pp}
-
+import com.typesafe.scalalogging.{StrictLogging ⇒ Logging}
 import MyPostgresProfile.api._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -54,128 +53,209 @@ case class PgSObservation(
                         )
 
 
-class PostgresDbSlick(slickConfig: Config) extends DbInterface {
+class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
 
   val details: String = s"PostgreSQL-based database (slick)"
 
-  val db = Database.forConfig("slick", slickConfig)
+  // path: ``empty string for the top level of the Config object''
+  private val db = Database.forConfig(path = "", slickConfig)
 
   class SensorSystems(tag: Tag) extends Table[
-    (String, Option[String], Option[String], Option[Boolean], Option[Double], Option[Double], Option[Int], Option[String])](tag, "sensorsystem") {
+    PgSSensorSystem
+    //(String, Option[String], Option[String], Option[Boolean], Option[Double], Option[Double], Option[Int], Option[String])
+    ](tag, "sensorsystem") {
 
     def sysid         = column[String]("sysid", O.PrimaryKey)
     def name          = column[Option[String]]("name")
     def description   = column[Option[String]]("description")
-    def pushEvents    = column[Option[Boolean]]("pushEvents")
+    def pushEvents    = column[Boolean]("pushEvents")
     def centerLat     = column[Option[Double]]("centerLat")
     def centerLon     = column[Option[Double]]("centerLon")
     def zoom          = column[Option[Int]]("zoom")
     def clickListener = column[Option[String]]("clickListener")
 
-    def * = (sysid, name, description, pushEvents, centerLat, centerLon, zoom, clickListener)
+    def * = (sysid, name, description, pushEvents, centerLat, centerLon, zoom, clickListener
+            ) <> (PgSSensorSystem.tupled, PgSSensorSystem.unapply)
   }
   val sensorsystem = TableQuery[SensorSystems]
 
   class DataStreams(tag: Tag) extends Table[
-    (String, String, String, String, String, Int, String)](tag, "datastream") {
+    PgSDataStream
+    //(String, String, String, String, String, Int, String)
+    ](tag, "datastream") {
 
-    def sysid         = column[String]("sysid", O.PrimaryKey)
-    def strid         = column[String]("strid", O.PrimaryKey)
-    def name          = column[String]("name")
-    def description   = column[String]("description")
-    def mapStyle      = column[String]("mapStyle")
+    def sysid         = column[String]("sysid")
+    def strid         = column[String]("strid")
+    def name          = column[Option[String]]("name")
+    def description   = column[Option[String]]("description")
+    def mapStyle      = column[Option[String]]("mapStyle")
     def zOrder        = column[Int]("zOrder")
-    def chartStyle    = column[String]("chartStyle")
+    def chartStyle    = column[Option[String]]("chartStyle")
 
-    def * = (sysid, strid, name, description, mapStyle, zOrder, chartStyle)
+    def * = (sysid, strid, name, description, mapStyle, zOrder, chartStyle
+            ) <> (PgSDataStream.tupled, PgSDataStream.unapply)
 
-    def ss = foreignKey("fk_ds_ss", sysid, sensorsystem)(_.sysid)
+    def pk_ds = primaryKey("pk_ds", (sysid, strid))
+    def fk_ds_ss = foreignKey("fk_ds_ss", sysid, sensorsystem)(_.sysid)
   }
   val datastream = TableQuery[DataStreams]
 
   class VariableDefs(tag: Tag) extends Table[
-    (String, String, String, String, String)](tag, "variabledef") {
+    PgSVariableDef
+    //(String, String, String, String, String)
+    ](tag, "variabledef") {
 
-    def sysid         = column[String]("sysid", O.PrimaryKey)
-    def strid         = column[String]("strid", O.PrimaryKey)
+    def sysid         = column[String]("sysid")
+    def strid         = column[String]("strid")
     def name          = column[String]("name")
-    def units         = column[String]("units")
-    def chartStyle    = column[String]("chartStyle")
+    def units         = column[Option[String]]("units")
+    def chartStyle    = column[Option[String]]("chartStyle")
 
-    def * = (sysid, strid, name, units, chartStyle)
+    def * = (sysid, strid, name, units, chartStyle
+            ) <> (PgSVariableDef.tupled, PgSVariableDef.unapply)
 
+    def pk_vd = primaryKey("pk_vd", (sysid, strid, name))
     def fk_vd_ds = foreignKey("fk_vd_ds", (sysid, strid), datastream)(x ⇒ (x.sysid, x.strid))
   }
   val variabledef = TableQuery[VariableDefs]
 
   class Observations(tag: Tag) extends Table[
-    (String, String, String, String, String, List[String], List[Double], Double, Double)](tag, "observation") {
+    PgSObservation
+    //(String, String, String, String, String, List[String], List[Double], Double, Double)
+    ](tag, "observation") {
 
     def sysid         = column[String]("sysid")
     def strid         = column[String]("strid")
     def time          = column[String]("time")
-    def feature       = column[String]("feature")
-    def geometry      = column[String]("geometry")
+    def feature       = column[Option[String]]("feature")
+    def geometry      = column[Option[String]]("geometry")
     def vars          = column[List[String]]("vars")
     def vals          = column[List[Double]]("vals")
-    def lat           = column[Double]("lat")
-    def lon           = column[Double]("lon")
+    def lat           = column[Option[Double]]("lat")
+    def lon           = column[Option[Double]]("lon")
 
-    def * = (sysid, strid, time, feature, geometry, vars, vals, lat, lon)
+    def * = (sysid, strid, time, feature, geometry, vars, vals, lat, lon
+            ) <> (PgSObservation.tupled, PgSObservation.unapply)
 
     def fk_obs_ds = foreignKey("fk_obs_ds", (sysid, strid), datastream)(x ⇒ (x.sysid, x.strid))
   }
   val observation = TableQuery[Observations]
 
-  def createTables(): Unit = {
+  private val schema = sensorsystem.schema ++ datastream.schema ++ variabledef.schema ++ observation.schema
+
+  def createTables(): Future[Unit] = {
+    db.run(schema.create)
   }
 
   def listSensorSystems(): Future[Seq[SensorSystemSummary]] = {
-    val q = sensorsystem.map(ss ⇒ (ss.sysid, ss.name, ss.description))
+    val q = for {
+      ss ← sensorsystem
+      ds ← datastream if ds.sysid === ss.sysid
+    } yield (ss, ds)
+
     val action = q.result
 
-    db.run(action).map(_.map { pss ⇒ SensorSystemSummary(
-      pss._1,
-      pss._2,
-      pss._3
-      //,strIds.toSet
-    )})
+    db.run(action).map(_.groupBy(_._1.sysid).map({ case (sysid, ssdss) ⇒
+      val ss = ssdss.head._1
+      val dss = ssdss.map(_._2)
+      SensorSystemSummary(
+        sysid,
+        ss.name,
+        ss.description,
+        streamIds = dss.map(_.strid).toSet
+      )
+    }).toSeq)
   }
 
-  def existsSensorSystem(sysid: String): Future[Boolean] = Future {
-
-    false
+  def existsSensorSystem(sysid: String): Future[Boolean] = {
+    val q = sensorsystem.filter(_.sysid === sysid)
+    db.run(q.result).map(_.nonEmpty)
   }
 
-  def registerSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystemSummary]] = Future {
+  def registerSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystemSummary]] = {
+    val ssAction =
+      sensorsystem += PgSSensorSystem(
+        ss.sysid,
+        name = ss.name,
+        description = ss.description,
+        pushEvents = ss.pushEvents,
+        centerLat = ss.center.map(_.lat),
+        centerLon = ss.center.map(_.lon),
+        zoom = ss.zoom,
+        clickListener = ss.clickListener
+      )
 
-    // ...
+    val dsActions = ss.streams.values.map(addDataStreamAction(ss.sysid, _))
 
-    val regStream = registerDataStream(ss.sysid) _
-    ss.streams.values foreach regStream
+    val actions = List(ssAction) ++ dsActions
 
-    Right(SensorSystemSummary(
-      ss.sysid,
-      name = ss.name,
-      description = ss.description
-    ))
+    db.run(DBIO.seq(actions: _*)) map { _ ⇒
+      Right(SensorSystemSummary(
+        ss.sysid,
+        name = ss.name,
+        description = ss.description
+      ))
+    }
   }
 
-  def updateSensorSystem(sysid: String, ssu: SSUpdate): Future[Either[GnError, SensorSystemSummary]] = Future {
+  def updateSensorSystem(sysid: String, ssu: SSUpdate): Future[Either[GnError, SensorSystemSummary]] = {
+    val action = sensorsystem.filter(_.sysid === sysid)
+      .map(p ⇒ (p.centerLat, p.centerLon))
+      .update((
+        ssu.center.map(_.lat),
+        ssu.center.map(_.lon)
+      ))
 
-    Right(SensorSystemSummary(sysid))
+    db.run(action) map { _ ⇒
+      Right(SensorSystemSummary(sysid))
+    }
+  }
+
+  private def addDataStreamAction(sysid: String, ds: DataStream) = {
+    val dsAction = datastream += PgSDataStream(
+      sysid,
+      ds.strid,
+      name = ds.name,
+      description = ds.description,
+      mapStyle = ds.mapStyle.map(utl.toJsonString),
+      zOrder = ds.zOrder,
+      chartStyle = ds.chartStyle.map(utl.toJsonString)
+    )
+
+    val vdActions = ds.variables.getOrElse(List.empty).map(addVariableDefAction(sysid, ds.strid, _))
+
+    val obsActions = ds.observations.getOrElse(Map.empty) flatMap { case (time, obss) ⇒
+      obss map (addObservationAction(sysid, ds.strid, time, _))
+    }
+
+    val actions = List(dsAction) ++ vdActions ++ obsActions
+    DBIO.seq(actions: _*)
   }
 
   def registerDataStream(sysid: String)
-                        (ds: DataStream): Future[Either[GnError, DataStreamSummary]] = Future {
+                        (ds: DataStream): Future[Either[GnError, DataStreamSummary]] = {
 
-    Right(DataStreamSummary(sysid, ds.strid))
+    db.run(addDataStreamAction(sysid, ds)) map { _ ⇒
+      Right(DataStreamSummary(sysid, ds.strid))
+    }
+  }
+
+  private def addVariableDefAction(sysid: String, strid: String, vd: VariableDef) = {
+    variabledef += PgSVariableDef(
+      sysid,
+      strid,
+      name = vd.name,
+      units = vd.units,
+      chartStyle = vd.chartStyle.map(utl.toJsonString)
+    )
   }
 
   def registerVariableDef(sysid: String, strid: String)
-                         (vd: VariableDef): Future[Either[GnError, VariableDefSummary]] = Future {
+                         (vd: VariableDef): Future[Either[GnError, VariableDefSummary]] = {
 
-    Right(VariableDefSummary(sysid, strid, vd.name, vd.units))
+    db.run(addVariableDefAction(sysid, strid, vd)) map { _ ⇒
+      Right(VariableDefSummary(sysid, strid, vd.name, vd.units))
+    }
   }
 
   def registerObservations(sysid: String, strid: String)
@@ -188,33 +268,71 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface {
     Right(ObservationsSummary(sysid, strid, added = Some(num)))
   }
 
+  private def addObservationAction(sysid: String, strid: String, time: String, obsData: ObsData) = {
+    observation += PgSObservation(
+      sysid,
+      strid,
+      time,
+      feature = obsData.feature.map(utl.toJsonString),
+      geometry = obsData.geometry.map(utl.toJsonString),
+      vars = obsData.scalarData.map(_.vars).getOrElse(List.empty),
+      vals = obsData.scalarData.map(_.vals).getOrElse(List.empty),
+      lat = obsData.scalarData.map(_.position.map(_.lat)).head,
+      lon = obsData.scalarData.map(_.position.map(_.lon)).head,
+    )
+  }
+
   def registerObservation(sysid: String, strid: String, time: String,
-                          obsData: ObsData): Future[Either[GnError, ObservationsSummary]] = Future {
+                          obsData: ObsData): Future[Either[GnError, ObservationsSummary]] = {
 
-    Right(ObservationsSummary(sysid, strid, time = Some(time), added = Some(1)))
+    db.run(addObservationAction(sysid, strid, time, obsData)) map { _ ⇒
+      Right(ObservationsSummary(sysid, strid, time = Some(time), added = Some(1)))
+    }
   }
 
-  def getSensorSystem(sysid: String): Future[Option[SensorSystem]] = Future {
-
- /*   val q = sensorsystem.filter(_.sysid == sysid)
-    val action = q.result
-
-    db.run(action).map(_.map(pss ⇒ SensorSystem(
-      sysid = pss._1,
-      name = pss._2,
-      description = pss._3
-      //,strIds.toSet
-    )).headOption)
- */
-    None
+  def getSensorSystem(sysid: String): Future[Option[SensorSystem]] = {
+    val q = sensorsystem.filter(_.sysid === sysid)
+    db.run(q.result.headOption).map(_ map { pss ⇒
+      val streams = Map[String, DataStream]() // TODO streams
+      SensorSystem(
+        sysid = pss.sysid,
+        name = pss.name,
+        description = pss.description,
+        streams = streams,
+        pushEvents = pss.pushEvents,
+        center = pss.centerLat.map(lat ⇒ LatLon(lat, pss.centerLon.get)),
+        zoom = pss.zoom,
+        clickListener = pss.clickListener
+      )
+    })
   }
 
-  def deleteSensorSystem(sysid: String): Future[Either[GnError, SensorSystemSummary]] = Future {
-    Right(SensorSystemSummary(sysid))
+  def deleteSensorSystem(sysid: String): Future[Either[GnError, SensorSystemSummary]] = {
+    val ss = sensorsystem.filter(_.sysid === sysid)
+    val dss = datastream.filter(_.sysid === sysid)
+    val vds = variabledef.filter(_.sysid === sysid)
+    val obs = observation.filter(_.sysid === sysid)
+
+    db.run((
+      obs.delete andThen
+      vds.delete andThen
+      dss.delete andThen
+      ss.delete).transactionally) map { _ ⇒
+      Right(SensorSystemSummary(sysid))
+    }
   }
 
-  def deleteDataStream(sysid: String, strid: String): Future[Either[GnError, DataStreamSummary]] = Future {
-    Right(DataStreamSummary(sysid, strid))
+  def deleteDataStream(sysid: String, strid: String): Future[Either[GnError, DataStreamSummary]] = {
+    val dss = datastream.filter(_.sysid === sysid)
+    val vds = variabledef.filter(_.sysid === sysid)
+    val obs = observation.filter(_.sysid === sysid)
+
+    db.run((
+      obs.delete andThen
+        vds.delete andThen
+        dss.delete).transactionally) map { _ ⇒
+      Right(DataStreamSummary(sysid, strid))
+    }
   }
 
   def close(): Unit = db.close

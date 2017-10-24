@@ -1,5 +1,9 @@
 # Gpdviz
 
+2017-10-23
+
+- first slick-based version
+
 2017-10-20
 
 - due to doobie issues, trying slick

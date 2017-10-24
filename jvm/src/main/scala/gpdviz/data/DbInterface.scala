@@ -10,7 +10,7 @@ trait DbInterface {
 
   def details: String
 
-  def createTables(): Unit
+  def createTables(): Future[Unit]
 
   def listSensorSystems(): Future[Seq[SensorSystemSummary]]
 

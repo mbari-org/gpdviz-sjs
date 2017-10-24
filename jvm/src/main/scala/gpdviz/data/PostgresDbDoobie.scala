@@ -1,6 +1,7 @@
 package gpdviz.data
 
 import com.typesafe.config.Config
+/*
 import gpdviz.model._
 import gpdviz.server.{GnError, ObservationsRegister, SSUpdate}
 import pprint.PPrinter.Color.{apply ⇒ pp}
@@ -55,10 +56,12 @@ case class PgDObservation(
                           lat:       Option[Double],
                           lon:       Option[Double]
                         )
+*/
 
 
-class PostgresDbDoobie(doobieConfig: Config) extends DbInterface {
+abstract class PostgresDbDoobie(doobieConfig: Config) extends DbInterface {
 
+/*
   private val xa = Transactor.fromDriverManager[IO](
     driver = "org.postgresql.Driver",
     url = "jdbc:postgresql:gpdviz",
@@ -68,7 +71,7 @@ class PostgresDbDoobie(doobieConfig: Config) extends DbInterface {
 
   val details: String = s"PostgreSQL-based database (doobie)"
 
-  def createTables(): Unit = {
+  def createTables(): Future[Unit] = Future {
     def sensorsystem(): Unit = {
       val drop: Update0 = sql"DROP TABLE IF EXISTS sensorsystem".update
       val create: Update0 = sql"""
@@ -340,4 +343,5 @@ class PostgresDbDoobie(doobieConfig: Config) extends DbInterface {
   }
 
   def close(): Unit = ()
+*/
 }

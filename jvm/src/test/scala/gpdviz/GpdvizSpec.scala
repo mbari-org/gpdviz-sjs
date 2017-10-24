@@ -17,6 +17,11 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
   var sysid: Option[String] = None
   val strid = "aStrId"
 
+  override def beforeAll(): Unit = {
+    super.beforeAll()
+    DbFactory.createTablesSync(db)
+  }
+
   override def afterAll(): Unit = {
     db.close()
     super.afterAll()
@@ -61,7 +66,7 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
       }
     }
 
-    "update an existing sensor system" ignore {
+    "update an existing sensor system" in {
       val ssUpdate = SSUpdate(center = Some(LatLon(36, -122)), pushEvents = Some(false))
       Put(s"/api/ss/${sysid.get}", ssUpdate) ~> routes ~> check {
         status shouldBe OK

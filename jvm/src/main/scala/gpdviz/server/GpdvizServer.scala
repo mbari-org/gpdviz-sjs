@@ -15,16 +15,24 @@ object GpdvizServer {
     if (args.contains("generate-conf")) {
       generateConf(args)
     }
+    else if (args.contains("create-tables")) {
+      createTables(args)
+    }
+    else if (args.contains("add-some-data")) {
+      addSomeData(args)
+    }
     else if (args.contains("run")) {
       if (!configFile.canRead) {
         System.err.println(s"cannot access $configFile")
       }
-      else new GpdvizServer().run(!args.contains("-d"))
+      else new GpdvizServer().run(keyToStop = !args.contains("-d"))
     }
     else {
       System.err.println(s"""
         |Usage:
         |   gpdviz generate-conf [--overwrite]
+        |   gpdviz create-tables
+        |   gpdviz add-some-data
         |   gpdviz run [-d]
         """.stripMargin)
     }
@@ -45,12 +53,22 @@ object GpdvizServer {
       println(s" Configuration generated: $configFile\n")
     }
   }
+
+  private def createTables(args: Array[String]): Unit = {
+    val db = DbFactory.openDb
+    DbFactory.createTablesSync(db)
+    db.close()
+  }
+
+  private def addSomeData(args: Array[String]): Unit = {
+    val db = DbFactory.openDb
+    DbFactory.addSomeDataSync(db)
+    db.close()
+  }
 }
 
 class GpdvizServer extends GpdvizService {
-  val db: DbInterface = DbFactory.db
-
-  DbFactory.initStuff(db)
+  val db: DbInterface = DbFactory.openDb
 
   implicit val system: ActorSystem = ActorSystem()
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
