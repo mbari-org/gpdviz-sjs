@@ -18,6 +18,8 @@ trait DbInterface {
 
   def getSensorSystem(sysid: String): Future[Option[SensorSystem]]
 
+  def getDataStream(sysid: String, strid: String): Future[Option[DataStream]]
+
   def registerSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystemSummary]]
 
   def updateSensorSystem(sysid: String, ssu: SSUpdate): Future[Either[GnError, SensorSystemSummary]]

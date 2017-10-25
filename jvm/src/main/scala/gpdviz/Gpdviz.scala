@@ -66,12 +66,11 @@ object Gpdviz {
 
   private def importJson(args: Array[String]): Unit = {
     import java.nio.file.Paths
-    import java.util.concurrent.TimeUnit
 
     import gpdviz.model.SensorSystem
 
     import scala.concurrent.Await
-    import scala.concurrent.duration.Duration
+    import scala.concurrent.duration._
     import scala.util.Failure
     import scala.util.control.NonFatal
 
@@ -108,8 +107,8 @@ object Gpdviz {
       systems foreach { ss ⇒
         println(s"Importing ${ss.sysid} ...")
         Await.ready(db.registerSensorSystem(ss) andThen {
-          case Failure(e) ⇒ println("error registering data", e)
-        }, Duration(10, TimeUnit.SECONDS))
+          case Failure(e) ⇒ println(s"error registering ${ss.sysid}", e)
+        }, 10.seconds)
       }
       db.close()
     }

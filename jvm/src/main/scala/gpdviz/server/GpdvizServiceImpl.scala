@@ -36,13 +36,18 @@ trait GpdvizServiceImpl extends JsonImplicits  {
         }
 
       case true ⇒
-        p.success(Conflict -> GnError(409, "Already registered", sysid = Some(ssr.sysid)))
+        p.success(sensorSystemAlreadyDefined(ssr.sysid))
     }
 
     p.future
   }
 
-  def getSensorSystem(sysid: String): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒ Future(ss) }
+  def getSensorSystem(sysid: String): Future[ToResponseMarshallable] = {
+    db.getSensorSystem(sysid) map {
+      case Some(ss) ⇒ ss
+      case None     ⇒ sensorSystemUndefined(sysid)
+    }
+  }
 
   def updateSensorSystem(sysid: String, ssu: SSUpdate): Future[ToResponseMarshallable] = {
     println(s"updateSensorSystem: sysid=$sysid ssu=$ssu")
@@ -106,12 +111,10 @@ trait GpdvizServiceImpl extends JsonImplicits  {
     }
   }
 
-  def getStream(sysid: String, strid: String): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒
-    Future {
-      ss.streams.get(strid) match {
-        case Some(str) ⇒ str
-        case None ⇒ streamUndefined(sysid, strid)
-      }
+  def getStream(sysid: String, strid: String): Future[ToResponseMarshallable] = {
+    db.getDataStream(sysid, strid) map {
+      case Some(ds) ⇒ ds
+      case None     ⇒ streamUndefined(sysid, strid)
     }
   }
 
@@ -125,14 +128,6 @@ trait GpdvizServiceImpl extends JsonImplicits  {
     }
   }
 
-  private def withSensorSystem(sysid: String)(p : SensorSystem ⇒ Future[ToResponseMarshallable]): Future[ToResponseMarshallable] = {
-    println(s"withSensorSystem calling getSensorSystem sysid=$sysid")
-    db.getSensorSystem(sysid) map {
-      case Some(ss) ⇒ p(ss)
-      case None ⇒ NotFound -> GnError(404, "not registered", sysid = Some(sysid))
-    }
-  }
-
   def getSensorSystemIndex(sysid: String): Future[ToResponseMarshallable] = {
     println(s"getSensorSystemIndex calling getSensorSystem sysid=$sysid")
     db.getSensorSystem(sysid) map { ssOpt ⇒
@@ -141,9 +136,15 @@ trait GpdvizServiceImpl extends JsonImplicits  {
     }
   }
 
+  private def sensorSystemUndefined(sysid: String): (StatusCodes.ClientError, GnError) =
+    NotFound -> GnError(404, "sensor system undefined", sysid = Some(sysid))
+
+  private def sensorSystemAlreadyDefined(sysid: String): (StatusCodes.ClientError, GnError) =
+    NotFound -> GnError(409, "sensor system already defined", sysid = Some(sysid))
+
   private def streamUndefined(sysid: String, strid: String): (StatusCodes.ClientError, GnError) =
     NotFound -> GnError(404, "stream undefined", sysid = Some(sysid), strid = Some(strid))
 
-  def streamAlreadyDefined(sysid: String, strid: String): (StatusCodes.ClientError, GnError) =
+  private def streamAlreadyDefined(sysid: String, strid: String): (StatusCodes.ClientError, GnError) =
     Conflict -> GnError(409, "stream already defined", sysid = Some(sysid), strid = Some(strid))
 }
