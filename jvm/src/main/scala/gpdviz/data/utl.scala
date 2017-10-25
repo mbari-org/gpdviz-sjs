@@ -12,7 +12,7 @@ object utl extends GeoJsonProtocol {
   def toJsonString(x: Feature): String = x.toJson.prettyPrint
   def toJsonString(x: Geometry): String = x.toJson.prettyPrint
 
-  def toJsObject(x: String): JsObject = x.toJson.asJsObject
+  def toJsObject(x: String): JsObject = x.parseJson.asJsObject
   def toFeature(x: String): Feature = FeatureJsonFormat.read(x.parseJson)
   def toGeometry(x: String): Geometry = RichGeometryJsonFormat.read(x.parseJson)
 
