@@ -252,7 +252,7 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
   }
 
   def getDataStream(sysid: String, strid: String): Future[Option[DataStream]] = {
-    db.run(dataStreamAddAction(sysid, strid))
+    db.run(dataStreamAction(sysid, strid))
   }
 
   def deleteSensorSystem(sysid: String): Future[Either[GnError, SensorSystemSummary]] = {
@@ -354,12 +354,23 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     dataStreamQuery(sysid, strid).result.headOption
   }
 
-  private def dataStreamAction(sysid: String, strid: String, variables: Seq[VariableDef] = Seq.empty
+  private def dataStreamAction(sysid: String, strid: String,
+                               variables: Seq[VariableDef] = Seq.empty,
+                               observations: Map[String, List[ObsData]] = Map.empty
                               ): DBIOAction[Option[DataStream], NoStream, Effect.Read] = {
     dataStreamPgAction(sysid, strid) map {
       case None      ⇒ None
-      case Some(pds) ⇒ Some(dataStream2model(pds, Some(variables.toList)))
+      case Some(pds) ⇒ Some(dataStream2model(pds, Some(variables.toList), Some(observations)))
     }
+  }
+
+  private def dataStreamAction(sysid: String, strid: String
+                              ): DBIOAction[Option[DataStream], NoStream, Effect.Read] = {
+    for {
+      variables    ← variableDefsAction(sysid, strid)
+      observations ← observationAction(sysid, strid)
+      ss           ← dataStreamAction(sysid, strid, variables, observations)
+    } yield ss
   }
 
   private def dataStreamsQuery(sysid: String): Query[DataStreamTable, PgSDataStream, Seq] = {
@@ -376,16 +387,9 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     } yield pdss.map(dataStream2model(_))
   }
 
-  private def dataStreamAddAction(sysid: String, strid: String
-                                 ): DBIOAction[Option[DataStream], NoStream, Effect.Read] = {
-    for {
-      variables ← variableDefsAction(sysid, strid)
-      ss        ← dataStreamAction(sysid, strid, variables)
-    } yield ss
-  }
-
   private def dataStream2model(pds: PgSDataStream,
-                               variables: Option[List[VariableDef]] = None
+                               variables: Option[List[VariableDef]] = None,
+                               observations: Option[Map[String, List[ObsData]]] = None
                               ): DataStream = {
     DataStream(
       strid = pds.strid,
@@ -394,7 +398,8 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
       mapStyle = pds.mapStyle.map(utl.toJsObject),
       zOrder = pds.zOrder,
       variables = variables,
-      chartStyle = pds.chartStyle.map(utl.toJsObject)
+      chartStyle = pds.chartStyle.map(utl.toJsObject),
+      observations = observations
     )
   }
 
@@ -451,4 +456,36 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     )
   }
 
+  private def observationQuery(sysid: String, strid: String): Query[ObservationTable, PgSObservation, Seq] = {
+    observation.filter(vd ⇒ vd.sysid === sysid && vd.strid === strid)
+  }
+
+  private def observationPgAction(sysid: String, strid: String
+                                 ): SqlAction[Seq[PgSObservation], NoStream, Effect.Read] = {
+    observationQuery(sysid, strid).result
+  }
+
+  private def observationAction(sysid: String, strid: String
+                                ): DBIOAction[Map[String, List[ObsData]], NoStream, Effect.Read] = {
+    for {
+      obss ← observationPgAction(sysid, strid)
+    } yield observation2model(obss.toList)
+  }
+
+  private def observation2model(seq: Seq[PgSObservation]): Map[String, List[ObsData]] = {
+    val byTime = seq.groupBy(_.time)
+    byTime.mapValues { obss ⇒
+      (obss map { obs ⇒
+        ObsData(
+          feature = obs.feature.map(utl.toFeature),
+          geometry = obs.geometry.map(utl.toGeometry),
+          scalarData = if (obs.vars.nonEmpty)
+            Some(ScalarData(
+              obs.vars, obs.vals, position = obs.lat.map(lt ⇒ LatLon(lt, obs.lon.get))
+            ))
+          else None
+        )
+      }).toList
+    }
+  }
 }
