@@ -368,8 +368,17 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
                               ): DBIOAction[Option[DataStream], NoStream, Effect.Read] = {
     for {
       variables    ← variableDefsAction(sysid, strid)
-      observations ← observationAction(sysid, strid)
+      observations ← observationsAction(sysid, strid)
       ss           ← dataStreamAction(sysid, strid, variables, observations)
+    } yield ss
+  }
+
+  private def dataStreamAction(sysid: String, pds: PgSDataStream
+                              ): DBIOAction[DataStream, NoStream, Effect.Read] = {
+    for {
+      variables    ← variableDefsAction(sysid, pds.strid)
+      observations ← observationsAction(sysid, pds.strid)
+      ss = dataStream2model(pds, Some(variables.toList), Some(observations))
     } yield ss
   }
 
@@ -382,9 +391,9 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
   }
 
   private def dataStreamsAction(sysid: String): DBIOAction[Seq[DataStream], NoStream, Effect.Read] = {
-    for {
-      pdss ← dataStreamsPgAction(sysid)
-    } yield pdss.map(dataStream2model(_))
+    dataStreamsPgAction(sysid).flatMap[Seq[DataStream], NoStream, Effect.Read](
+      pdss ⇒ DBIO.sequence(pdss.map(dataStreamAction(sysid, _)))
+    )
   }
 
   private def dataStream2model(pds: PgSDataStream,
@@ -465,7 +474,7 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     observationQuery(sysid, strid).result
   }
 
-  private def observationAction(sysid: String, strid: String
+  private def observationsAction(sysid: String, strid: String
                                 ): DBIOAction[Map[String, List[ObsData]], NoStream, Effect.Read] = {
     for {
       obss ← observationPgAction(sysid, strid)

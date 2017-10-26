@@ -1,7 +1,8 @@
 # Gpdviz
 
-2017-10-24
+2017-10-25
 
+- complete retrieval of full sensor system
 - add option to import existing models in json files
 
 2017-10-23
