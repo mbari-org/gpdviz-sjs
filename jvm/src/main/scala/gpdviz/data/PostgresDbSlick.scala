@@ -61,11 +61,7 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
   // path: ``empty string for the top level of the Config object''
   private val db = Database.forConfig(path = "", slickConfig)
 
-  class SensorSystemTable(tag: Tag) extends Table[
-    PgSSensorSystem
-    //(String, Option[String], Option[String], Option[Boolean], Option[Double], Option[Double], Option[Int], Option[String])
-    ](tag, "sensorsystem") {
-
+  class SensorSystemTable(tag: Tag) extends Table[PgSSensorSystem](tag, "sensorsystem") {
     def sysid         = column[String]("sysid", O.PrimaryKey)
     def name          = column[Option[String]]("name")
     def description   = column[Option[String]]("description")
@@ -78,13 +74,9 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     def * = (sysid, name, description, pushEvents, centerLat, centerLon, zoom, clickListener
             ) <> (PgSSensorSystem.tupled, PgSSensorSystem.unapply)
   }
-  val sensorsystem = TableQuery[SensorSystemTable]
+  private val sensorsystem = TableQuery[SensorSystemTable]
 
-  class DataStreamTable(tag: Tag) extends Table[
-    PgSDataStream
-    //(String, String, String, String, String, Int, String)
-    ](tag, "datastream") {
-
+  class DataStreamTable(tag: Tag) extends Table[PgSDataStream](tag, "datastream") {
     def sysid         = column[String]("sysid")
     def strid         = column[String]("strid")
     def name          = column[Option[String]]("name")
@@ -99,13 +91,9 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     def pk_ds = primaryKey("pk_ds", (sysid, strid))
     def fk_ds_ss = foreignKey("fk_ds_ss", sysid, sensorsystem)(_.sysid)
   }
-  val datastream = TableQuery[DataStreamTable]
+  private val datastream = TableQuery[DataStreamTable]
 
-  class VariableDefTable(tag: Tag) extends Table[
-    PgSVariableDef
-    //(String, String, String, String, String)
-    ](tag, "variabledef") {
-
+  class VariableDefTable(tag: Tag) extends Table[PgSVariableDef](tag, "variabledef") {
     def sysid         = column[String]("sysid")
     def strid         = column[String]("strid")
     def name          = column[String]("name")
@@ -118,13 +106,9 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     def pk_vd = primaryKey("pk_vd", (sysid, strid, name))
     def fk_vd_ds = foreignKey("fk_vd_ds", (sysid, strid), datastream)(x ⇒ (x.sysid, x.strid))
   }
-  val variabledef = TableQuery[VariableDefTable]
+  private val variabledef = TableQuery[VariableDefTable]
 
-  class ObservationTable(tag: Tag) extends Table[
-    PgSObservation
-    //(String, String, String, String, String, List[String], List[Double], Double, Double)
-    ](tag, "observation") {
-
+  class ObservationTable(tag: Tag) extends Table[PgSObservation](tag, "observation") {
     def sysid         = column[String]("sysid")
     def strid         = column[String]("strid")
     def time          = column[String]("time")
@@ -140,7 +124,7 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
 
     def fk_obs_ds = foreignKey("fk_obs_ds", (sysid, strid), datastream)(x ⇒ (x.sysid, x.strid))
   }
-  val observation = TableQuery[ObservationTable]
+  private val observation = TableQuery[ObservationTable]
 
   private val schema = sensorsystem.schema ++ datastream.schema ++ variabledef.schema ++ observation.schema
 
