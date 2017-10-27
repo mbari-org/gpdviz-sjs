@@ -72,7 +72,7 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     def clickListener = column[Option[String]]("clickListener")
 
     def * = (sysid, name, description, pushEvents, centerLat, centerLon, zoom, clickListener
-            ) <> (PgSSensorSystem.tupled, PgSSensorSystem.unapply)
+            ).mapTo[PgSSensorSystem]
   }
   private val sensorsystem = TableQuery[SensorSystemTable]
 
@@ -86,7 +86,7 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     def chartStyle    = column[Option[String]]("chartStyle")
 
     def * = (sysid, strid, name, description, mapStyle, zOrder, chartStyle
-            ) <> (PgSDataStream.tupled, PgSDataStream.unapply)
+            ).mapTo[PgSDataStream]
 
     def pk_ds = primaryKey("pk_ds", (sysid, strid))
     def fk_ds_ss = foreignKey("fk_ds_ss", sysid, sensorsystem)(_.sysid)
@@ -101,7 +101,7 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     def chartStyle    = column[Option[String]]("chartStyle")
 
     def * = (sysid, strid, name, units, chartStyle
-            ) <> (PgSVariableDef.tupled, PgSVariableDef.unapply)
+            ).mapTo[PgSVariableDef]
 
     def pk_vd = primaryKey("pk_vd", (sysid, strid, name))
     def fk_vd_ds = foreignKey("fk_vd_ds", (sysid, strid), datastream)(x ⇒ (x.sysid, x.strid))
@@ -120,13 +120,24 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     def lon           = column[Option[Double]]("lon")
 
     def * = (sysid, strid, time, feature, geometry, vars, vals, lat, lon
-            ) <> (PgSObservation.tupled, PgSObservation.unapply)
+            ).mapTo[PgSObservation]
 
     def fk_obs_ds = foreignKey("fk_obs_ds", (sysid, strid), datastream)(x ⇒ (x.sysid, x.strid))
   }
   private val observation = TableQuery[ObservationTable]
 
   private val schema = sensorsystem.schema ++ datastream.schema ++ variabledef.schema ++ observation.schema
+
+  def dropTables(): Future[Int] = {
+    val action = sqlu"""
+      SET CONSTRAINTS ALL DEFERRED;
+      DROP TABLE IF EXISTS #${observation.baseTableRow.tableName};
+      DROP TABLE IF EXISTS #${variabledef.baseTableRow.tableName};
+      DROP TABLE IF EXISTS #${datastream.baseTableRow.tableName};
+      DROP TABLE IF EXISTS #${sensorsystem.baseTableRow.tableName};
+      """
+    db.run(action.transactionally)
+  }
 
   def createTables(): Future[Unit] = {
     db.run(schema.create)

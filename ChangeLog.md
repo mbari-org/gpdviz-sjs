@@ -1,5 +1,9 @@
 # Gpdviz
 
+2017-10-27
+
+- add drop-tables, especially to avoid error noise during local testing
+
 2017-10-25
 
 - complete retrieval of full sensor system

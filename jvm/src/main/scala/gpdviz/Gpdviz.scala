@@ -29,7 +29,7 @@ object Gpdviz {
         s"""
            |Usage:
            |   gpdviz generate-conf [--overwrite]
-           |   gpdviz create-tables
+           |   gpdviz create-tables [--drop-first]
            |   gpdviz add-some-data
            |   gpdviz run-server [-d]
         """.stripMargin)
@@ -54,7 +54,7 @@ object Gpdviz {
 
   private def createTables(args: Array[String]): Unit = {
     val db = DbFactory.openDb
-    DbFactory.createTablesSync(db)
+    DbFactory.createTablesSync(db, dropFirst = args.contains("--drop-first"))
     db.close()
   }
 

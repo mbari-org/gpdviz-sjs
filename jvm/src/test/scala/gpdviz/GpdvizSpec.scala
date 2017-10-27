@@ -19,7 +19,7 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
 
   override def beforeAll(): Unit = {
     super.beforeAll()
-    DbFactory.createTablesSync(db)
+    DbFactory.createTablesSync(db, dropFirst = true)
   }
 
   override def afterAll(): Unit = {

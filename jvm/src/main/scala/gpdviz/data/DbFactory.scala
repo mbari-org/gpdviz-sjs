@@ -8,7 +8,7 @@ import gpdviz.config
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration._
 import scala.util.Failure
 
 object DbFactory extends Logging {
@@ -35,11 +35,15 @@ object DbFactory extends Logging {
     new PostgresDbSlick(config)
   }
 
-  def createTablesSync(db: DbInterface): Unit = {
-    logger.info("Creating tables")
-    Await.ready(db.createTables() andThen {
-      case Failure(e) ⇒ logger.error("error creating tables", e)
-    }, Duration(30, TimeUnit.SECONDS))
+  def createTablesSync(db: DbInterface, dropFirst: Boolean = false): Unit = {
+    val (msg, fut) = if (dropFirst)
+      ("dropping and creating tables", db.dropTables() flatMap {_ ⇒ db.createTables()})
+    else
+      ("creating tables", db.createTables())
+    logger.info(msg)
+    Await.ready(fut andThen {
+      case Failure(e) ⇒ logger.error(s"error while $msg", e)
+    }, 30.seconds)
   }
 
   def addSomeDataSync(db: DbInterface): Unit = {
