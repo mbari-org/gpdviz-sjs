@@ -188,7 +188,9 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
       Right(SensorSystemSummary(
         ss.sysid,
         name = ss.name,
-        description = ss.description
+        description = ss.description,
+        pushEvents = Some(ss.pushEvents),
+        center = ss.center
       ))
     }
   }

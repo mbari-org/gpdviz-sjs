@@ -55,8 +55,8 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
         ss.sysid shouldBe sysid.get
         ss.name shouldBe Some("test ss")
         ss.description shouldBe Some("test description")
-        //ss.center shouldBe Some(LatLon(36.8, -122.04))
-        //ss.pushEvents shouldBe true
+        ss.center shouldBe Some(LatLon(36.8, -122.04))
+        ss.pushEvents shouldBe Some(true)
       }
     }
 
@@ -74,7 +74,7 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
         val ss = responseAs[SensorSystemSummary]
         ss.sysid shouldBe sysid.get
         //ss.center shouldBe Some(LatLon(36, -122))
-        //ss.pushEvents shouldBe false
+        //ss.pushEvents shouldBe Some(false)
       }
     }
 

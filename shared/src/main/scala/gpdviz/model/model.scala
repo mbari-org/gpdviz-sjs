@@ -3,6 +3,8 @@ package gpdviz.model
 case class SensorSystemSummary(sysid:        String,
                                name:         Option[String] = None,
                                description:  Option[String] = None,
+                               pushEvents:   Option[Boolean] = None,
+                               center:       Option[LatLon] = None,
                                streamIds:    Set[String] = Set.empty
                               )
 
