@@ -16,6 +16,7 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
 
   var sysid: Option[String] = None
   val strid = "aStrId"
+  val strid2 = "bStrId"
 
   override def beforeAll(): Unit = {
     super.beforeAll()
@@ -92,7 +93,7 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
       }
     }
 
-    "add a stream" in {
+    "add streams" in {
       val variables = Some(List(VariableDef("temperature")))
       val streamRegister = StreamRegister(strid = strid, variables = variables)
       Post(s"/api/ss/${sysid.get}", streamRegister) ~> routes ~> check {
@@ -103,6 +104,17 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
         ds.strid === strid
         //ds.variables === variables
       }
+
+      val variables2 = Some(List(VariableDef("fooVar")))
+      val streamRegister2 = StreamRegister(strid = strid2, variables = variables2)
+      Post(s"/api/ss/${sysid.get}", streamRegister2) ~> routes ~> check {
+        status shouldBe OK
+        contentType shouldBe `application/json`
+        val ds = responseAs[DataStreamSummary]
+        ds.sysid === sysid.get
+        ds.strid === strid2
+        //ds.variables === variables
+      }
     }
 
     "fail to add an existing a stream" in {
@@ -111,6 +123,23 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
         //println(s"::::: status=$status: " + pp(response))
         status shouldBe Conflict
         //TODO contentType shouldBe `application/json`
+      }
+    }
+
+    "delete stream" in {
+      Delete(s"/api/ss/${sysid.get}/$strid2") ~> routes ~> check {
+        status shouldBe OK
+        contentType shouldBe `application/json`
+        val ss = responseAs[DataStreamSummary]
+        ss.sysid shouldBe sysid.get
+        ss.strid shouldBe strid2
+      }
+    }
+
+    "fail to delete non-existent stream" in {
+      Delete(s"/api/ss/${sysid.get}/NoStr") ~> routes ~> check {
+        status shouldBe NotFound
+        // TODO contentType shouldBe `application/json`
       }
     }
 
@@ -155,6 +184,13 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
         contentType shouldBe `application/json`
         val ss = responseAs[SensorSystemSummary]
         ss.sysid shouldBe sysid.get
+      }
+    }
+
+    "fail to delete non-existent sensor system" in {
+      Delete(s"/api/ss/NoSs") ~> routes ~> check {
+        status shouldBe NotFound
+        //TODO contentType shouldBe `application/json`
       }
     }
 

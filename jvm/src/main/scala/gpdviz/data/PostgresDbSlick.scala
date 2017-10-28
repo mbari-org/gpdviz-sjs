@@ -255,27 +255,35 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     db.run(dataStreamAction(sysid, strid))
 
   def deleteSensorSystem(sysid: String): Future[Either[GnError, SensorSystemSummary]] = {
-    val ss = sensorsystem.filter(_.sysid === sysid)
-    val dss = datastream.filter(_.sysid === sysid)
-    val vds = variabledef.filter(_.sysid === sysid)
-    val obs = observation.filter(_.sysid === sysid)
+    val action = existsSensorSystemAction(sysid) flatMap {
+      case false ⇒ DBIO.successful(GnErrorF.sensorSystemUndefined(sysid))
+      case true  ⇒
+        val ss = sensorsystem.filter(_.sysid === sysid)
+        val dss = datastream.filter(_.sysid === sysid)
+        val vds = variabledef.filter(_.sysid === sysid)
+        val obs = observation.filter(_.sysid === sysid)
+        obs.delete andThen vds.delete andThen dss.delete andThen ss.delete
+    }
 
-    val action = obs.delete andThen vds.delete andThen dss.delete andThen ss.delete
-
-    db.run(action.transactionally) map { _ ⇒
-      Right(SensorSystemSummary(sysid))
+    db.run(action.transactionally) map {
+      case e: GnError ⇒ Left(e)
+      case _          ⇒ Right(SensorSystemSummary(sysid))
     }
   }
 
   def deleteDataStream(sysid: String, strid: String): Future[Either[GnError, DataStreamSummary]] = {
-    val dss = datastream.filter(_.sysid === sysid)
-    val vds = variabledef.filter(_.sysid === sysid)
-    val obs = observation.filter(_.sysid === sysid)
+    val action = existsDataStreamAction(sysid, strid) flatMap {
+      case false ⇒ DBIO.successful(GnErrorF.dataStreamUndefined(sysid, strid))
+      case true  ⇒
+        val dss = datastream.filter( r ⇒ r.sysid === sysid && r.strid === strid)
+        val vds = variabledef.filter(r ⇒ r.sysid === sysid && r.strid === strid)
+        val obs = observation.filter(r ⇒ r.sysid === sysid && r.strid === strid)
+        obs.delete andThen vds.delete andThen dss.delete
+    }
 
-    val action = obs.delete andThen vds.delete andThen dss.delete
-
-    db.run(action.transactionally) map { _ ⇒
-      Right(DataStreamSummary(sysid, strid))
+    db.run(action.transactionally) map {
+      case e: GnError ⇒ Left(e)
+      case _          ⇒ Right(DataStreamSummary(sysid, strid))
     }
   }
 

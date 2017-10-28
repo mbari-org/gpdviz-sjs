@@ -123,12 +123,17 @@ trait GpdvizServiceImpl extends JsonImplicits  {
   }
 
   def deleteStream(sysid: String, strid: String): Future[ToResponseMarshallable] = {
-    println(s"deleteStream: sysid=$sysid strid=$strid")
+    //import fansi.Color._
+    //println(Red(s"deleteStream: sysid=$sysid strid=$strid"))
     db.deleteDataStream(sysid, strid) map {
       case Right(dsSum) ⇒
         notifier.notifyStreamRemoved(sysid, strid)
         dsSum
-      case Left(error) ⇒ InternalServerError -> error
+      case Left(error) ⇒
+        if (error.code < 500)
+          StatusCodes.custom(error.code, error.msg)
+        else
+          InternalServerError -> error
     }
   }
 
