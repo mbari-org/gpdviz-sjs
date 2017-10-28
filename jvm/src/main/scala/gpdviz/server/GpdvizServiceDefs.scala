@@ -12,8 +12,24 @@ import scala.annotation.meta.field
 case class GnError(code: Int,
                    msg: String,
                    sysid: Option[String] = None,
-                   strid: Option[String] = None
+                   strid: Option[String] = None,
+                   varName: Option[String] = None
                    )
+
+object GnErrorF {
+
+  def sensorSystemDefined(sysid: String): GnError =
+    GnError(409, "sensor system already defined", sysid = Some(sysid))
+
+  def sensorSystemUndefined(sysid: String): GnError =
+    GnError(404, "sensor system undefined", sysid = Some(sysid))
+
+  def dataStreamDefined(sysid: String, strid: String): GnError =
+    GnError(409, "data stream already defined", sysid = Some(sysid), strid = Some(strid))
+
+  def dataStreamUndefined(sysid: String, strid: String): GnError =
+    GnError(404, "data stream undefined", sysid = Some(sysid), strid = Some(strid))
+}
 
 case class SSRegister(sysid: String,
                       name: Option[String] = None,
@@ -60,5 +76,5 @@ trait JsonImplicits extends DefaultJsonProtocol with SprayJsonSupport with GeoJs
   implicit val obssRegFormat = jsonFormat1(ObservationsRegister)
   implicit val systemFormat  = jsonFormat8(SensorSystem)
 
-  implicit val dbErrorFormat = jsonFormat4(GnError)
+  implicit val dbErrorFormat = jsonFormat5(GnError)
 }

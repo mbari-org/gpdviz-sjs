@@ -36,7 +36,7 @@ trait GpdvizServiceImpl extends JsonImplicits  {
         }
 
       case true ⇒
-        p.success(sensorSystemAlreadyDefined(ssr.sysid))
+        p.success(Conflict -> GnErrorF.sensorSystemDefined(ssr.sysid))
     }
 
     p.future
@@ -45,7 +45,7 @@ trait GpdvizServiceImpl extends JsonImplicits  {
   def getSensorSystem(sysid: String): Future[ToResponseMarshallable] = {
     db.getSensorSystem(sysid) map {
       case Some(ss) ⇒ ss
-      case None     ⇒ sensorSystemUndefined(sysid)
+      case None     ⇒ NotFound -> GnErrorF.sensorSystemUndefined(sysid)
     }
   }
 
@@ -92,7 +92,11 @@ trait GpdvizServiceImpl extends JsonImplicits  {
       case Right(dsSum) ⇒
         notifier.notifyStreamAdded(sysid, ds)
         dsSum
-      case Left(error) ⇒ InternalServerError -> error
+      case Left(error) ⇒
+        if (error.code < 500)
+          StatusCodes.custom(error.code, error.msg)
+        else
+          InternalServerError -> error
     }
   }
 
@@ -114,7 +118,7 @@ trait GpdvizServiceImpl extends JsonImplicits  {
   def getStream(sysid: String, strid: String): Future[ToResponseMarshallable] = {
     db.getDataStream(sysid, strid) map {
       case Some(ds) ⇒ ds
-      case None     ⇒ streamUndefined(sysid, strid)
+      case None     ⇒ NotFound -> GnErrorF.dataStreamUndefined(sysid, strid)
     }
   }
 
@@ -135,16 +139,4 @@ trait GpdvizServiceImpl extends JsonImplicits  {
       HttpEntity(ContentType(MediaTypes.`text/html`, HttpCharsets.`UTF-8`), ssIndex.getBytes("UTF-8"))
     }
   }
-
-  private def sensorSystemUndefined(sysid: String): (StatusCodes.ClientError, GnError) =
-    NotFound -> GnError(404, "sensor system undefined", sysid = Some(sysid))
-
-  private def sensorSystemAlreadyDefined(sysid: String): (StatusCodes.ClientError, GnError) =
-    NotFound -> GnError(409, "sensor system already defined", sysid = Some(sysid))
-
-  private def streamUndefined(sysid: String, strid: String): (StatusCodes.ClientError, GnError) =
-    NotFound -> GnError(404, "stream undefined", sysid = Some(sysid), strid = Some(strid))
-
-  private def streamAlreadyDefined(sysid: String, strid: String): (StatusCodes.ClientError, GnError) =
-    Conflict -> GnError(409, "stream already defined", sysid = Some(sysid), strid = Some(strid))
 }

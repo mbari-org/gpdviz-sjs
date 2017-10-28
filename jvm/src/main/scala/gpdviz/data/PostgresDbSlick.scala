@@ -4,7 +4,7 @@ import com.typesafe.config.Config
 import com.typesafe.scalalogging.{StrictLogging ⇒ Logging}
 import gpdviz.data.MyPostgresProfile.api._
 import gpdviz.model._
-import gpdviz.server.{GnError, ObservationsRegister, SSUpdate}
+import gpdviz.server.{GnError, GnErrorF, ObservationsRegister, SSUpdate}
 import slick.sql.SqlAction
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -139,9 +139,8 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     db.run(action.transactionally)
   }
 
-  def createTables(): Future[Unit] = {
+  def createTables(): Future[Unit] =
     db.run(schema.create)
-  }
 
   def listSensorSystems(): Future[Seq[SensorSystemSummary]] = {
     val q = for {
@@ -163,9 +162,8 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     }).toSeq)
   }
 
-  def existsSensorSystem(sysid: String): Future[Boolean] = {
-    db.run(sensorsystem.filter(_.sysid === sysid).exists.result)
-  }
+  def existsSensorSystem(sysid: String): Future[Boolean] =
+    db.run(existsSensorSystemAction(sysid))
 
   def registerSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystemSummary]] = {
     val ssAction =
@@ -211,8 +209,14 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
   def registerDataStream(sysid: String)
                         (ds: DataStream): Future[Either[GnError, DataStreamSummary]] = {
 
-    db.run(dataStreamAddAction(sysid, ds).transactionally) map { _ ⇒
-      Right(DataStreamSummary(sysid, ds.strid))
+    val action = existsDataStreamAction(sysid, ds.strid) flatMap {
+      case true  ⇒ DBIO.successful(GnErrorF.dataStreamDefined(sysid, ds.strid))
+      case false ⇒ dataStreamAddAction(sysid, ds)
+    }
+
+    db.run(action.transactionally) map {
+      case e: GnError ⇒ Left(e)
+      case _          ⇒ Right(DataStreamSummary(sysid, ds.strid))
     }
   }
 
@@ -244,13 +248,11 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     }
   }
 
-  def getSensorSystem(sysid: String): Future[Option[SensorSystem]] = {
+  def getSensorSystem(sysid: String): Future[Option[SensorSystem]] =
     db.run(sensorSystemAction(sysid))
-  }
 
-  def getDataStream(sysid: String, strid: String): Future[Option[DataStream]] = {
+  def getDataStream(sysid: String, strid: String): Future[Option[DataStream]] =
     db.run(dataStreamAction(sysid, strid))
-  }
 
   def deleteSensorSystem(sysid: String): Future[Either[GnError, SensorSystemSummary]] = {
     val ss = sensorsystem.filter(_.sysid === sysid)
@@ -281,13 +283,14 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
 
   ///////////////////////////////////////////////////////////////////////////
 
-  private def sensorSystemQuery(sysid: String): Query[SensorSystemTable, PgSSensorSystem, Seq] = {
-    sensorsystem.filter(_.sysid === sysid)
-  }
+  private def existsSensorSystemAction(sysid: String): SqlAction[Boolean, NoStream, Effect.Read] =
+    sensorsystem.filter(_.sysid === sysid).exists.result
 
-  private def sensorSystemPgAction(sysid: String): SqlAction[Option[PgSSensorSystem], NoStream, Effect.Read] = {
+  private def sensorSystemQuery(sysid: String): Query[SensorSystemTable, PgSSensorSystem, Seq] =
+    sensorsystem.filter(_.sysid === sysid)
+
+  private def sensorSystemPgAction(sysid: String): SqlAction[Option[PgSSensorSystem], NoStream, Effect.Read] =
     sensorSystemQuery(sysid).result.headOption
-  }
 
   private def sensorSystemAction(sysid: String, streams: Seq[DataStream] = Seq.empty
                                 ): DBIOAction[Option[SensorSystem], NoStream, Effect.Read] = {
@@ -320,6 +323,9 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
 
   ////////////
 
+  private def existsDataStreamAction(sysid: String, strid: String): SqlAction[Boolean, NoStream, Effect.Read] =
+    datastream.filter(ds ⇒ ds.sysid === sysid && ds.strid === strid).exists.result
+
   private def dataStreamAddAction(sysid: String, ds: DataStream) = {
     val dsAction = datastream += PgSDataStream(
       sysid,
@@ -337,66 +343,57 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
       obss map (observationAddAction(sysid, ds.strid, time, _))
     }
 
-    val actions = List(dsAction) ++ vdActions ++ obsActions
-    DBIO.seq(actions: _*)
+    dsAction andThen DBIO.seq(vdActions ++ obsActions: _*)
   }
 
   private def dataStreamQuery(sysid: String, strid: String
-                             ): Query[DataStreamTable, PgSDataStream, Seq] = {
+                             ): Query[DataStreamTable, PgSDataStream, Seq] =
     datastream.filter(ds ⇒ ds.sysid === sysid && ds.strid === strid)
-  }
 
   private def dataStreamPgAction(sysid: String, strid: String
-                                ): SqlAction[Option[PgSDataStream], NoStream, Effect.Read] = {
+                                ): SqlAction[Option[PgSDataStream], NoStream, Effect.Read] =
     dataStreamQuery(sysid, strid).result.headOption
-  }
 
   private def dataStreamAction(sysid: String, strid: String,
                                variables: Seq[VariableDef] = Seq.empty,
                                observations: Map[String, List[ObsData]] = Map.empty
-                              ): DBIOAction[Option[DataStream], NoStream, Effect.Read] = {
+                              ): DBIOAction[Option[DataStream], NoStream, Effect.Read] =
     dataStreamPgAction(sysid, strid) map {
       case None      ⇒ None
       case Some(pds) ⇒ Some(dataStream2model(pds, Some(variables.toList), Some(observations)))
     }
-  }
 
   private def dataStreamAction(sysid: String, strid: String
-                              ): DBIOAction[Option[DataStream], NoStream, Effect.Read] = {
+                              ): DBIOAction[Option[DataStream], NoStream, Effect.Read] =
     for {
       variables    ← variableDefsAction(sysid, strid)
       observations ← observationsAction(sysid, strid)
       ss           ← dataStreamAction(sysid, strid, variables, observations)
     } yield ss
-  }
 
   private def dataStreamAction(sysid: String, pds: PgSDataStream
-                              ): DBIOAction[DataStream, NoStream, Effect.Read] = {
+                              ): DBIOAction[DataStream, NoStream, Effect.Read] =
     for {
       variables    ← variableDefsAction(sysid, pds.strid)
       observations ← observationsAction(sysid, pds.strid)
       ss = dataStream2model(pds, Some(variables.toList), Some(observations))
     } yield ss
-  }
 
-  private def dataStreamsQuery(sysid: String): Query[DataStreamTable, PgSDataStream, Seq] = {
+  private def dataStreamsQuery(sysid: String): Query[DataStreamTable, PgSDataStream, Seq] =
     datastream.filter(_.sysid === sysid)
-  }
 
-  private def dataStreamsPgAction(sysid: String): SqlAction[Seq[PgSDataStream], NoStream, Effect.Read] = {
+  private def dataStreamsPgAction(sysid: String): SqlAction[Seq[PgSDataStream], NoStream, Effect.Read] =
     dataStreamsQuery(sysid).result
-  }
 
-  private def dataStreamsAction(sysid: String): DBIOAction[Seq[DataStream], NoStream, Effect.Read] = {
+  private def dataStreamsAction(sysid: String): DBIOAction[Seq[DataStream], NoStream, Effect.Read] =
     dataStreamsPgAction(sysid).flatMap[Seq[DataStream], NoStream, Effect.Read](
       pdss ⇒ DBIO.sequence(pdss.map(dataStreamAction(sysid, _)))
     )
-  }
 
   private def dataStream2model(pds: PgSDataStream,
                                variables: Option[List[VariableDef]] = None,
                                observations: Option[Map[String, List[ObsData]]] = None
-                              ): DataStream = {
+                              ): DataStream =
     DataStream(
       strid = pds.strid,
       name = pds.name,
@@ -407,11 +404,10 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
       chartStyle = pds.chartStyle.map(utl.toJsObject),
       observations = observations
     )
-  }
 
   //////////////
 
-  private def variableDefAddAction(sysid: String, strid: String, vd: VariableDef) = {
+  private def variableDefAddAction(sysid: String, strid: String, vd: VariableDef) =
     variabledef += PgSVariableDef(
       sysid,
       strid,
@@ -419,36 +415,31 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
       units = vd.units,
       chartStyle = vd.chartStyle.map(utl.toJsonString)
     )
-  }
 
-  private def variableDefsQuery(sysid: String, strid: String): Query[VariableDefTable, PgSVariableDef, Seq] = {
+  private def variableDefsQuery(sysid: String, strid: String): Query[VariableDefTable, PgSVariableDef, Seq] =
     variabledef.filter(vd ⇒ vd.sysid === sysid && vd.strid === strid)
-  }
 
   private def variableDefsPgAction(sysid: String, strid: String
-                                  ): SqlAction[Seq[PgSVariableDef], NoStream, Effect.Read] = {
+                                  ): SqlAction[Seq[PgSVariableDef], NoStream, Effect.Read] =
     variableDefsQuery(sysid, strid).result
-  }
 
   private def variableDefsAction(sysid: String, strid: String
-                                ): DBIOAction[Seq[VariableDef], NoStream, Effect.Read] = {
+                                ): DBIOAction[Seq[VariableDef], NoStream, Effect.Read] =
     for {
       pdss ← variableDefsPgAction(sysid, strid)
     } yield pdss.map(variableDef2model)
-  }
 
-  private def variableDef2model(pvd: PgSVariableDef): VariableDef = {
+  private def variableDef2model(pvd: PgSVariableDef): VariableDef =
     VariableDef(
       name = pvd.name,
       units = pvd.units,
       chartStyle = pvd.chartStyle.map(utl.toJsObject)
     )
-  }
 
   //////////////
 
   private def observationAddAction(sysid: String, strid: String, time: String,
-                                   obsData: ObsData) = {
+                                   obsData: ObsData) =
     observation += PgSObservation(
       sysid,
       strid,
@@ -460,23 +451,19 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
       lat = obsData.scalarData.flatMap(_.position.map(_.lat)),
       lon = obsData.scalarData.flatMap(_.position.map(_.lon)),
     )
-  }
 
-  private def observationQuery(sysid: String, strid: String): Query[ObservationTable, PgSObservation, Seq] = {
+  private def observationQuery(sysid: String, strid: String): Query[ObservationTable, PgSObservation, Seq] =
     observation.filter(vd ⇒ vd.sysid === sysid && vd.strid === strid)
-  }
 
   private def observationPgAction(sysid: String, strid: String
-                                 ): SqlAction[Seq[PgSObservation], NoStream, Effect.Read] = {
+                                 ): SqlAction[Seq[PgSObservation], NoStream, Effect.Read] =
     observationQuery(sysid, strid).result
-  }
 
   private def observationsAction(sysid: String, strid: String
-                                ): DBIOAction[Map[String, List[ObsData]], NoStream, Effect.Read] = {
+                                ): DBIOAction[Map[String, List[ObsData]], NoStream, Effect.Read] =
     for {
       obss ← observationPgAction(sysid, strid)
     } yield observation2model(obss.toList)
-  }
 
   private def observation2model(seq: Seq[PgSObservation]): Map[String, List[ObsData]] = {
     val byTime = seq.groupBy(_.time)

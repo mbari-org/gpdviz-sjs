@@ -60,9 +60,23 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
       }
     }
 
+    "fail to register existing sensor system" in {
+      Post(s"/api/ss", SSRegister(sysid.get)) ~> routes ~> check {
+        status shouldBe Conflict
+        contentType shouldBe `application/json`
+      }
+    }
+
     "find registered sensor system" in {
       Get(s"/api/ss/${sysid.get}") ~> routes ~> check {
         status shouldBe OK
+        contentType shouldBe `application/json`
+        val ss = responseAs[SensorSystem]
+        ss.sysid shouldBe sysid.get
+        ss.name shouldBe Some("test ss")
+        ss.description shouldBe Some("test description")
+        ss.center shouldBe Some(LatLon(36.8, -122.04))
+        ss.pushEvents shouldBe true
       }
     }
 
@@ -88,6 +102,15 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
         ds.sysid === sysid.get
         ds.strid === strid
         //ds.variables === variables
+      }
+    }
+
+    "fail to add an existing a stream" in {
+      Post(s"/api/ss/${sysid.get}", StreamRegister(strid)) ~> routes ~> check {
+        //import pprint.PPrinter.Color.{apply ⇒ pp}
+        //println(s"::::: status=$status: " + pp(response))
+        status shouldBe Conflict
+        //TODO contentType shouldBe `application/json`
       }
     }
 
