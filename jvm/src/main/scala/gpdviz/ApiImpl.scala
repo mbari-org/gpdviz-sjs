@@ -5,12 +5,13 @@ import gpdviz.data.DbInterface
 import gpdviz.model._
 import gpdviz.server.JsonImplicits
 import spray.json._
+import com.typesafe.scalalogging.{LazyLogging ⇒ Logging}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
-class ApiImpl(db: DbInterface) extends Api with JsonImplicits {
+class ApiImpl(db: DbInterface) extends Api with JsonImplicits with Logging {
 
   def clientConfig(): Future[ClientConfig] = Future {
     ClientConfig(
@@ -22,7 +23,7 @@ class ApiImpl(db: DbInterface) extends Api with JsonImplicits {
   }
 
   def refresh(sysid: String): Future[Option[VmSensorSystem]] = {
-    println(s"ApiImpl.refresh calling getSensorSystem sysid=$sysid")
+    logger.debug(s"ApiImpl.refresh calling getSensorSystem sysid=$sysid")
     db.getSensorSystem(sysid) map {
       case Some(ss) ⇒ Some(
       VmSensorSystem(

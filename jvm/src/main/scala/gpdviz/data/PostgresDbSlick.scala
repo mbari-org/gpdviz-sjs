@@ -1,7 +1,7 @@
 package gpdviz.data
 
 import com.typesafe.config.Config
-import com.typesafe.scalalogging.{StrictLogging ⇒ Logging}
+import com.typesafe.scalalogging.{LazyLogging ⇒ Logging}
 import gpdviz.data.MyPostgresProfile.api._
 import gpdviz.model._
 import gpdviz.server.{GnError, GnErrorF, ObservationsAdd, SensorSystemUpdate}

@@ -1,22 +1,15 @@
 package gpdviz.async
 
 import gpdviz._
-import gpdviz.config.cfg
 import gpdviz.model._
 import gpdviz.server.JsonImplicits
 import spray.json._
 
 import scala.annotation.tailrec
 
+// TODO should check pushEvents flag
 
 class Notifier(pub: Publisher) extends JsonImplicits {
-
-  def getSensorSystemIndex(sysid: String, ssOpt: Option[SensorSystem],
-                           indexResource: String = "web/index.html"): String = {
-    val template = scala.io.Source.fromResource(indexResource).mkString
-    template.replace("#sysid", sysid)
-      .replace("#externalUrl", cfg.externalUrl)
-  }
 
   def notifySensorSystemAdded(ss: SensorSystem): Unit = {
     if (ss.pushEvents) {
@@ -89,7 +82,6 @@ class Notifier(pub: Publisher) extends JsonImplicits {
   }
 
   def notifySensorSystemDeleted(sysid: String): Unit = {
-    // TODO should check pushEvents flag as before?
     pub.publish(SensorSystemDeleted(sysid))
   }
 }

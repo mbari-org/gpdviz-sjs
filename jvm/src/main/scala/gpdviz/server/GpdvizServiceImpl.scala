@@ -3,6 +3,7 @@ package gpdviz.server
 import akka.http.scaladsl.marshalling.ToResponseMarshallable
 import akka.http.scaladsl.model.StatusCodes.{Conflict, InternalServerError, NotFound}
 import akka.http.scaladsl.model._
+import com.typesafe.scalalogging.{LazyLogging ⇒ Logging}
 import gpdviz.async.Notifier
 import gpdviz.data.DbInterface
 import gpdviz.model.{DataStream, SensorSystem}
@@ -11,7 +12,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, Promise}
 import scala.util.control.NonFatal
 
-trait GpdvizServiceImpl extends JsonImplicits  {
+trait GpdvizServiceImpl extends JsonImplicits with Logging {
   def db: DbInterface
   def notifier: Notifier
 
@@ -49,7 +50,7 @@ trait GpdvizServiceImpl extends JsonImplicits  {
   }
 
   def updateSensorSystem(sysid: String, ssu: SensorSystemUpdate): Future[ToResponseMarshallable] = {
-    println(s"updateSensorSystem: sysid=$sysid ssu=$ssu")
+    logger.debug(s"updateSensorSystem: sysid=$sysid ssu=$ssu")
     db.updateSensorSystem(sysid, ssu) map {
       case Right(ssSum) ⇒
         notifier.notifySensorSystemUpdated(sysid)
@@ -63,7 +64,7 @@ trait GpdvizServiceImpl extends JsonImplicits  {
   }
 
   def deleteSensorSystem(sysid: String): Future[ToResponseMarshallable] = {
-    println(s"deleteSensorSystem: sysid=$sysid")
+    logger.debug(s"deleteSensorSystem: sysid=$sysid")
     db.deleteSensorSystem(sysid) map {
       case Right(ssSum) ⇒
         notifier.notifySensorSystemDeleted(sysid)
@@ -77,7 +78,7 @@ trait GpdvizServiceImpl extends JsonImplicits  {
   }
 
   def addDataStream(sysid: String, strr: DataStreamAdd): Future[ToResponseMarshallable] = {
-    println(s"addDataStream: sysid=$sysid strid=${strr.strid}")
+    logger.debug(s"addDataStream: sysid=$sysid strid=${strr.strid}")
     val ds = DataStream(
       strid       = strr.strid,
       name        = strr.name,
@@ -100,8 +101,8 @@ trait GpdvizServiceImpl extends JsonImplicits  {
   }
 
   def addObservations(sysid: String, strid: String, obssr: ObservationsAdd): Future[ToResponseMarshallable] = Future {
-    //import pprint.PPrinter.Color.{apply ⇒ pp}
-    //println(s"addObservations: sysid=$sysid, strid=$strid, obssr=${pp(obssr.observations)}")
+    import pprint.PPrinter.Color.{apply ⇒ pp}
+    logger.debug(s"addObservations: sysid=$sysid, strid=$strid, obssr=${pp(obssr.observations)}")
     try {
       db.addObservations(sysid, strid)(obssr) map { obsSum ⇒
         notifier.notifyObservationsAdded(sysid, strid, obssr.observations)
@@ -123,8 +124,8 @@ trait GpdvizServiceImpl extends JsonImplicits  {
   }
 
   def deleteDataStream(sysid: String, strid: String): Future[ToResponseMarshallable] = {
-    //import fansi.Color._
-    //println(Red(s"deleteDataStream: sysid=$sysid strid=$strid"))
+    import fansi.Color._
+    logger.debug(Red(s"deleteDataStream: sysid=$sysid strid=$strid").toString)
     db.deleteDataStream(sysid, strid) map {
       case Right(dsSum) ⇒
         notifier.notifyDataStreamDeleted(sysid, strid)
@@ -138,9 +139,18 @@ trait GpdvizServiceImpl extends JsonImplicits  {
   }
 
   def getSensorSystemIndex(sysid: String): Future[ToResponseMarshallable] = {
-    println(s"getSensorSystemIndex calling getSensorSystem sysid=$sysid")
+    def getIndex(ssOpt: Option[SensorSystem]): String = {
+      import gpdviz.config.cfg
+      val indexResource = "web/index.html"
+      val template = scala.io.Source.fromResource(indexResource).mkString
+      template
+        .replace("#sysid", sysid)
+        .replace("#externalUrl", cfg.externalUrl)
+    }
+
+    logger.debug(s"getSensorSystemIndex calling getSensorSystem sysid=$sysid")
     db.getSensorSystem(sysid) map { ssOpt ⇒
-      val ssIndex = notifier.getSensorSystemIndex(sysid, ssOpt)
+      val ssIndex = getIndex(ssOpt)
       HttpEntity(ContentType(MediaTypes.`text/html`, HttpCharsets.`UTF-8`), ssIndex.getBytes("UTF-8"))
     }
   }

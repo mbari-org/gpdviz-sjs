@@ -82,7 +82,7 @@ lazy val gpdviz = crossProject
       ,"com.typesafe.scala-logging" %% "scala-logging" % "3.7.2"
 
       ,"com.github.swagger-akka-http" %% "swagger-akka-http" % swaggerAkkaV
-      ,"org.slf4j"                     % "slf4j-simple"      % "1.7.25" // used by swagger-akka-http
+      ,"ch.qos.logback"      % "logback-classic" % "1.2.3"
     ),
     addCompilerPlugin(
       ("org.scalameta" % "paradise" % "3.0.0-M8").cross(CrossVersion.full)
