@@ -5,7 +5,8 @@ import akka.http.scaladsl.model._
 import com.typesafe.scalalogging.{LazyLogging ⇒ Logging}
 import gpdviz.async.Notifier
 import gpdviz.data.DbInterface
-import gpdviz.model.{DataStream, SensorSystem}
+import gpdviz.model.{DataStream, SensorSystem, VariableDef}
+import spray.json._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -27,7 +28,7 @@ trait GpdvizServiceImpl extends JsonImplicits with Logging {
     db.addSensorSystem(ss) map {
       case Right(ssSum) ⇒
         notifier.notifySensorSystemAdded(ss)
-        ssSum
+        goodResponse(StatusCodes.Created, ssSum.toJson)
       case Left(error) ⇒ errorResponse(error)
     }
   }
@@ -78,7 +79,17 @@ trait GpdvizServiceImpl extends JsonImplicits with Logging {
     db.addDataStream(sysid)(ds) map {
       case Right(dsSum) ⇒
         notifier.notifyDataStreamAdded(sysid, ds)
-        dsSum
+        goodResponse(StatusCodes.Created, dsSum.toJson)
+      case Left(error) ⇒ errorResponse(error)
+    }
+  }
+
+  def addVariableDef(sysid: String, strid: String, vd: VariableDef): Future[ToResponseMarshallable] = {
+    logger.debug(s"addVariableDef: sysid=$sysid strid=$strid vd=$vd")
+    db.addVariableDef(sysid, strid)(vd) map {
+      case Right(vdSum) ⇒
+        notifier.notifyVariableDefAdded(sysid, strid, vd)
+        goodResponse(StatusCodes.Created, vdSum.toJson)
       case Left(error) ⇒ errorResponse(error)
     }
   }
@@ -89,7 +100,7 @@ trait GpdvizServiceImpl extends JsonImplicits with Logging {
     try {
       db.addObservations(sysid, strid)(obssr) map { obsSum ⇒
         notifier.notifyObservationsAdded(sysid, strid, obssr.observations)
-        obsSum
+        goodResponse(StatusCodes.Created, obsSum.toJson)
       }
     }
     catch {
@@ -134,8 +145,17 @@ trait GpdvizServiceImpl extends JsonImplicits with Logging {
     }
   }
 
+  private def goodResponse(status: StatusCode, jsonValue: JsValue): HttpResponse = {
+    HttpResponse(
+      status = status,
+      entity = HttpEntity(
+        ContentType(MediaTypes.`application/json`),
+        jsonValue.compactPrint
+      )
+    )
+  }
+
   private def errorResponse(error: GnError): HttpResponse = {
-    import spray.json._
     HttpResponse(
       status = error.code,
       entity = HttpEntity(

@@ -51,7 +51,7 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
         center = Some(LatLon(36.8, -122.04))
       )
       Post(s"/api/ss", ssAdd) ~> routes ~> check {
-        status shouldBe OK
+        status shouldBe Created
         contentType shouldBe `application/json`
         val ss = responseAs[SensorSystemSummary]
         ss.sysid shouldBe sysid.get
@@ -96,11 +96,20 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
       }
     }
 
+    "fail to update non-existing sensor system" in {
+      Put(s"/api/ss/NoSS", SensorSystemUpdate(pushEvents = Some(false))) ~> routes ~> check {
+        status shouldBe NotFound
+        contentType shouldBe `application/json`
+        val ss = responseAs[GnError]
+        ss.sysid shouldBe Some("NoSS")
+      }
+    }
+
     "add streams" in {
       val variables = Some(List(VariableDef("temperature")))
       val dsAdd = DataStreamAdd(strid = strid, variables = variables)
       Post(s"/api/ss/${sysid.get}", dsAdd) ~> routes ~> check {
-        status shouldBe OK
+        status shouldBe Created
         contentType shouldBe `application/json`
         val ds = responseAs[DataStreamSummary]
         ds.sysid === sysid.get
@@ -111,12 +120,38 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
       val variables2 = Some(List(VariableDef("fooVar")))
       val dsAdd2 = DataStreamAdd(strid = strid2, variables = variables2)
       Post(s"/api/ss/${sysid.get}", dsAdd2) ~> routes ~> check {
-        status shouldBe OK
+        status shouldBe Created
         contentType shouldBe `application/json`
         val ds = responseAs[DataStreamSummary]
         ds.sysid === sysid.get
         ds.strid === strid2
         //ds.variables === variables
+      }
+    }
+
+    "add a variable definition" in {
+      val vd = VariableDef("bazVar", units = Some("meter"))
+      Post(s"/api/ss/${sysid.get}/$strid/vd", vd) ~> routes ~> check {
+        //println(s"::::: status=$status: " + pp(response))
+        status shouldBe Created
+        contentType shouldBe `application/json`
+        val ds = responseAs[VariableDefSummary]
+        ds.sysid === sysid.get
+        ds.strid === strid
+        ds.name === "bazVar"
+        ds.units === Some("meter")
+      }
+    }
+
+    "fail to add a variable definition to non-existing stream" in {
+      val vd = VariableDef("bazVar")
+      Post(s"/api/ss/${sysid.get}/NoStr/vd", vd) ~> routes ~> check {
+        //println(s"::::: status=$status: " + pp(response))
+        status shouldBe NotFound
+        contentType shouldBe `application/json`
+        val ds = responseAs[GnError]
+        ds.sysid === sysid.get
+        ds.strid === Some("NoStr")
       }
     }
 
@@ -177,7 +212,7 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
       ))
 
       Post(s"/api/ss/${sysid.get}/$strid/obs", obsAdd) ~> routes ~> check {
-        status shouldBe OK
+        status shouldBe Created
         contentType shouldBe `application/json`
         val map = responseAs[ObservationsSummary]
         map.sysid === sysid.get

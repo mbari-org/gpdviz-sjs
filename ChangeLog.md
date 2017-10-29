@@ -2,6 +2,8 @@
 
 2017-10-28
 
+- route to add variable definitions
+- adjust response for successful creation of entities
 - overall register/unregister-to-add/delete renaming
 - add drop-tables, especially to avoid error noise during local testing
 

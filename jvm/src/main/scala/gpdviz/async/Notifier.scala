@@ -25,6 +25,9 @@ class Notifier(pub: Publisher) extends JsonImplicits {
   }
 
   def notifyDataStreamAdded(sysid: String, str: DataStream): Unit = {
+    // NOTE observations not captured at time of stream registration
+    require(str.observations.isEmpty)
+
     pub.publish(DataStreamAdded(
       sysid = sysid,
       str = VmDataStream(
@@ -35,7 +38,18 @@ class Notifier(pub: Publisher) extends JsonImplicits {
         str.zOrder,
         chartStyle = str.chartStyle.map(_.toJson.compactPrint),
         variables = str.variables.map(_.map(v ⇒ VmVariableDef(v.name, v.units, v.chartStyle.map(_.toJson.compactPrint))))
-        // TODO NOTE observations not captured at time of stream registration
+      )
+    ))
+  }
+
+  def notifyVariableDefAdded(sysid: String, strid: String, vd: VariableDef): Unit = {
+    pub.publish(VariableDefAdded(
+      sysid = sysid,
+      strid = strid,
+      vd = VmVariableDef(
+        name = vd.name,
+        units = vd.units,
+        chartStyle = vd.chartStyle.map(_.toJson.compactPrint)
       )
     ))
   }

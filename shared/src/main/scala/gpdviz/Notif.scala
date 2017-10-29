@@ -1,6 +1,6 @@
 package gpdviz
 
-import gpdviz.model.{LatLon, VmDataStream, VmObsData}
+import gpdviz.model.{LatLon, VmDataStream, VmObsData, VmVariableDef}
 
 sealed trait Notif {
   def sysid: String
@@ -18,6 +18,12 @@ case class SensorSystemAdded(
 case class DataStreamAdded(
                             sysid: String,
                             str:   VmDataStream
+                          ) extends Notif
+
+case class VariableDefAdded(
+                            sysid: String,
+                            strid: String,
+                            vd:    VmVariableDef
                           ) extends Notif
 
 case class ObservationsAdded(

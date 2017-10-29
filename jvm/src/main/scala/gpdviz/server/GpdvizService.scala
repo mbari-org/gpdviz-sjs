@@ -2,6 +2,7 @@ package gpdviz.server
 
 import javax.ws.rs.Path
 
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{Directives, Route}
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives.cors
 import gpdviz.model._
@@ -11,7 +12,7 @@ import io.swagger.annotations._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait GpdvizService extends
-  SsService with OneSsService with OneStrService with ObsService
+  SsService with OneSsService with OneStrService with VariableDefService with ObsService
   with StaticAndAjaxService with RootIndexService {
 
   def routes: Route = {
@@ -19,7 +20,7 @@ trait GpdvizService extends
       swaggerUi ~
       staticAndAjaxRoute ~
       rootIndexRoute ~
-      obsRoute ~ oneStrRoute ~ oneSsRoute ~ ssRoute
+      variableDefRoute ~ obsRoute ~ oneStrRoute ~ oneSsRoute ~ ssRoute
   }
 
   private val swaggerUi: Route =
@@ -220,6 +221,41 @@ trait OneStrService extends GpdvizServiceImpl with Directives {
       delete {
         complete {
           deleteDataStream(sysid, strid)
+        }
+      }
+    }
+  }
+}
+
+@Api(produces = "application/json", tags = Array("variableDefs"))
+@Path("/ss")
+trait VariableDefService extends GpdvizServiceImpl with Directives {
+  def variableDefRoute: Route = {
+    vdAdd
+  }
+
+  @Path("/{sysid}/{strid}/vd")
+  @ApiOperation(value = "Add variable definition", nickname = "addVariableDef",
+    httpMethod = "POST", response = classOf[VariableDefSummary])
+  @ApiImplicitParams(Array(
+    new ApiImplicitParam(
+      name = "sysid", value = "sensor system id", required = true,
+      dataType = "string", paramType = "path"),
+    new ApiImplicitParam(
+      name = "strid", value = "data stream id", required = true,
+      dataType = "string", paramType = "path"),
+    new ApiImplicitParam(
+      name = "body", value = "The variable definition", required = true,
+      dataTypeClass = classOf[VariableDef], paramType = "body")
+  ))
+  @ApiResponses(Array(
+    new ApiResponse(code = 500, message = "Internal server error")
+  ))
+  def vdAdd: Route = {
+    pathPrefix("api" / "ss" / Segment / Segment / "vd") { case (sysid, strid) ⇒
+      (post & entity(as[VariableDef])) { vd ⇒
+        complete {
+          addVariableDef(sysid, strid, vd)
         }
       }
     }
