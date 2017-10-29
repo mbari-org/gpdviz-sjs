@@ -111,9 +111,9 @@ object DbFactory extends Logging {
       )
     )
 
-    logger.info("Registering a sensor system...\n" + pp(ss, height = Int.MaxValue))
-    Await.ready(db.registerSensorSystem(ss) andThen {
-      case Failure(e) ⇒ logger.error("error registering data", e)
+    logger.info("Adding a sensor system...\n" + pp(ss, height = Int.MaxValue))
+    Await.ready(db.addSensorSystem(ss) andThen {
+      case Failure(e) ⇒ logger.error("error adding data", e)
     }, Duration(10, TimeUnit.SECONDS))
   }
 }

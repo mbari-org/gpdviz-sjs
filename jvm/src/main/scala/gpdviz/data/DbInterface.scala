@@ -1,7 +1,7 @@
 package gpdviz.data
 
 import gpdviz.model._
-import gpdviz.server.{GnError, ObservationsRegister, SSUpdate}
+import gpdviz.server.{GnError, ObservationsAdd, SensorSystemUpdate}
 
 import scala.concurrent.Future
 
@@ -20,27 +20,24 @@ trait DbInterface {
 
   def getSensorSystem(sysid: String): Future[Option[SensorSystem]]
 
-  def getDataStream(sysid: String, strid: String): Future[Option[DataStream]]
+  def addSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystemSummary]]
 
-  def registerSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystemSummary]]
-
-  def updateSensorSystem(sysid: String, ssu: SSUpdate): Future[Either[GnError, SensorSystemSummary]]
-
-  def registerDataStream(sysid: String)
-                        (ds: DataStream): Future[Either[GnError, DataStreamSummary]]
-
-  def registerVariableDef(sysid: String, strid: String)
-                         (vd: VariableDef): Future[Either[GnError, VariableDefSummary]]
-
-  def registerObservations(sysid: String, strid: String)
-                          (obssr: ObservationsRegister): Future[Either[GnError, ObservationsSummary]]
-
-  def registerObservation(sysid: String, strid: String, time: String,
-                          obsData: ObsData): Future[Either[GnError, ObservationsSummary]]
+  def updateSensorSystem(sysid: String, ssu: SensorSystemUpdate): Future[Either[GnError, SensorSystemSummary]]
 
   def deleteSensorSystem(sysid: String): Future[Either[GnError, SensorSystemSummary]]
 
+  def getDataStream(sysid: String, strid: String): Future[Option[DataStream]]
+
+  def addDataStream(sysid: String)
+                   (ds: DataStream): Future[Either[GnError, DataStreamSummary]]
+
   def deleteDataStream(sysid: String, strid: String): Future[Either[GnError, DataStreamSummary]]
+
+  def addVariableDef(sysid: String, strid: String)
+                    (vd: VariableDef): Future[Either[GnError, VariableDefSummary]]
+
+  def addObservations(sysid: String, strid: String)
+                     (obssr: ObservationsAdd): Future[Either[GnError, ObservationsSummary]]
 
   def close(): Unit
 }

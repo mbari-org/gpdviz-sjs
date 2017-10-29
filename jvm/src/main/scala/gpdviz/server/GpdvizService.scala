@@ -41,15 +41,15 @@ trait SsService extends GpdvizServiceImpl with Directives {
   @ApiImplicitParams(Array(
     new ApiImplicitParam(
       name = "body", value = "sensor system definition", required = true,
-      dataTypeClass = classOf[SSRegister], paramType = "body")
+      dataTypeClass = classOf[SensorSystemAdd], paramType = "body")
   ))
   @ApiResponses(Array(
     new ApiResponse(code = 500, message = "Internal server error")
   ))
   def ssAdd: Route = path("api" / "ss") {
-    (post & entity(as[SSRegister])) { ssr ⇒
+    (post & entity(as[SensorSystemAdd])) { ssr ⇒
       complete {
-        registerSensorSystem(ssr)
+        addSensorSystem(ssr)
       }
     }
   }
@@ -89,15 +89,15 @@ trait OneSsService extends GpdvizServiceImpl with Directives {
       dataType = "string", paramType = "path"),
     new ApiImplicitParam(
       name = "body", value = "stream definition", required = true,
-      dataTypeClass = classOf[StreamRegister], paramType = "body")
+      dataTypeClass = classOf[DataStreamAdd], paramType = "body")
   ))
   @ApiResponses(Array(
     new ApiResponse(code = 500, message = "Internal server error")
   ))
   def strAdd: Route = pathPrefix("api" / "ss" / Segment) { sysid ⇒
-    (post & entity(as[StreamRegister])) { strr ⇒
+    (post & entity(as[DataStreamAdd])) { strr ⇒
       complete {
-        addStream(sysid, strr)
+        addDataStream(sysid, strr)
       }
     }
   }
@@ -134,13 +134,13 @@ trait OneSsService extends GpdvizServiceImpl with Directives {
       dataType = "string", paramType = "path"),
     new ApiImplicitParam(
       name = "body", value = "Properties to update", required = true,
-      dataTypeClass = classOf[SSUpdate], paramType = "body")
+      dataTypeClass = classOf[SensorSystemUpdate], paramType = "body")
   ))
   @ApiResponses(Array(
     new ApiResponse(code = 500, message = "Internal server error")
   ))
   def ssUpdate: Route = pathPrefix("api" / "ss" / Segment) { sysid ⇒
-    (put & entity(as[SSUpdate])) { ssu ⇒
+    (put & entity(as[SensorSystemUpdate])) { ssu ⇒
       complete {
         updateSensorSystem(sysid, ssu)
       }
@@ -162,7 +162,7 @@ trait OneSsService extends GpdvizServiceImpl with Directives {
   def ssDelete: Route = pathPrefix("api" / "ss" / Segment) { sysid ⇒
     delete {
       complete {
-        unregisterSensorSystem(sysid)
+        deleteSensorSystem(sysid)
       }
     }
   }
@@ -194,7 +194,7 @@ trait OneStrService extends GpdvizServiceImpl with Directives {
       cors() {
         get {
           complete {
-            getStream(sysid, strid)
+            getDataStream(sysid, strid)
           }
         }
       }
@@ -219,7 +219,7 @@ trait OneStrService extends GpdvizServiceImpl with Directives {
     pathPrefix("api" / "ss" / Segment / Segment) { case (sysid, strid) ⇒
       delete {
         complete {
-          deleteStream(sysid, strid)
+          deleteDataStream(sysid, strid)
         }
       }
     }
@@ -245,14 +245,14 @@ trait ObsService extends GpdvizServiceImpl with Directives {
       dataType = "string", paramType = "path"),
     new ApiImplicitParam(
       name = "body", value = "The observations", required = true,
-      dataTypeClass = classOf[ObservationsRegister], paramType = "body")
+      dataTypeClass = classOf[ObservationsAdd], paramType = "body")
   ))
   @ApiResponses(Array(
     new ApiResponse(code = 500, message = "Internal server error")
   ))
   def obsAdd: Route = {
     pathPrefix("api" / "ss" / Segment / Segment / "obs") { case (sysid, strid) ⇒
-      (post & entity(as[ObservationsRegister])) { obssr ⇒
+      (post & entity(as[ObservationsAdd])) { obssr ⇒
         complete {
           addObservations(sysid, strid, obssr)
         }

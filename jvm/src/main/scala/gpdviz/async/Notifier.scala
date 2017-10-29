@@ -18,9 +18,9 @@ class Notifier(pub: Publisher) extends JsonImplicits {
       .replace("#externalUrl", cfg.externalUrl)
   }
 
-  def notifySensorSystemRegistered(ss: SensorSystem): Unit = {
+  def notifySensorSystemAdded(ss: SensorSystem): Unit = {
     if (ss.pushEvents) {
-      pub.publish(SensorSystemRegistered(
+      pub.publish(SensorSystemAdded(
         sysid = ss.sysid,
         name = ss.name,
         description = ss.description,
@@ -31,8 +31,8 @@ class Notifier(pub: Publisher) extends JsonImplicits {
     }
   }
 
-  def notifyStreamAdded(sysid: String, str: DataStream): Unit = {
-    pub.publish(StreamAdded(
+  def notifyDataStreamAdded(sysid: String, str: DataStream): Unit = {
+    pub.publish(DataStreamAdded(
       sysid = sysid,
       str = VmDataStream(
         str.strid,
@@ -47,7 +47,7 @@ class Notifier(pub: Publisher) extends JsonImplicits {
     ))
   }
 
-  def notifyObservations2Added(sysid: String, strid: String, observations: Map[String, List[ObsData]]): Unit = {
+  def notifyObservationsAdded(sysid: String, strid: String, observations: Map[String, List[ObsData]]): Unit = {
     val obs = observations mapValues { list ⇒
       val obsDataList = collection.mutable.ListBuffer[VmObsData]()
       list foreach  { o ⇒
@@ -65,7 +65,7 @@ class Notifier(pub: Publisher) extends JsonImplicits {
       if (from < obs.size) {
         val next = Math.min(from + 15, obs.size)
         val slice = obs.slice(from, next)
-        pub.publish(Observations2Added(
+        pub.publish(ObservationsAdded(
           sysid = sysid,
           strid = strid,
           obss = slice
@@ -76,8 +76,8 @@ class Notifier(pub: Publisher) extends JsonImplicits {
     rec(0)
   }
 
-  def notifyStreamRemoved(sysid: String, strid: String): Unit = {
-    pub.publish(StreamRemoved(sysid, strid))
+  def notifyDataStreamDeleted(sysid: String, strid: String): Unit = {
+    pub.publish(DataStreamDeleted(sysid, strid))
   }
 
   def notifySensorSystemUpdated(sysid: String): Unit = {
@@ -88,8 +88,8 @@ class Notifier(pub: Publisher) extends JsonImplicits {
     pub.publish(SensorSystemRefresh(sysid))
   }
 
-  def notifySensorSystemUnregistered(sysid: String): Unit = {
+  def notifySensorSystemDeleted(sysid: String): Unit = {
     // TODO should check pushEvents flag as before?
-    pub.publish(SensorSystemUnregistered(sysid))
+    pub.publish(SensorSystemDeleted(sysid))
   }
 }

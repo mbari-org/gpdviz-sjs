@@ -3,7 +3,7 @@ package gpdviz.data
 import com.typesafe.config.Config
 /*
 import gpdviz.model._
-import gpdviz.server.{GnError, ObservationsRegister, SSUpdate}
+import gpdviz.server.{GnError, ObservationsAdd, SensorSystemUpdate}
 import pprint.PPrinter.Color.{apply ⇒ pp}
 
 import _root_.doobie._
@@ -166,7 +166,7 @@ abstract class PostgresDbDoobie(doobieConfig: Config) extends DbInterface {
     false
   }
 
-  def registerSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystemSummary]] = Future {
+  def addSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystemSummary]] = Future {
     sql"""
       insert into sensorsystem (
         sysid,
@@ -190,7 +190,7 @@ abstract class PostgresDbDoobie(doobieConfig: Config) extends DbInterface {
       )
     """.update.run.transact(xa).unsafeRunSync
 
-    val regStream = registerDataStream(ss.sysid) _
+    val regStream = addDataStream(ss.sysid) _
     ss.streams.values foreach regStream
 
     Right(SensorSystemSummary(
@@ -200,7 +200,7 @@ abstract class PostgresDbDoobie(doobieConfig: Config) extends DbInterface {
     ))
   }
 
-  def updateSensorSystem(sysid: String, ssu: SSUpdate): Future[Either[GnError, SensorSystemSummary]] = Future {
+  def updateSensorSystem(sysid: String, ssu: SensorSystemUpdate): Future[Either[GnError, SensorSystemSummary]] = Future {
     sql"""
       update sensorsystem set
         pushEvents = ${ssu.pushEvents},
@@ -214,7 +214,7 @@ abstract class PostgresDbDoobie(doobieConfig: Config) extends DbInterface {
     Right(SensorSystemSummary(sysid))
   }
 
-  def registerDataStream(sysid: String)
+  def addDataStream(sysid: String)
                         (ds: DataStream): Future[Either[GnError, DataStreamSummary]] = Future {
     sql"""
       insert into datastream (
@@ -240,7 +240,7 @@ abstract class PostgresDbDoobie(doobieConfig: Config) extends DbInterface {
     Right(DataStreamSummary(sysid, ds.strid))
   }
 
-  def registerVariableDef(sysid: String, strid: String)
+  def addVariableDef(sysid: String, strid: String)
                          (vd: VariableDef): Future[Either[GnError, VariableDefSummary]] = Future {
     sql"""
       insert into variabledef (
@@ -262,8 +262,8 @@ abstract class PostgresDbDoobie(doobieConfig: Config) extends DbInterface {
     Right(VariableDefSummary(sysid, strid, vd.name, vd.units))
   }
 
-  def registerObservations(sysid: String, strid: String)
-                          (obssr: ObservationsRegister): Future[Either[GnError, ObservationsSummary]] = Future {
+  def addObservations(sysid: String, strid: String)
+                          (obssr: ObservationsAdd): Future[Either[GnError, ObservationsSummary]] = Future {
     var num = 0
     obssr.observations foreach { case (time, list) ⇒
       //val timeIso = if (time.startsWith("15030")) utl.iso(time.toLong) else time

@@ -3,7 +3,7 @@ package gpdviz.data
 import com.typesafe.config.Config
 /*
 import gpdviz.model._
-import gpdviz.server.{GnError, ObservationsRegister, SSUpdate}
+import gpdviz.server.{GnError, ObservationsAdd, SensorSystemUpdate}
 import io.getquill.{Embedded, LowerCase, PostgresJdbcContext}
 import pprint.PPrinter.Color.{apply ⇒ pp}
 import spray.json._
@@ -114,7 +114,7 @@ abstract class PostgresDbQuill(quillConfig: Config) extends DbInterface {
     ctx.run(sensorSystem.filter(_.sysid == lift(sysid))).nonEmpty
   }
 
-  def registerSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystemSummary]] = Future {
+  def addSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystemSummary]] = Future {
     ctx.run(sensorSystem.insert(lift(PgQSensorSystem(
       sysid = ss.sysid,
       name = ss.name,
@@ -123,7 +123,7 @@ abstract class PostgresDbQuill(quillConfig: Config) extends DbInterface {
       clickListener = ss.clickListener
     ))))
 
-    val regStream = registerDataStream(ss.sysid) _
+    val regStream = addDataStream(ss.sysid) _
     ss.streams.values foreach regStream
 
     Right(SensorSystemSummary(
@@ -135,7 +135,7 @@ abstract class PostgresDbQuill(quillConfig: Config) extends DbInterface {
 
   // TODO seems like quill's update operation is also affected by the nested Embedding issue.
   // The test is currently ignored in GpdvizSpec
-  def updateSensorSystem(sysid: String, ssu: SSUpdate): Future[Either[GnError, SensorSystemSummary]] = Future {
+  def updateSensorSystem(sysid: String, ssu: SensorSystemUpdate): Future[Either[GnError, SensorSystemSummary]] = Future {
     ctx.run(sensorSystem.filter(_.sysid == lift(sysid)).update { ss ⇒
       ss.pushEvents → lift(ssu.pushEvents getOrElse ss.pushEvents)
       ss.center → lift(ssu.center orElse ss.center)
@@ -144,7 +144,7 @@ abstract class PostgresDbQuill(quillConfig: Config) extends DbInterface {
     Right(SensorSystemSummary(sysid))
   }
 
-  def registerDataStream(sysid: String)
+  def addDataStream(sysid: String)
                         (ds: DataStream): Future[Either[GnError, DataStreamSummary]] = Future {
     ctx.run(dataStream.insert(lift(PgQDataStream(
       sysid = sysid,
@@ -160,7 +160,7 @@ abstract class PostgresDbQuill(quillConfig: Config) extends DbInterface {
     val observations = ds.observations.getOrElse(Map.empty)
 
     println(s"  ** sysid=$sysid strid=${ds.strid} Registering ${variables.size} variables: $variables")
-    variables foreach registerVariableDef(sysid, ds.strid)
+    variables foreach addVariableDef(sysid, ds.strid)
 
     println(s"  ** sysid=$sysid strid=${ds.strid} Registering ${observations.size} observations")
     observations foreach { case (time, list) ⇒
@@ -172,9 +172,9 @@ abstract class PostgresDbQuill(quillConfig: Config) extends DbInterface {
     Right(DataStreamSummary(sysid, ds.strid))
   }
 
-  def registerVariableDef(sysid: String, strid: String)
+  def addVariableDef(sysid: String, strid: String)
                          (vd: VariableDef): Future[Either[GnError, VariableDefSummary]] = Future {
-    println(s"  *** registerVariableDef ${vd.name}")
+    println(s"  *** addVariableDef ${vd.name}")
     ctx.run(variableDef.insert(lift(PgQVariableDef(
       sysid = sysid,
       strid = strid,
@@ -184,8 +184,8 @@ abstract class PostgresDbQuill(quillConfig: Config) extends DbInterface {
     Right(VariableDefSummary(sysid, strid, vd.name, vd.units))
   }
 
-  def registerObservations(sysid: String, strid: String)
-                          (obssr: ObservationsRegister): Future[Either[GnError, ObservationsSummary]] = Future {
+  def addObservations(sysid: String, strid: String)
+                          (obssr: ObservationsAdd): Future[Either[GnError, ObservationsSummary]] = Future {
 
     var num = 0
     obssr.observations foreach { case (time, list) ⇒

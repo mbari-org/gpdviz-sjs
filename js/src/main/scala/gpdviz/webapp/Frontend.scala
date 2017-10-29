@@ -32,13 +32,13 @@ object DOMGlobalScope extends js.Object {
 @js.native
 trait LLMap extends js.Object {
 
-  def sensorSystemRegistered(center: js.Array[Double], zoom: Int): Unit = js.native
+  def sensorSystemAdded(center: js.Array[Double], zoom: Int): Unit = js.native
 
-  def sensorSystemUnregistered(): Unit = js.native
+  def sensorSystemDeleted(): Unit = js.native
 
-  def addStream(str: js.Dictionary[_]): Unit = js.native
+  def addDataStream(str: js.Dictionary[_]): Unit = js.native
 
-  def removeStream(strid: String): Unit = js.native
+  def deleteDataStream(strid: String): Unit = js.native
 
   def addGeoJson(strid: String, timestamp: String, feature: String): Unit = js.native
 
@@ -73,19 +73,19 @@ class WebApp(cc: ClientConfig) {
     refresh()
 
     val handleNotification: Notif ⇒ Unit = {
-      case SensorSystemRegistered(_, name, description, center, zoom, clickListener) ⇒
-        vm.registerSystem(name, description, center, zoom, clickListener)
+      case SensorSystemAdded(_, name, description, center, zoom, clickListener) ⇒
+        vm.addSensorSystem(name, description, center, zoom, clickListener)
 
-      case SensorSystemUnregistered(_) ⇒
-        vm.unregisterSystem()
+      case SensorSystemDeleted(_) ⇒
+        vm.deleteSensorSystem()
 
-      case StreamAdded(_, str) ⇒
-        vm.addStream(str)
+      case DataStreamAdded(_, str) ⇒
+        vm.addDataStream(str)
 
-      case StreamRemoved(_, strid) ⇒
-        vm.removeStream(strid)
+      case DataStreamDeleted(_, strid) ⇒
+        vm.deleteDataStream(strid)
 
-      case Observations2Added(_, strid, obss) ⇒
+      case ObservationsAdded(_, strid, obss) ⇒
         vm.addObservations(strid, obss)
 
       case SensorSystemUpdated(_) ⇒

@@ -6,7 +6,6 @@ import akka.http.scaladsl.model._
 import gpdviz.async.Notifier
 import gpdviz.data.DbInterface
 import gpdviz.model.{DataStream, SensorSystem}
-import pprint.PPrinter.Color.{apply ⇒ pp}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, Promise}
@@ -16,7 +15,7 @@ trait GpdvizServiceImpl extends JsonImplicits  {
   def db: DbInterface
   def notifier: Notifier
 
-  def registerSensorSystem(ssr: SSRegister): Future[ToResponseMarshallable] = {
+  def addSensorSystem(ssr: SensorSystemAdd): Future[ToResponseMarshallable] = {
     val p = Promise[ToResponseMarshallable]()
     db.existsSensorSystem(ssr.sysid) map {
       case false ⇒
@@ -27,9 +26,9 @@ trait GpdvizServiceImpl extends JsonImplicits  {
           center = ssr.center,
           clickListener = ssr.clickListener
         )
-        db.registerSensorSystem(ss) map {
+        db.addSensorSystem(ss) map {
           case Right(ssSum) ⇒
-            notifier.notifySensorSystemRegistered(ss)
+            notifier.notifySensorSystemAdded(ss)
             p.success(ssSum)
           case Left(error) ⇒
             p.success(InternalServerError -> error)
@@ -49,7 +48,7 @@ trait GpdvizServiceImpl extends JsonImplicits  {
     }
   }
 
-  def updateSensorSystem(sysid: String, ssu: SSUpdate): Future[ToResponseMarshallable] = {
+  def updateSensorSystem(sysid: String, ssu: SensorSystemUpdate): Future[ToResponseMarshallable] = {
     println(s"updateSensorSystem: sysid=$sysid ssu=$ssu")
     db.updateSensorSystem(sysid, ssu) map {
       case Right(ssSum) ⇒
@@ -63,11 +62,11 @@ trait GpdvizServiceImpl extends JsonImplicits  {
     }
   }
 
-  def unregisterSensorSystem(sysid: String): Future[ToResponseMarshallable] = {
-    println(s"unregisterSensorSystem: sysid=$sysid")
+  def deleteSensorSystem(sysid: String): Future[ToResponseMarshallable] = {
+    println(s"deleteSensorSystem: sysid=$sysid")
     db.deleteSensorSystem(sysid) map {
       case Right(ssSum) ⇒
-        notifier.notifySensorSystemUnregistered(sysid)
+        notifier.notifySensorSystemDeleted(sysid)
         ssSum
       case Left(error) ⇒
         if (error.code < 500)
@@ -77,8 +76,8 @@ trait GpdvizServiceImpl extends JsonImplicits  {
     }
   }
 
-  def addStream(sysid: String, strr: StreamRegister): Future[ToResponseMarshallable] = {
-    println(s"addStream: sysid=$sysid strid=${strr.strid}")
+  def addDataStream(sysid: String, strr: DataStreamAdd): Future[ToResponseMarshallable] = {
+    println(s"addDataStream: sysid=$sysid strid=${strr.strid}")
     val ds = DataStream(
       strid       = strr.strid,
       name        = strr.name,
@@ -88,9 +87,9 @@ trait GpdvizServiceImpl extends JsonImplicits  {
       variables   = strr.variables,
       chartStyle  = strr.chartStyle
     )
-    db.registerDataStream(sysid)(ds) map {
+    db.addDataStream(sysid)(ds) map {
       case Right(dsSum) ⇒
-        notifier.notifyStreamAdded(sysid, ds)
+        notifier.notifyDataStreamAdded(sysid, ds)
         dsSum
       case Left(error) ⇒
         if (error.code < 500)
@@ -100,11 +99,12 @@ trait GpdvizServiceImpl extends JsonImplicits  {
     }
   }
 
-  def addObservations(sysid: String, strid: String, obssr: ObservationsRegister): Future[ToResponseMarshallable] = Future {
-    println(s"addObservations: sysid=$sysid, strid=$strid, obssr=${pp(obssr.observations)}")
+  def addObservations(sysid: String, strid: String, obssr: ObservationsAdd): Future[ToResponseMarshallable] = Future {
+    //import pprint.PPrinter.Color.{apply ⇒ pp}
+    //println(s"addObservations: sysid=$sysid, strid=$strid, obssr=${pp(obssr.observations)}")
     try {
-      db.registerObservations(sysid, strid)(obssr) map { obsSum ⇒
-        notifier.notifyObservations2Added(sysid, strid, obssr.observations)
+      db.addObservations(sysid, strid)(obssr) map { obsSum ⇒
+        notifier.notifyObservationsAdded(sysid, strid, obssr.observations)
         obsSum
       }
     }
@@ -115,19 +115,19 @@ trait GpdvizServiceImpl extends JsonImplicits  {
     }
   }
 
-  def getStream(sysid: String, strid: String): Future[ToResponseMarshallable] = {
+  def getDataStream(sysid: String, strid: String): Future[ToResponseMarshallable] = {
     db.getDataStream(sysid, strid) map {
       case Some(ds) ⇒ ds
       case None     ⇒ NotFound -> GnErrorF.dataStreamUndefined(sysid, strid)
     }
   }
 
-  def deleteStream(sysid: String, strid: String): Future[ToResponseMarshallable] = {
+  def deleteDataStream(sysid: String, strid: String): Future[ToResponseMarshallable] = {
     //import fansi.Color._
-    //println(Red(s"deleteStream: sysid=$sysid strid=$strid"))
+    //println(Red(s"deleteDataStream: sysid=$sysid strid=$strid"))
     db.deleteDataStream(sysid, strid) map {
       case Right(dsSum) ⇒
-        notifier.notifyStreamRemoved(sysid, strid)
+        notifier.notifyDataStreamDeleted(sysid, strid)
         dsSum
       case Left(error) ⇒
         if (error.code < 500)

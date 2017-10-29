@@ -158,16 +158,16 @@ function setupLLMap(center, zoom, hoveredPoint, clickHandler) {
     overlayGroupByStreamId = {};
   }
 
-  function sensorSystemRegistered(center, zoom) {
+  function sensorSystemAdded(center, zoom) {
     clearMarkers();
     setView(center, zoom);
   }
 
-  function sensorSystemUnregistered() {
+  function sensorSystemDeleted() {
     clearMarkers();
   }
 
-  function addStream(str) {
+  function addDataStream(str) {
     // json-ify some stuff
     str.mapStyle   = str.mapStyle   ? JSON.parse(str.mapStyle) : {};
     str.chartStyle = str.chartStyle ? JSON.parse(str.chartStyle) : {};
@@ -179,7 +179,7 @@ function setupLLMap(center, zoom, hoveredPoint, clickHandler) {
         return variable;
       });
     }
-    //console.debug("addStream: str=", _.cloneDeep(str));
+    //console.debug("addDataStream: str=", _.cloneDeep(str));
 
     str.observations = {}; // TODO check already provided observation (not the case at the moment)
     byStrId[str.strid] = {
@@ -189,8 +189,8 @@ function setupLLMap(center, zoom, hoveredPoint, clickHandler) {
   }
 
   // TODO
-  function removeStream(strid) {
-    console.debug("TODO removeStream: strid=", strid)
+  function deleteDataStream(strid) {
+    console.debug("TODO deleteDataStream: strid=", strid)
   }
 
   function addGeoJson(strid, timestamp, geoJsonStr) {
@@ -351,10 +351,10 @@ function setupLLMap(center, zoom, hoveredPoint, clickHandler) {
   prepareAdjustMapUponWindowResize();
 
   return {
-    sensorSystemRegistered:    sensorSystemRegistered,
-    sensorSystemUnregistered:  sensorSystemUnregistered,
-    addStream:                 addStream,
-    removeStream:              removeStream,
+    sensorSystemAdded:         sensorSystemAdded,
+    sensorSystemDeleted:       sensorSystemDeleted,
+    addDataStream:             addDataStream,
+    deleteDataStream:          deleteDataStream,
     addGeoJson:                addGeoJson,
     addObsScalarData:          addObsScalarData,
     addSelectionPoint:         addSelectionPoint,

@@ -29,11 +29,11 @@ class VModel(sysid: String, cc: ClientConfig, llmap: LLMap) {
     }
   }
 
-  def registerSystem(name:          Option[String],
-                     description:   Option[String],
-                     center:        Option[LatLon],
-                     zoom:          Option[Int],
-                     clickListener: Option[String]): Unit = {
+  def addSensorSystem(name:          Option[String],
+                      description:   Option[String],
+                      center:        Option[LatLon],
+                      zoom:          Option[Int],
+                      clickListener: Option[String]): Unit = {
     ss := VmSensorSystem(
       sysid = sysid,
       name = name,
@@ -42,7 +42,7 @@ class VModel(sysid: String, cc: ClientConfig, llmap: LLMap) {
       center = center,
       clickListener = clickListener
     )
-    llmap.sensorSystemRegistered(jsCenter(center), zoom.getOrElse(cc.zoom))
+    llmap.sensorSystemAdded(jsCenter(center), zoom.getOrElse(cc.zoom))
   }
 
   private def jsCenter(center: Option[LatLon]): js.Array[Double] = {
@@ -50,12 +50,12 @@ class VModel(sysid: String, cc: ClientConfig, llmap: LLMap) {
     js.Array(c.lat, c.lon)
   }
 
-  def unregisterSystem(): Unit = {
+  def deleteSensorSystem(): Unit = {
     ss := VmSensorSystem(sysid)
-    llmap.sensorSystemUnregistered()
+    llmap.sensorSystemDeleted()
   }
 
-  def addStream(str: VmDataStream): Unit = {
+  def addDataStream(str: VmDataStream): Unit = {
     ss := ss.get.copy(streams = str :: ss.get.streams)
     addAbsoluteChartIfSo(str.strid, str.chartStyle)
     addStreamToMap(str)
@@ -84,7 +84,7 @@ class VModel(sysid: String, cc: ClientConfig, llmap: LLMap) {
   }
 
   private def addStreamToMap(str: VmDataStream): Unit = {
-    llmap.addStream(Map(
+    llmap.addDataStream(Map(
       "strid"        → str.strid,
       "name"         → str.name.orUndefined,
       "description"  → str.description.orUndefined,
@@ -102,10 +102,10 @@ class VModel(sysid: String, cc: ClientConfig, llmap: LLMap) {
     ).toJSDictionary)
   }
 
-  def removeStream(strid: String): Unit = {
+  def deleteDataStream(strid: String): Unit = {
     val streams = ss.get.streams.filterNot(_.strid == strid)
     ss := ss.get.copy(streams = streams)
-    llmap.removeStream(strid)
+    llmap.deleteDataStream(strid)
   }
 
   def addObservations(strid: String,

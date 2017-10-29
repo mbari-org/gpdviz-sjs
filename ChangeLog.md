@@ -1,7 +1,8 @@
 # Gpdviz
 
-2017-10-27
+2017-10-28
 
+- overall register/unregister-to-add/delete renaming
 - add drop-tables, especially to avoid error noise during local testing
 
 2017-10-25

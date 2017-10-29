@@ -4,8 +4,9 @@ import com.typesafe.config.Config
 import com.typesafe.scalalogging.{StrictLogging ⇒ Logging}
 import gpdviz.data.MyPostgresProfile.api._
 import gpdviz.model._
-import gpdviz.server.{GnError, GnErrorF, ObservationsRegister, SSUpdate}
-import slick.sql.SqlAction
+import gpdviz.server.{GnError, GnErrorF, ObservationsAdd, SensorSystemUpdate}
+import slick.dbio.Effect
+import slick.sql.{FixedSqlAction, SqlAction}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -165,7 +166,7 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
   def existsSensorSystem(sysid: String): Future[Boolean] =
     db.run(existsSensorSystemAction(sysid))
 
-  def registerSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystemSummary]] = {
+  def addSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystemSummary]] = {
     val ssAction =
       sensorsystem += PgSSensorSystem(
         ss.sysid,
@@ -193,7 +194,7 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     }
   }
 
-  def updateSensorSystem(sysid: String, ssu: SSUpdate): Future[Either[GnError, SensorSystemSummary]] = {
+  def updateSensorSystem(sysid: String, ssu: SensorSystemUpdate): Future[Either[GnError, SensorSystemSummary]] = {
     val action = sensorsystem.filter(_.sysid === sysid)
       .map(p ⇒ (p.centerLat, p.centerLon))
       .update((
@@ -206,8 +207,8 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     }
   }
 
-  def registerDataStream(sysid: String)
-                        (ds: DataStream): Future[Either[GnError, DataStreamSummary]] = {
+  def addDataStream(sysid: String)
+                   (ds: DataStream): Future[Either[GnError, DataStreamSummary]] = {
 
     val action = existsDataStreamAction(sysid, ds.strid) flatMap {
       case true  ⇒ DBIO.successful(GnErrorF.dataStreamDefined(sysid, ds.strid))
@@ -220,16 +221,16 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     }
   }
 
-  def registerVariableDef(sysid: String, strid: String)
-                         (vd: VariableDef): Future[Either[GnError, VariableDefSummary]] = {
+  def addVariableDef(sysid: String, strid: String)
+                    (vd: VariableDef): Future[Either[GnError, VariableDefSummary]] = {
 
     db.run(variableDefAddAction(sysid, strid, vd)) map { _ ⇒
       Right(VariableDefSummary(sysid, strid, vd.name, vd.units))
     }
   }
 
-  def registerObservations(sysid: String, strid: String)
-                          (obssr: ObservationsRegister): Future[Either[GnError, ObservationsSummary]] = {
+  def addObservations(sysid: String, strid: String)
+                     (obssr: ObservationsAdd): Future[Either[GnError, ObservationsSummary]] = {
     var num = 0
     val actions = obssr.observations flatMap { case (time, list) ⇒
       num += list.length
@@ -237,14 +238,6 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     }
     db.run(DBIO.seq(actions.toSeq: _*).transactionally) map { _ ⇒
       Right(ObservationsSummary(sysid, strid, added = Some(num)))
-    }
-  }
-
-  def registerObservation(sysid: String, strid: String, time: String,
-                          obsData: ObsData): Future[Either[GnError, ObservationsSummary]] = {
-
-    db.run(observationAddAction(sysid, strid, time, obsData)) map { _ ⇒
-      Right(ObservationsSummary(sysid, strid, time = Some(time), added = Some(1)))
     }
   }
 
@@ -446,8 +439,9 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
 
   //////////////
 
-  private def observationAddAction(sysid: String, strid: String, time: String,
-                                   obsData: ObsData) =
+  private def observationAddAction(sysid: String, strid: String,
+                                   time: String, obsData: ObsData
+                                  ): FixedSqlAction[Int, NoStream, Effect.Write] =
     observation += PgSObservation(
       sysid,
       strid,

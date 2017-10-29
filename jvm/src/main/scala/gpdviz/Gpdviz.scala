@@ -106,8 +106,8 @@ object Gpdviz {
       val db = DbFactory.openDb
       systems foreach { ss ⇒
         println(s"Importing ${ss.sysid} ...")
-        Await.ready(db.registerSensorSystem(ss) andThen {
-          case Failure(e) ⇒ println(s"error registering ${ss.sysid}", e)
+        Await.ready(db.addSensorSystem(ss) andThen {
+          case Failure(e) ⇒ println(s"error adding ${ss.sysid}", e)
         }, 10.seconds)
       }
       db.close()
