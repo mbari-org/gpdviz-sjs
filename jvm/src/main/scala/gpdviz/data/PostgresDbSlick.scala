@@ -163,34 +163,37 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     }).toSeq)
   }
 
-  def existsSensorSystem(sysid: String): Future[Boolean] =
-    db.run(existsSensorSystemAction(sysid))
-
   def addSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystemSummary]] = {
-    val ssAction =
-      sensorsystem += PgSSensorSystem(
-        ss.sysid,
-        name = ss.name,
-        description = ss.description,
-        pushEvents = ss.pushEvents,
-        centerLat = ss.center.map(_.lat),
-        centerLon = ss.center.map(_.lon),
-        zoom = ss.zoom,
-        clickListener = ss.clickListener
-      )
+    val action = existsSensorSystemAction(ss.sysid) flatMap {
+      case true  ⇒ DBIO.successful(GnErrorF.sensorSystemDefined(ss.sysid))
+      case false ⇒
+        val ssAction =
+          sensorsystem += PgSSensorSystem(
+            ss.sysid,
+            name = ss.name,
+            description = ss.description,
+            pushEvents = ss.pushEvents,
+            centerLat = ss.center.map(_.lat),
+            centerLon = ss.center.map(_.lon),
+            zoom = ss.zoom,
+            clickListener = ss.clickListener
+          )
 
-    val dsActions = ss.streams.values.map(dataStreamAddAction(ss.sysid, _))
+        val dsActions = ss.streams.values.map(dataStreamAddAction(ss.sysid, _))
+        val actions = List(ssAction) ++ dsActions
+        DBIO.seq(actions: _*)
+    }
 
-    val actions = List(ssAction) ++ dsActions
-
-    db.run(DBIO.seq(actions: _*).transactionally) map { _ ⇒
-      Right(SensorSystemSummary(
-        ss.sysid,
-        name = ss.name,
-        description = ss.description,
-        pushEvents = Some(ss.pushEvents),
-        center = ss.center
-      ))
+    db.run(action.transactionally) map {
+      case e: GnError ⇒ Left(e)
+      case _          ⇒
+        Right(SensorSystemSummary(
+          ss.sysid,
+          name = ss.name,
+          description = ss.description,
+          pushEvents = Some(ss.pushEvents),
+          center = ss.center
+        ))
     }
   }
 

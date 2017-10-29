@@ -16,8 +16,6 @@ trait DbInterface {
 
   def listSensorSystems(): Future[Seq[SensorSystemSummary]]
 
-  def existsSensorSystem(sysid: String): Future[Boolean]
-
   def getSensorSystem(sysid: String): Future[Option[SensorSystem]]
 
   def addSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystemSummary]]

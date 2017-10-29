@@ -1,7 +1,7 @@
 package gpdviz.server
 
 import akka.http.scaladsl.marshalling.ToResponseMarshallable
-import akka.http.scaladsl.model.StatusCodes.{Conflict, InternalServerError, NotFound}
+import akka.http.scaladsl.model.StatusCodes.{InternalServerError, NotFound}
 import akka.http.scaladsl.model._
 import com.typesafe.scalalogging.{LazyLogging ⇒ Logging}
 import gpdviz.async.Notifier
@@ -9,7 +9,7 @@ import gpdviz.data.DbInterface
 import gpdviz.model.{DataStream, SensorSystem}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.Future
 import scala.util.control.NonFatal
 
 trait GpdvizServiceImpl extends JsonImplicits with Logging {
@@ -17,29 +17,24 @@ trait GpdvizServiceImpl extends JsonImplicits with Logging {
   def notifier: Notifier
 
   def addSensorSystem(ssr: SensorSystemAdd): Future[ToResponseMarshallable] = {
-    val p = Promise[ToResponseMarshallable]()
-    db.existsSensorSystem(ssr.sysid) map {
-      case false ⇒
-        val ss = SensorSystem(ssr.sysid,
-          name = ssr.name,
-          description = ssr.description,
-          pushEvents = ssr.pushEvents.getOrElse(true),
-          center = ssr.center,
-          clickListener = ssr.clickListener
-        )
-        db.addSensorSystem(ss) map {
-          case Right(ssSum) ⇒
-            notifier.notifySensorSystemAdded(ss)
-            p.success(ssSum)
-          case Left(error) ⇒
-            p.success(InternalServerError -> error)
-        }
-
-      case true ⇒
-        p.success(Conflict -> GnErrorF.sensorSystemDefined(ssr.sysid))
+    logger.debug(s"addSensorSystem: sysid=${ssr.sysid}")
+    val ss = SensorSystem(ssr.sysid,
+      name = ssr.name,
+      description = ssr.description,
+      pushEvents = ssr.pushEvents.getOrElse(true),
+      center = ssr.center,
+      clickListener = ssr.clickListener
+    )
+    db.addSensorSystem(ss) map {
+      case Right(ssSum) ⇒
+        notifier.notifySensorSystemAdded(ss)
+        ssSum
+      case Left(error) ⇒
+        if (error.code < 500)
+          StatusCodes.custom(error.code, error.msg)
+        else
+          InternalServerError -> error
     }
-
-    p.future
   }
 
   def getSensorSystem(sysid: String): Future[ToResponseMarshallable] = {
