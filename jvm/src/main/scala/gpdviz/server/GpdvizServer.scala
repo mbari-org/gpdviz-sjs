@@ -4,54 +4,14 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import gpdviz.async._
-import gpdviz.config.configFile
 import gpdviz.config.cfg
-import gpdviz.data.{DbInterface, FileDb, MongoDb, PostgresDb}
+import gpdviz.data.{DbFactory, DbInterface}
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.io.StdIn
 
-object GpdvizServer {
-  def main(args: Array[String]) {
-    if (args.contains("generate-conf")) {
-      generateConf(args)
-    }
-    else if (args.contains("run")) {
-      if (!configFile.canRead) {
-        System.err.println(s"cannot access $configFile")
-      }
-      else new GpdvizServer().run(!args.contains("-d"))
-    }
-    else {
-      System.err.println(s"""
-        |Usage:
-        |   gpdviz generate-conf [--overwrite]
-        |   gpdviz run [-d]
-        """.stripMargin)
-    }
-  }
-
-  private def generateConf(args: Array[String]): Unit = {
-    if (configFile.exists() && !args.contains("--overwrite")) {
-      System.err.println(s"$configFile exists.  Use --overwrite to overwrite")
-    }
-    else {
-      val conf = scala.io.Source.fromInputStream(
-        getClass.getClassLoader.getResource("params_template.conf").openStream()
-      ).mkString
-      import java.nio.charset.StandardCharsets
-      import java.nio.file.Files
-      val bytes = conf.getBytes(StandardCharsets.UTF_8)
-      Files.write(configFile.toPath, bytes)
-      println(s" Configuration generated: $configFile\n")
-    }
-  }
-}
-
 class GpdvizServer extends GpdvizService {
-  val db: DbInterface = cfg.mongo.map(new MongoDb(_))
-    .getOrElse(cfg.postgres.map(new PostgresDb(_))
-    .getOrElse(new FileDb("data")))
+  val db: DbInterface = DbFactory.openDb
 
   implicit val system: ActorSystem = ActorSystem()
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
@@ -78,9 +38,13 @@ class GpdvizServer extends GpdvizService {
     if (keyToStop) {
       println("Press RETURN to stop...")
       StdIn.readLine()
+      // trigger unbinding from the port and shutdown when done
       bindingFuture
-        .flatMap(_.unbind()) // trigger unbinding from the port
-        .onComplete(_ ⇒ system.terminate()) // and shutdown when done
+        .flatMap(_.unbind())
+        .onComplete { _ ⇒
+          db.close()
+          system.terminate()
+        }
     }
   }
 }

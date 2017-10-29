@@ -6,21 +6,21 @@ Gpdviz is a tool for web-based visualization of geo-located point data streams i
 
 Gpdviz uses a simple data model and a REST API for data providers to register sensor systems,
 data streams, and observations.
-The visualizer is updated in real-time using WebSockets.
-
-Assuming Gpdviz is deployed at `http://example.net/gpdviz`, users will visualize a
-particular sensor system with ID `mysysid` at `http://example.net/gpdviz/mysysid/`.
-The REST API endpoint for data providers is `http://example.net/gpdviz/api`.
 This API is specified using [OpenAPI 2.0](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md).
-A page with the complete API documentation, with ability to directly exercise it (powered by Swagger UI),
-is located at `http://example.net/gpdviz/api-docs`.
+The visualization is updated in real-time using WebSockets.
+
+Assuming Gpdviz is deployed at `http://example.net/gpdviz` and particular sensor system with 
+ID `mysysid`:
+- Data provider uses the REST API endpoint at `http://example.net/gpdviz/api`.
+  A page with the complete API documentation, with ability to directly exercise it (powered by Swagger UI),
+  is located at `http://example.net/gpdviz/api-docs`.
+- Users visualize the system at `http://example.net/gpdviz/mysysid/`
 
 **Motivation** 
 
 Gpdviz is motivated by the value of having a web-based, lightweight tool for easy
 visualization of sensor data information especially in non-data intensive scenarios.
-It is not intended to compete with any more sophisticated visualization and analysis tools,
-but rather complement the available tool set for the user.
+It is intended to complement the available tool set for the user.
 
 
 **Data model**
@@ -29,20 +29,24 @@ Gpdviz's data model is intended to be simple.
 There are three main entities in the data model:
 _sensor systems_, _data streams_, and _observations_.
 
-A sensor system has associated metadata (name, description, etc.) and consists of a set of data streams.
+- A sensor system has associated metadata (name, description, etc.) 
+  and consists of a set of data streams.
 
-A data stream also has associated metadata (name, description, styles) and consists of
-a set of variable definitions (name, units) and associated timestamped data observations.
-Observations can be a combination of scalar data (eg., temperature values),
-and features and geometries (in geo-json format).
+- A data stream has associated metadata (name, description, map/chart styles, etc.) 
+  and consists of a set of variable definitions and associated timestamped data observations.
+
+- A variable definition consists of a name, units, and chart style. 
+
+- An observation is timestamped and can capture scalar data (eg., temperature values),
+  as well as features and geometries (in geo-json format).
  
 **Operations for data providers**
 
 Data providers interact with a Gpdviz endpoint to perform the following operations:
 
-- Register/Unregister sensor systems
-- Add/Remove data streams
-- Notify new observations for the streams
+- Register/unregister sensor systems
+- Add/remove data streams
+- Register data stream observations
 
 The Gpdviz server maintains a registry with the provided information for each sensor system
 including a window of most recent reported observations for each stream in the system.
@@ -55,25 +59,29 @@ updates reported by the provider.
 
 Download the latest executable JAR `gpdviz-x.y.z.jar` from https://github.com/gpdviz/gpdviz/releases/.
 
-You will only need a [Java runtime environment](https://www.java.com/) to execute it.
+To execute Gpdviz you will need a [Java runtime environment](https://www.java.com/) and
+access to a PostgreSQL server. 
 
-Gpdviz expects a number of parameters for its regular execution. These parameters are to be
-indicated in a local `gpdviz.conf` file on the current directory. A template of such file, with
-a description of the various parameters, can be generated as follows:
+- Gpdviz expects a number of parameters for its regular execution. These parameters are to be
+  indicated in a local `gpdviz.conf` file on the current directory. A template of such file, with
+  a description of the various parameters, can be generated as follows:
 
-```shell 
-$ java -jar gpdviz-x.y.z.jar generate-conf
-```
+        $ java -jar gpdviz-x.y.z.jar generate-conf
 
-Edit `gpdviz.conf` as indicated.
+- Edit `gpdviz.conf` as indicated.
 
-Regular execution is indicated with the `run` argument: 
+- Create the database according to the relevant parameters in `gpdviz.conf`, e.g.:
 
-```shell 
-$ java -jar gpdviz-x.y.z.jar run
-```
+        $ psql -c 'create database gpdviz;' -U postgres
 
-An [httpie](https://httpie.org/)-based client demo is described below.
+- Execute the Gpdviz server: 
+
+        $ java -jar gpdviz-x.y.z.jar run-server
+
+
+This [bash script](https://github.com/gpdviz/gpdviz/blob/master/data/ss1.demo.sh)
+can be used as a demo of a data provider. Define the `GPDVIZ_SERVER` environment
+variable prior to running this [httpie](https://httpie.org/)-based script.
 
 For a similar demo in Python, see https://github.com/gpdviz/gpdviz_python_client_example.
 
@@ -92,8 +100,10 @@ Gpdviz implementation is based on:
     $ npm install jsdom source-map-support
 	$ sbt
 	> package   # to copy js resources to jvm's classpath needed for the webapp
-	> gpdvizJVM/runMain gpdviz.server.GpdvizServer generate-conf
-	> ~gpdvizJVM/runMain gpdviz.server.GpdvizServer run
+	> gpdvizJVM/runMain gpdviz.Gpdviz generate-conf
+	> gpdvizJVM/runMain gpdviz.Gpdviz create-tables
+	> gpdvizJVM/runMain gpdviz.Gpdviz add-some-data
+	> gpdvizJVM/runMain gpdviz.Gpdviz run-server
 
 Open http://localhost:5050/ss1/
 
@@ -113,7 +123,7 @@ generates: `jvm/target/scala-2.12/gpdviz-assembly-x.y.z.jar`.
 
 ### Model
 
-Data model details are still rather ad hoc.
+Data model details are still wip.
 
 ### API
 

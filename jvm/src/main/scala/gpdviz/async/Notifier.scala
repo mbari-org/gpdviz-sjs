@@ -1,26 +1,19 @@
 package gpdviz.async
 
 import gpdviz._
-import gpdviz.config.cfg
 import gpdviz.model._
 import gpdviz.server.JsonImplicits
 import spray.json._
 
 import scala.annotation.tailrec
 
+// TODO should check pushEvents flag
 
 class Notifier(pub: Publisher) extends JsonImplicits {
 
-  def getSensorSystemIndex(sysid: String, ssOpt: Option[SensorSystem],
-                           indexResource: String = "web/index.html"): String = {
-    val template = scala.io.Source.fromResource(indexResource).mkString
-    template.replace("#sysid", sysid)
-      .replace("#externalUrl", cfg.externalUrl)
-  }
-
-  def notifySensorSystemRegistered(ss: SensorSystem): Unit = {
+  def notifySensorSystemAdded(ss: SensorSystem): Unit = {
     if (ss.pushEvents) {
-      pub.publish(SensorSystemRegistered(
+      pub.publish(SensorSystemAdded(
         sysid = ss.sysid,
         name = ss.name,
         description = ss.description,
@@ -31,25 +24,37 @@ class Notifier(pub: Publisher) extends JsonImplicits {
     }
   }
 
-  def notifyStreamAdded(ss: SensorSystem, str: DataStream): Unit = {
-    if (ss.pushEvents) {
-      pub.publish(StreamAdded(
-        sysid = ss.sysid,
-        str = VmDataStream(
-          str.strid,
-          str.name,
-          str.description,
-          mapStyle = str.mapStyle.map(_.toJson.compactPrint),
-          str.zOrder,
-          chartStyle = str.chartStyle.map(_.toJson.compactPrint),
-          variables = str.variables.map(_.map(v ⇒ VmVariableDef(v.name, v.units, v.chartStyle.map(_.toJson.compactPrint))))
-          // TODO NOTE observations not captured at time of stream registration
-        )
-      ))
-    }
+  def notifyDataStreamAdded(sysid: String, str: DataStream): Unit = {
+    // NOTE observations not captured at time of stream registration
+    require(str.observations.isEmpty)
+
+    pub.publish(DataStreamAdded(
+      sysid = sysid,
+      str = VmDataStream(
+        str.strid,
+        str.name,
+        str.description,
+        mapStyle = str.mapStyle.map(_.toJson.compactPrint),
+        str.zOrder,
+        chartStyle = str.chartStyle.map(_.toJson.compactPrint),
+        variables = str.variables.map(_.map(v ⇒ VmVariableDef(v.name, v.units, v.chartStyle.map(_.toJson.compactPrint))))
+      )
+    ))
   }
 
-  def notifyObservations2Added(ss: SensorSystem, strid: String, observations: Map[String, List[ObsData]]): Unit = if (ss.pushEvents) {
+  def notifyVariableDefAdded(sysid: String, strid: String, vd: VariableDef): Unit = {
+    pub.publish(VariableDefAdded(
+      sysid = sysid,
+      strid = strid,
+      vd = VmVariableDef(
+        name = vd.name,
+        units = vd.units,
+        chartStyle = vd.chartStyle.map(_.toJson.compactPrint)
+      )
+    ))
+  }
+
+  def notifyObservationsAdded(sysid: String, strid: String, observations: Map[String, List[ObsData]]): Unit = {
     val obs = observations mapValues { list ⇒
       val obsDataList = collection.mutable.ListBuffer[VmObsData]()
       list foreach  { o ⇒
@@ -67,8 +72,8 @@ class Notifier(pub: Publisher) extends JsonImplicits {
       if (from < obs.size) {
         val next = Math.min(from + 15, obs.size)
         val slice = obs.slice(from, next)
-        pub.publish(Observations2Added(
-          sysid = ss.sysid,
+        pub.publish(ObservationsAdded(
+          sysid = sysid,
           strid = strid,
           obss = slice
         ))
@@ -78,27 +83,19 @@ class Notifier(pub: Publisher) extends JsonImplicits {
     rec(0)
   }
 
-  def notifyStreamRemoved(ss: SensorSystem, strid: String): Unit = {
-    if (ss.pushEvents) {
-      pub.publish(StreamRemoved(ss.sysid, strid))
-    }
+  def notifyDataStreamDeleted(sysid: String, strid: String): Unit = {
+    pub.publish(DataStreamDeleted(sysid, strid))
   }
 
-  def notifySensorSystemUpdated(ss: SensorSystem): Unit = {
-    if (ss.pushEvents) {
-      pub.publish(SensorSystemUpdated(ss.sysid))
-    }
+  def notifySensorSystemUpdated(sysid: String): Unit = {
+    pub.publish(SensorSystemUpdated(sysid))
   }
 
-  def notifySensorSystemRefresh(ss: SensorSystem): Unit = {
-    if (ss.pushEvents) {
-      pub.publish(SensorSystemRefresh(ss.sysid))
-    }
+  def notifySensorSystemRefresh(sysid: String): Unit = {
+    pub.publish(SensorSystemRefresh(sysid))
   }
 
-  def notifySensorSystemUnregistered(ss: SensorSystem): Unit = {
-    if (ss.pushEvents) {
-      pub.publish(SensorSystemUnregistered(ss.sysid))
-    }
+  def notifySensorSystemDeleted(sysid: String): Unit = {
+    pub.publish(SensorSystemDeleted(sysid))
   }
 }

@@ -1,5 +1,45 @@
 # Gpdviz
 
+2017-10-28
+
+- route to add variable definitions
+- adjust response for successful creation of entities
+- overall register/unregister-to-add/delete renaming
+- add drop-tables, especially to avoid error noise during local testing
+
+2017-10-25
+
+- complete retrieval of full sensor system
+- add option to import existing models in json files
+
+2017-10-23
+
+- first slick-based version
+
+2017-10-20
+
+- due to doobie issues, trying slick
+- due to quill issues, trying again with doobie
+- some db-related refact
+- nested embedded with intermediate Option still not handled by quill 
+
+2017-10-19
+
+- do not forget to also update the swagger response types!
+- adjustments to API mainly in terms of responses (so they are all objects)
+- tests re-enabled (except for one involving quill's update operation) 
+
+2017-10-14
+
+- focus on quill/postgres as the database system. 
+  Some tests ignored for now.
+  ss1.demo.sh working.
+  Define config property `gpdviz.postgres` to exercise it.
+  DB setup:
+
+        psql -c 'create database gpdviz;' -U postgres
+        psql -U postgres -d gpdviz < create_tables.sql
+
 2017-09-14 0.3.2
 
 - fix api-docs link

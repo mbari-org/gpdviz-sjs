@@ -167,13 +167,17 @@ function Charter(str, hoveredPoint) {
 
       rangeSelector: {
         buttons: [{
-          count: 10,
+          count: 15,
           type: 'minute',
-          text: '10m'
+          text: '15m'
         }, {
           count: 1,
           type: 'hour',
           text: '1H'
+        }, {
+          count: 3,
+          type: 'hour',
+          text: '3H'
         }, {
           count: 6,
           type: 'hour',

@@ -8,7 +8,8 @@ object SwaggerSpecService extends SwaggerHttpService {
   override val info = Info(
     version = cfg.gpdviz.version,
     title = "Gpdviz REST API",
-    description = "The Gpdviz REST API deals with three kinds of resources: " +
+    description =
+      "The Gpdviz REST API deals with three main kinds of resources: " +
       "sensor systems, data streams, and observations."
   )
 
@@ -24,6 +25,7 @@ object SwaggerSpecService extends SwaggerHttpService {
     classOf[SsService],
     classOf[OneSsService],
     classOf[OneStrService],
+    classOf[VariableDefService],
     classOf[ObsService]
   )
 }

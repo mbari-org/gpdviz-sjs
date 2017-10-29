@@ -1,173 +1,167 @@
 package gpdviz.server
 
 import akka.http.scaladsl.marshalling.ToResponseMarshallable
-import akka.http.scaladsl.model.StatusCodes.{Conflict, InternalServerError, NotFound}
 import akka.http.scaladsl.model._
+import com.typesafe.scalalogging.{LazyLogging ⇒ Logging}
 import gpdviz.async.Notifier
 import gpdviz.data.DbInterface
-import gpdviz.model.{DataStream, SensorSystem}
+import gpdviz.model.{DataStream, SensorSystem, VariableDef}
+import spray.json._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.Future
+import scala.util.control.NonFatal
 
-trait GpdvizServiceImpl extends JsonImplicits  {
+trait GpdvizServiceImpl extends JsonImplicits with Logging {
   def db: DbInterface
   def notifier: Notifier
 
-  def registerSensorSystem(ssr: SSRegister): Future[ToResponseMarshallable] = {
-    val p = Promise[ToResponseMarshallable]()
-    db.getSensorSystem(ssr.sysid) map {
-      case None ⇒
-        val ss = SensorSystem(ssr.sysid,
-          name = ssr.name,
-          description = ssr.description,
-          pushEvents = ssr.pushEvents.getOrElse(true),
-          center = ssr.center,
-          clickListener = ssr.clickListener
-        )
-        db.saveSensorSystem(ss) map {
-          case Right(rss) ⇒
-            notifier.notifySensorSystemRegistered(rss)
-            p.success(rss)
-          case Left(error) ⇒
-            p.success(InternalServerError -> error)
-        }
-
-      case Some(_) ⇒
-        p.success(Conflict -> GnError(409, "Already registered", sysid = Some(ssr.sysid)))
+  def addSensorSystem(ssr: SensorSystemAdd): Future[ToResponseMarshallable] = {
+    logger.debug(s"addSensorSystem: sysid=${ssr.sysid}")
+    val ss = SensorSystem(ssr.sysid,
+      name = ssr.name,
+      description = ssr.description,
+      pushEvents = ssr.pushEvents.getOrElse(true),
+      center = ssr.center,
+      clickListener = ssr.clickListener
+    )
+    db.addSensorSystem(ss) map {
+      case Right(ssSum) ⇒
+        notifier.notifySensorSystemAdded(ss)
+        goodResponse(StatusCodes.Created, ssSum.toJson)
+      case Left(error) ⇒ errorResponse(error)
     }
-
-    p.future
   }
 
-  def getSensorSystem(sysid: String): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒ Future(ss) }
-
-  def updateSensorSystem(sysid: String, ssu: SSUpdate): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒
-    println(s"updateSensorSystem: sysid=$sysid ssu=$ssu")
-
-    var updated = ss.copy()
-    ssu.pushEvents foreach {
-      pe ⇒ updated = updated.copy(pushEvents = pe)
+  def getSensorSystem(sysid: String): Future[ToResponseMarshallable] = {
+    db.getSensorSystem(sysid) map {
+      case Some(ss) ⇒ ss
+      case None     ⇒ errorResponse(GnErrorF.sensorSystemUndefined(sysid))
     }
-    ssu.center foreach { _ ⇒
-      updated = updated.copy(center = ssu.center)
-    }
+  }
 
-    db.saveSensorSystem(updated) map {
-      case Right(uss) ⇒
-        notifier.notifySensorSystemUpdated(uss)
+  def updateSensorSystem(sysid: String, ssu: SensorSystemUpdate): Future[ToResponseMarshallable] = {
+    logger.debug(s"updateSensorSystem: sysid=$sysid ssu=$ssu")
+    db.updateSensorSystem(sysid, ssu) map {
+      case Right(ssSum) ⇒
+        notifier.notifySensorSystemUpdated(sysid)
         if (ssu.refresh.getOrElse(false)) {
-          notifier.notifySensorSystemRefresh(uss)
+          notifier.notifySensorSystemRefresh(sysid)
         }
-        uss
-      case Left(error) ⇒ InternalServerError -> error
+        ssSum
+
+      case Left(error) ⇒ errorResponse(error)
     }
   }
 
-  def unregisterSensorSystem(sysid: String): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒
-    println(s"unregisterSensorSystem: sysid=$sysid")
+  def deleteSensorSystem(sysid: String): Future[ToResponseMarshallable] = {
+    logger.debug(s"deleteSensorSystem: sysid=$sysid")
     db.deleteSensorSystem(sysid) map {
-      case Right(s) ⇒
-        notifier.notifySensorSystemUnregistered(s)
-        s
-      case Left(error) ⇒ InternalServerError -> error
+      case Right(ssSum) ⇒
+        notifier.notifySensorSystemDeleted(sysid)
+        ssSum
+
+      case Left(error) ⇒ errorResponse(error)
     }
   }
 
-  def addStream(sysid: String, strr: StreamRegister): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒
-    println(s"addStream: sysid=$sysid strid=${strr.strid}")
-    ss.streams.get(strr.strid) match {
-      case None ⇒
-        val ds = DataStream(
-          strid       = strr.strid,
-          name        = strr.name,
-          description = strr.description,
-          mapStyle    = strr.mapStyle,
-          zOrder      = strr.zOrder.getOrElse(0),
-          variables   = strr.variables,
-          chartStyle  = strr.chartStyle
-        )
-        val updated = ss.copy(streams = ss.streams.updated(strr.strid, ds))
-        db.saveSensorSystem(updated) map {
-          case Right(uss) ⇒
-            notifier.notifyStreamAdded(uss, ds)
-            uss
-          case Left(error) ⇒ InternalServerError -> error
-        }
-
-      case Some(_) ⇒ Future(streamAlreadyDefined(sysid, strr.strid))
+  def addDataStream(sysid: String, strr: DataStreamAdd): Future[ToResponseMarshallable] = {
+    logger.debug(s"addDataStream: sysid=$sysid strid=${strr.strid}")
+    val ds = DataStream(
+      strid       = strr.strid,
+      name        = strr.name,
+      description = strr.description,
+      mapStyle    = strr.mapStyle,
+      zOrder      = strr.zOrder.getOrElse(0),
+      variables   = strr.variables,
+      chartStyle  = strr.chartStyle
+    )
+    db.addDataStream(sysid)(ds) map {
+      case Right(dsSum) ⇒
+        notifier.notifyDataStreamAdded(sysid, ds)
+        goodResponse(StatusCodes.Created, dsSum.toJson)
+      case Left(error) ⇒ errorResponse(error)
     }
   }
 
-  def addObservations(sysid: String, strid: String, obssr: ObservationsRegister): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒
-    println(s"addObservations: sysid=$sysid, strid=$strid, obssr=${obssr.observations.size}")
-    ss.streams.get(strid) match {
-      case Some(str) ⇒
-        val newObs = obssr.observations
-        val previous = str.observations.getOrElse(Map.empty)
-        var obsUpdated = previous
-        newObs foreach { case (k, v) ⇒
-          //v.map(_.geometry).filter(_.isDefined).map(_.get) foreach {geometry ⇒
-          //  println(s"::: geometry: type=${geometry.getType}: $geometry")
-          //}
-          obsUpdated = obsUpdated.updated(k, v)
-        }
-        val strUpdated = str.copy(observations = Some(obsUpdated))
-        val ssUpdated = ss.copy(streams = ss.streams.updated(strid, strUpdated))
-        db.saveSensorSystem(ssUpdated) map {
-          case Right(uss) ⇒
-            notifier.notifyObservations2Added(uss, strid, newObs)
-            newObs
-
-          case Left(error) ⇒ InternalServerError -> error
-        }
-
-      case None ⇒ Future(streamUndefined(sysid, strid))
+  def addVariableDef(sysid: String, strid: String, vd: VariableDef): Future[ToResponseMarshallable] = {
+    logger.debug(s"addVariableDef: sysid=$sysid strid=$strid vd=$vd")
+    db.addVariableDef(sysid, strid)(vd) map {
+      case Right(vdSum) ⇒
+        notifier.notifyVariableDefAdded(sysid, strid, vd)
+        goodResponse(StatusCodes.Created, vdSum.toJson)
+      case Left(error) ⇒ errorResponse(error)
     }
   }
 
-  def getStream(sysid: String, strid: String): Future[ToResponseMarshallable] = withSensorSystem(sysid) { ss ⇒
-    Future {
-      ss.streams.get(strid) match {
-        case Some(str) ⇒ str
-        case None ⇒ streamUndefined(sysid, strid)
+  def addObservations(sysid: String, strid: String, obssr: ObservationsAdd): Future[ToResponseMarshallable] = Future {
+    import pprint.PPrinter.Color.{apply ⇒ pp}
+    logger.debug(s"addObservations: sysid=$sysid, strid=$strid, obssr=${pp(obssr.observations)}")
+    try {
+      db.addObservations(sysid, strid)(obssr) map { obsSum ⇒
+        notifier.notifyObservationsAdded(sysid, strid, obssr.observations)
+        goodResponse(StatusCodes.Created, obsSum.toJson)
       }
     }
-  }
-
-  def deleteStream(sysid: String, strid: String): ToResponseMarshallable = withSensorSystem(sysid) { ss ⇒
-    println(s"deleteStream: sysid=$sysid strid=$strid")
-    ss.streams.get(strid) match {
-      case Some(_) ⇒
-        val updated = ss.copy(streams = ss.streams - strid)
-        db.saveSensorSystem(updated) map {
-          case Right(uss) ⇒
-            notifier.notifyStreamRemoved(uss, strid)
-            uss
-          case Left(error) ⇒ InternalServerError -> error
-        }
-
-      case None ⇒ Future(streamUndefined(sysid, strid))
+    catch {
+      case NonFatal(ex) ⇒
+        ex.printStackTrace()
+        errorResponse(GnError(500, ex.getMessage))
     }
   }
 
-  private def withSensorSystem(sysid: String)(p : SensorSystem ⇒ Future[ToResponseMarshallable]): Future[ToResponseMarshallable] = {
-    db.getSensorSystem(sysid) map {
-      case Some(ss) ⇒ p(ss)
-      case None ⇒ NotFound -> GnError(404, "not registered", sysid = Some(sysid))
+  def getDataStream(sysid: String, strid: String): Future[ToResponseMarshallable] = {
+    db.getDataStream(sysid, strid) map {
+      case Some(ds) ⇒ ds
+      case None     ⇒ errorResponse(GnErrorF.dataStreamUndefined(sysid, strid))
+    }
+  }
+
+  def deleteDataStream(sysid: String, strid: String): Future[ToResponseMarshallable] = {
+    import fansi.Color._
+    logger.debug(Red(s"deleteDataStream: sysid=$sysid strid=$strid").toString)
+    db.deleteDataStream(sysid, strid) map {
+      case Right(dsSum) ⇒
+        notifier.notifyDataStreamDeleted(sysid, strid)
+        dsSum
+      case Left(error) ⇒ errorResponse(error)
     }
   }
 
   def getSensorSystemIndex(sysid: String): Future[ToResponseMarshallable] = {
+    def getIndex(ssOpt: Option[SensorSystem]): String = {
+      import gpdviz.config.cfg
+      val indexResource = "web/index.html"
+      val template = scala.io.Source.fromResource(indexResource).mkString
+      template
+        .replace("#sysid", sysid)
+        .replace("#externalUrl", cfg.externalUrl)
+    }
+
+    logger.debug(s"getSensorSystemIndex calling getSensorSystem sysid=$sysid")
     db.getSensorSystem(sysid) map { ssOpt ⇒
-      val ssIndex = notifier.getSensorSystemIndex(sysid, ssOpt)
+      val ssIndex = getIndex(ssOpt)
       HttpEntity(ContentType(MediaTypes.`text/html`, HttpCharsets.`UTF-8`), ssIndex.getBytes("UTF-8"))
     }
   }
 
-  private def streamUndefined(sysid: String, strid: String): (StatusCodes.ClientError, GnError) =
-    NotFound -> GnError(404, "stream undefined", sysid = Some(sysid), strid = Some(strid))
+  private def goodResponse(status: StatusCode, jsonValue: JsValue): HttpResponse = {
+    HttpResponse(
+      status = status,
+      entity = HttpEntity(
+        ContentType(MediaTypes.`application/json`),
+        jsonValue.compactPrint
+      )
+    )
+  }
 
-  def streamAlreadyDefined(sysid: String, strid: String): (StatusCodes.ClientError, GnError) =
-    Conflict -> GnError(409, "stream already defined", sysid = Some(sysid), strid = Some(strid))
+  private def errorResponse(error: GnError): HttpResponse = {
+    HttpResponse(
+      status = error.code,
+      entity = HttpEntity(
+        ContentType(MediaTypes.`application/json`),
+        error.toJson.compactPrint
+      )
+    )
+  }
 }
