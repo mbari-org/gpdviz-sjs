@@ -8,6 +8,7 @@ import gpdviz.data.{DbFactory, DbInterface}
 import gpdviz.model._
 import gpdviz.server._
 import org.scalatest.{Matchers, WordSpec}
+//import pprint.PPrinter.Color.{apply ⇒ pp}
 
 
 class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with GpdvizService {
@@ -64,7 +65,9 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
     "fail to add existing sensor system" in {
       Post(s"/api/ss", SensorSystemAdd(sysid.get)) ~> routes ~> check {
         status shouldBe Conflict
-        //TODO contentType shouldBe `application/json`
+        contentType shouldBe `application/json`
+        val error = responseAs[GnError]
+        error.sysid shouldBe sysid
       }
     }
 
@@ -119,10 +122,12 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
 
     "fail to add an existing a stream" in {
       Post(s"/api/ss/${sysid.get}", DataStreamAdd(strid)) ~> routes ~> check {
-        //import pprint.PPrinter.Color.{apply ⇒ pp}
         //println(s"::::: status=$status: " + pp(response))
         status shouldBe Conflict
-        //TODO contentType shouldBe `application/json`
+        contentType shouldBe `application/json`
+        val error = responseAs[GnError]
+        error.sysid shouldBe sysid
+        error.strid shouldBe Some(strid)
       }
     }
 
@@ -139,7 +144,10 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
     "fail to delete non-existent stream" in {
       Delete(s"/api/ss/${sysid.get}/NoStr") ~> routes ~> check {
         status shouldBe NotFound
-        // TODO contentType shouldBe `application/json`
+        contentType shouldBe `application/json`
+        val error = responseAs[GnError]
+        error.sysid shouldBe sysid
+        error.strid shouldBe Some("NoStr")
       }
     }
 
@@ -190,13 +198,18 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
     "fail to delete non-existent sensor system" in {
       Delete(s"/api/ss/NoSs") ~> routes ~> check {
         status shouldBe NotFound
-        //TODO contentType shouldBe `application/json`
+        contentType shouldBe `application/json`
+        val error = responseAs[GnError]
+        error.sysid shouldBe Some("NoSs")
       }
     }
 
-    "not find non-existent sensor system" in {
+    "not find just removed sensor system" in {
       Get(s"/api/ss/${sysid.get}") ~> routes ~> check {
         status shouldBe NotFound
+        contentType shouldBe `application/json`
+        val error = responseAs[GnError]
+        error.sysid shouldBe sysid
       }
     }
   }

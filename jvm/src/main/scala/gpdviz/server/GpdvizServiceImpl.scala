@@ -1,7 +1,6 @@
 package gpdviz.server
 
 import akka.http.scaladsl.marshalling.ToResponseMarshallable
-import akka.http.scaladsl.model.StatusCodes.{InternalServerError, NotFound}
 import akka.http.scaladsl.model._
 import com.typesafe.scalalogging.{LazyLogging ⇒ Logging}
 import gpdviz.async.Notifier
@@ -29,18 +28,14 @@ trait GpdvizServiceImpl extends JsonImplicits with Logging {
       case Right(ssSum) ⇒
         notifier.notifySensorSystemAdded(ss)
         ssSum
-      case Left(error) ⇒
-        if (error.code < 500)
-          StatusCodes.custom(error.code, error.msg)
-        else
-          InternalServerError -> error
+      case Left(error) ⇒ errorResponse(error)
     }
   }
 
   def getSensorSystem(sysid: String): Future[ToResponseMarshallable] = {
     db.getSensorSystem(sysid) map {
       case Some(ss) ⇒ ss
-      case None     ⇒ NotFound -> GnErrorF.sensorSystemUndefined(sysid)
+      case None     ⇒ errorResponse(GnErrorF.sensorSystemUndefined(sysid))
     }
   }
 
@@ -54,7 +49,7 @@ trait GpdvizServiceImpl extends JsonImplicits with Logging {
         }
         ssSum
 
-      case Left(error) ⇒ InternalServerError -> error
+      case Left(error) ⇒ errorResponse(error)
     }
   }
 
@@ -64,11 +59,8 @@ trait GpdvizServiceImpl extends JsonImplicits with Logging {
       case Right(ssSum) ⇒
         notifier.notifySensorSystemDeleted(sysid)
         ssSum
-      case Left(error) ⇒
-        if (error.code < 500)
-          StatusCodes.custom(error.code, error.msg)
-        else
-          InternalServerError -> error
+
+      case Left(error) ⇒ errorResponse(error)
     }
   }
 
@@ -87,11 +79,7 @@ trait GpdvizServiceImpl extends JsonImplicits with Logging {
       case Right(dsSum) ⇒
         notifier.notifyDataStreamAdded(sysid, ds)
         dsSum
-      case Left(error) ⇒
-        if (error.code < 500)
-          StatusCodes.custom(error.code, error.msg)
-        else
-          InternalServerError -> error
+      case Left(error) ⇒ errorResponse(error)
     }
   }
 
@@ -107,14 +95,14 @@ trait GpdvizServiceImpl extends JsonImplicits with Logging {
     catch {
       case NonFatal(ex) ⇒
         ex.printStackTrace()
-        InternalServerError -> ex.getMessage
+        errorResponse(GnError(500, ex.getMessage))
     }
   }
 
   def getDataStream(sysid: String, strid: String): Future[ToResponseMarshallable] = {
     db.getDataStream(sysid, strid) map {
       case Some(ds) ⇒ ds
-      case None     ⇒ NotFound -> GnErrorF.dataStreamUndefined(sysid, strid)
+      case None     ⇒ errorResponse(GnErrorF.dataStreamUndefined(sysid, strid))
     }
   }
 
@@ -125,11 +113,7 @@ trait GpdvizServiceImpl extends JsonImplicits with Logging {
       case Right(dsSum) ⇒
         notifier.notifyDataStreamDeleted(sysid, strid)
         dsSum
-      case Left(error) ⇒
-        if (error.code < 500)
-          StatusCodes.custom(error.code, error.msg)
-        else
-          InternalServerError -> error
+      case Left(error) ⇒ errorResponse(error)
     }
   }
 
@@ -148,5 +132,16 @@ trait GpdvizServiceImpl extends JsonImplicits with Logging {
       val ssIndex = getIndex(ssOpt)
       HttpEntity(ContentType(MediaTypes.`text/html`, HttpCharsets.`UTF-8`), ssIndex.getBytes("UTF-8"))
     }
+  }
+
+  private def errorResponse(error: GnError): HttpResponse = {
+    import spray.json._
+    HttpResponse(
+      status = error.code,
+      entity = HttpEntity(
+        ContentType(MediaTypes.`application/json`),
+        error.toJson.compactPrint
+      )
+    )
   }
 }
