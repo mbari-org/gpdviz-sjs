@@ -2,7 +2,6 @@ package gpdviz.server
 
 import javax.ws.rs.Path
 
-import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{Directives, Route}
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives.cors
 import gpdviz.model._
@@ -37,7 +36,7 @@ trait SsService extends GpdvizServiceImpl with Directives {
   }
 
   @ApiOperation(value = "Register sensor system", nickname = "registerSystem",
-    tags = Array("system"),
+    tags = Array("sensor system"),
     httpMethod = "POST", response = classOf[SensorSystemSummary])
   @ApiImplicitParams(Array(
     new ApiImplicitParam(
@@ -56,7 +55,7 @@ trait SsService extends GpdvizServiceImpl with Directives {
   }
 
   @ApiOperation(value = "List all registered sensor systems", nickname = "listSystems",
-    tags = Array("system"),
+    tags = Array("sensor system"),
     httpMethod = "GET", response = classOf[Seq[SensorSystemSummary]])
   @ApiResponses(Array(
     new ApiResponse(code = 500, message = "Internal server error")
@@ -82,7 +81,7 @@ trait OneSsService extends GpdvizServiceImpl with Directives {
 
   @Path("/{sysid}")
   @ApiOperation(value = "Add a data stream", nickname = "registerStream",
-    tags = Array("system", "stream"),
+    tags = Array("sensor system", "data stream"),
     httpMethod = "POST", response = classOf[DataStreamSummary])
   @ApiImplicitParams(Array(
     new ApiImplicitParam(
@@ -105,7 +104,7 @@ trait OneSsService extends GpdvizServiceImpl with Directives {
 
   @Path("/{sysid}")
   @ApiOperation(value = "Get a sensor system", nickname = "getSystem",
-    tags = Array("system"),
+    tags = Array("sensor system"),
     httpMethod = "GET", response = classOf[SensorSystem])
   @ApiImplicitParams(Array(
     new ApiImplicitParam(
@@ -127,7 +126,7 @@ trait OneSsService extends GpdvizServiceImpl with Directives {
 
   @Path("/{sysid}")
   @ApiOperation(value = "Update a sensor system", nickname = "updateSystem",
-    tags = Array("system"),
+    tags = Array("sensor system"),
     httpMethod = "PUT", response = classOf[SensorSystemSummary])
   @ApiImplicitParams(Array(
     new ApiImplicitParam(
@@ -150,7 +149,7 @@ trait OneSsService extends GpdvizServiceImpl with Directives {
 
   @Path("/{sysid}")
   @ApiOperation(value = "Unregister a sensor system", nickname = "deleteSystem",
-    tags = Array("system"),
+    tags = Array("sensor system"),
     httpMethod = "DELETE", response = classOf[SensorSystemSummary])
   @ApiImplicitParams(Array(
     new ApiImplicitParam(
@@ -169,7 +168,7 @@ trait OneSsService extends GpdvizServiceImpl with Directives {
   }
 }
 
-@Api(produces = "application/json", tags = Array("stream"))
+@Api(produces = "application/json", tags = Array("data stream"))
 @Path("/ss")
 trait OneStrService extends GpdvizServiceImpl with Directives {
   def oneStrRoute: Route = {
@@ -227,7 +226,7 @@ trait OneStrService extends GpdvizServiceImpl with Directives {
   }
 }
 
-@Api(produces = "application/json", tags = Array("variableDefs"))
+@Api(produces = "application/json", tags = Array("variable definition"))
 @Path("/ss")
 trait VariableDefService extends GpdvizServiceImpl with Directives {
   def variableDefRoute: Route = {
@@ -262,7 +261,7 @@ trait VariableDefService extends GpdvizServiceImpl with Directives {
   }
 }
 
-@Api(produces = "application/json", tags = Array("observations"))
+@Api(produces = "application/json", tags = Array("observation"))
 @Path("/ss")
 trait ObsService extends GpdvizServiceImpl with Directives {
   def obsRoute: Route = {
