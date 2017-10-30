@@ -10,6 +10,11 @@ val autowireV     = "0.2.6"
 val upickleV      = "0.4.4"
 val pprintV       = "0.5.2"
 val swaggerAkkaV  = "0.11.0"
+val postgresV     = "42.1.4"
+val slickV        = "3.2.1"
+val slickPgV      = "0.15.4"
+val scalaLoggingV = "3.7.2"
+val logbackV      = "1.2.3"
 
 val scalaJsDomV      = "0.9.3"
 val bindingV         = "10.0.2"
@@ -61,16 +66,17 @@ lazy val gpdviz = crossProject
       "com.esri.geometry"     % "esri-geometry-api"    % esriV,
       "com.pusher"            % "pusher-http-java"     % pusherV
 
-      ,"org.postgresql"       % "postgresql"           % "42.1.4"
+      ,"org.postgresql"       % "postgresql"           % postgresV
 
-      ,"com.typesafe.slick"  %% "slick"                % "3.2.1"
-      ,"com.typesafe.slick"  %% "slick-hikaricp"       % "3.2.1"
-      ,"com.github.tminglei" %% "slick-pg"             % "0.15.3"
-
-      ,"com.typesafe.scala-logging" %% "scala-logging" % "3.7.2"
+      ,"com.typesafe.slick"  %% "slick"                % slickV
+      ,"com.typesafe.slick"  %% "slick-hikaricp"       % slickV
+      ,"com.github.tminglei" %% "slick-pg"             % slickPgV
+      ,"com.github.tminglei" %% "slick-pg_spray-json"  % slickPgV
 
       ,"com.github.swagger-akka-http" %% "swagger-akka-http" % swaggerAkkaV
-      ,"ch.qos.logback"      % "logback-classic" % "1.2.3"
+
+      ,"com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingV
+      ,"ch.qos.logback"      % "logback-classic"       % logbackV
     ),
     addCompilerPlugin(
       ("org.scalameta" % "paradise" % "3.0.0-M8").cross(CrossVersion.full)
