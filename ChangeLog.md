@@ -1,7 +1,8 @@
 # Gpdviz
 
-2017-10-28
+2017-10-30
 
+- remove PostgresDbDoobie and PostgresDbQuill
 - route to add variable definitions
 - adjust response for successful creation of entities
 - overall register/unregister-to-add/delete renaming
