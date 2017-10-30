@@ -198,20 +198,20 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
   }
 
   def updateSensorSystem(sysid: String, ssu: SensorSystemUpdate): Future[Either[GnError, SensorSystemSummary]] = {
-    val action = existsSensorSystemAction(sysid) flatMap {
-      case false ⇒ DBIO.successful(GnErrorF.sensorSystemUndefined(sysid))
-      case true  ⇒
+    val action = sensorSystemPgAction(sysid) flatMap {
+      case None ⇒ DBIO.successful(GnErrorF.sensorSystemUndefined(sysid))
+      case Some(pss)  ⇒
+        val pushEvents = ssu.pushEvents getOrElse pss.pushEvents
+        val centerLat = ssu.center.map(_.lat) orElse pss.centerLat
+        val centerLon = ssu.center.map(_.lat) orElse pss.centerLon
         sensorsystem.filter(_.sysid === sysid)
-          .map(p ⇒ (p.centerLat, p.centerLon))
-          .update((
-            ssu.center.map(_.lat),
-            ssu.center.map(_.lon)
-          ))
+          .map(p ⇒ (p.pushEvents, p.centerLat, p.centerLon))
+          .update((pushEvents, centerLat, centerLon))
     }
 
     db.run(action.transactionally) map {
       case e: GnError ⇒ Left(e)
-      case _          ⇒ Right(SensorSystemSummary(sysid))
+      case _          ⇒ Right(SensorSystemSummary(sysid, pushEvents = ssu.pushEvents, center = ssu.center))
     }
   }
 

@@ -91,8 +91,8 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
         contentType shouldBe `application/json`
         val ss = responseAs[SensorSystemSummary]
         ss.sysid shouldBe sysid.get
-        //ss.center shouldBe Some(LatLon(36, -122))
-        //ss.pushEvents shouldBe Some(false)
+        ss.center shouldBe Some(LatLon(36, -122))
+        ss.pushEvents shouldBe Some(false)
       }
     }
 

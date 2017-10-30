@@ -2,6 +2,7 @@
 
 2017-10-30
 
+- fix update sensor system
 - remove PostgresDbDoobie and PostgresDbQuill
 - route to add variable definitions
 - adjust response for successful creation of entities
