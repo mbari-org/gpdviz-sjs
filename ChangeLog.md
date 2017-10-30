@@ -2,6 +2,7 @@
 
 2017-10-30
 
+- adjust swagger spec
 - fix update sensor system
 - remove PostgresDbDoobie and PostgresDbQuill
 - route to add variable definitions
