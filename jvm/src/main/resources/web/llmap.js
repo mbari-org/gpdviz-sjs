@@ -193,6 +193,26 @@ function setupLLMap(center, zoom, hoveredPoint, clickHandler) {
     console.debug("TODO deleteDataStream: strid=", strid)
   }
 
+  function addVariableDef(strid, vd) {
+    var str = byStrId[strid] && byStrId[strid].str;
+    if (!str) {
+      console.warn("addVariableDef: unknown stream by strid=", strid);
+      return;
+    }
+
+    var variable = {
+      name:       vd.name,
+      units:      vd.units,
+      chartStyle: JSON.parse(vd.chartStyle)
+    };
+
+    if (!str.variables) {
+      str.variables = [];
+    }
+    str.variables.push(variable);
+    console.debug("addVariableDef: variable=", _.cloneDeep(variable));
+  }
+
   function addGeoJson(strid, timestamp, geoJsonStr) {
     var str = byStrId[strid] && byStrId[strid].str;
     if (!str) {
@@ -355,6 +375,7 @@ function setupLLMap(center, zoom, hoveredPoint, clickHandler) {
     sensorSystemDeleted:       sensorSystemDeleted,
     addDataStream:             addDataStream,
     deleteDataStream:          deleteDataStream,
+    addVariableDef:            addVariableDef,
     addGeoJson:                addGeoJson,
     addObsScalarData:          addObsScalarData,
     addSelectionPoint:         addSelectionPoint,

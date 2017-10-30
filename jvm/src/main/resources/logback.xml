@@ -11,6 +11,6 @@
     <appender-ref ref="STDOUT" />
   </root>
 
-  <logger name="gpdviz.server" level="DEBUG"/>
+  <logger name="gpdviz.server" level="INFO"/>
   <logger name="slick.jdbc.JdbcBackend.statement" level="INFO"/>
 </configuration>

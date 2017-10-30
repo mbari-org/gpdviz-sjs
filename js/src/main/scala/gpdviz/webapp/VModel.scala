@@ -2,7 +2,7 @@ package gpdviz.webapp
 
 import com.thoughtworks.binding.Binding.{Var, Vars}
 import gpdviz.ClientConfig
-import gpdviz.model.{LatLon, VmDataStream, VmObsData, VmSensorSystem}
+import gpdviz.model._
 import upickle.Js
 
 import scala.scalajs.js
@@ -61,6 +61,22 @@ class VModel(sysid: String, cc: ClientConfig, llmap: LLMap) {
     addStreamToMap(str)
   }
 
+  def addVariableDef(strid: String, vd: VmVariableDef): Unit = {
+    ss.get.streams.find(_.strid == strid) match {
+      case None ⇒ println(s"addVariableDef: undefined strid=$strid")
+
+      case Some(stream) ⇒
+        val newVariables = Some(stream.variables match {
+          case None            ⇒ List[VmVariableDef](vd)
+          case Some(variables) ⇒ variables :+ vd
+        })
+        val updatedStream = stream.copy(variables = newVariables)
+        val updatedStreams = updatedStream :: ss.get.streams.filterNot(_.strid == strid)
+        ss := ss.get.copy(streams = updatedStreams)
+        addVariableDefToMap(strid, vd)
+    }
+  }
+
   private def addAbsoluteChartIfSo(strid: String, chartStyle: Option[String]): Unit = {
     val jsObj: Js.Obj = chartStyle.map(upickle.default.read[Js.Obj]).getOrElse(Js.Obj())
     //println(s"strid=$strid  jsObj=$jsObj")
@@ -99,6 +115,14 @@ class VModel(sysid: String, cc: ClientConfig, llmap: LLMap) {
       ).toJSDictionary).toJSArray).orUndefined
 
       //,"observations" → str.observations.toJSArray
+    ).toJSDictionary)
+  }
+
+  private def addVariableDefToMap(strid: String, vd: VmVariableDef): Unit = {
+    llmap.addVariableDef(strid, Map(
+      "name"        → vd.name,
+      "units"       → vd.units.orUndefined,
+      "chartStyle"  → vd.chartStyle.orUndefined,
     ).toJSDictionary)
   }
 

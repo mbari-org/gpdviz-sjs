@@ -43,7 +43,7 @@ function generate_str1() {
 }
 
 function add_str1() {
-    echo "add stream str1"
+    echo "add stream str1 (with baz variable)"
 	http post ${GPDVIZ}/api/ss/${SS} strid=str1 \
 	     name="Stream one" \
 	     description="Description of Stream one" \
@@ -71,14 +71,16 @@ function add_str1() {
 	         "yAxis": 0,
 	         "type": "column"
 	       }
-	     }, {
-	       "name": "temperature",
-	       "units": "°",
-	       "chartStyle": {
-	         "yAxis": 1
-	       }
 	     }]' \
 	     mapStyle:='{"color":"green", "dashArray": "5,5"}' > /dev/null
+
+    echo "add temperature variable to stream str1"
+	http post ${GPDVIZ}/api/ss/${SS}/str1/vd \
+	       name="temperature" \
+	       units="°" \
+	       chartStyle:='{
+	         "yAxis": 1
+	       }'
 }
 
 function add_str1_polygon() {

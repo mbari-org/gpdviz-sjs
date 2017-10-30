@@ -40,6 +40,8 @@ trait LLMap extends js.Object {
 
   def deleteDataStream(strid: String): Unit = js.native
 
+  def addVariableDef(strid: String, str: js.Dictionary[_]): Unit = js.native
+
   def addGeoJson(strid: String, timestamp: String, feature: String): Unit = js.native
 
   def addObsScalarData(strid: String, timestamp: String, scalarData: js.Dictionary[_]): Unit = js.native
@@ -84,6 +86,9 @@ class WebApp(cc: ClientConfig) {
 
       case DataStreamDeleted(_, strid) ⇒
         vm.deleteDataStream(strid)
+
+      case VariableDefAdded(_, strid, vd) ⇒
+        vm.addVariableDef(strid, vd)
 
       case ObservationsAdded(_, strid, obss) ⇒
         vm.addObservations(strid, obss)
