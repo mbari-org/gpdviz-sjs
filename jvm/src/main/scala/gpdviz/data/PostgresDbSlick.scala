@@ -1,5 +1,7 @@
 package gpdviz.data
 
+import com.cloudera.science.geojson.Feature
+import com.esri.core.geometry.Geometry
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.{LazyLogging ⇒ Logging}
 import gpdviz.data.MyPostgresProfile.api._
@@ -45,8 +47,8 @@ case class PgSObservation(
                           sysid:         String,
                           strid:         String,
                           time:          String,
-                          feature:       Option[String],
-                          geometry:      Option[String],
+                          feature:       Option[Feature],
+                          geometry:      Option[Geometry],
                           // scalarData:
                           vars:      List[String],
                           vals:      List[Double],
@@ -111,8 +113,8 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     def sysid         = column[String]("sysid")
     def strid         = column[String]("strid")
     def time          = column[String]("time")
-    def feature       = column[Option[String]]("feature")
-    def geometry      = column[Option[String]]("geometry")
+    def feature       = column[Option[Feature]]("feature")
+    def geometry      = column[Option[Geometry]]("geometry")
     def vars          = column[List[String]]("vars")
     def vals          = column[List[Double]]("vals")
     def position      = column[Option[LatLon]]("position")
@@ -454,8 +456,8 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
       sysid,
       strid,
       time,
-      feature = obsData.feature.map(utl.toJsonString),
-      geometry = obsData.geometry.map(utl.toJsonString),
+      feature = obsData.feature,
+      geometry = obsData.geometry,
       vars = obsData.scalarData.map(_.vars).getOrElse(List.empty),
       vals = obsData.scalarData.map(_.vals).getOrElse(List.empty),
       position = obsData.scalarData.flatMap(_.position)
@@ -479,8 +481,8 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     byTime.mapValues { obss ⇒
       (obss map { obs ⇒
         ObsData(
-          feature = obs.feature.map(utl.toFeature),
-          geometry = obs.geometry.map(utl.toGeometry),
+          feature = obs.feature,
+          geometry = obs.geometry,
           scalarData = if (obs.vars.nonEmpty)
             Some(ScalarData(
               vars = obs.vars,
