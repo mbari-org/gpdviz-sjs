@@ -4,6 +4,8 @@ import gpdviz.model.LatLon
 
 object PositionsByTime {
 
+  // TODO use Double for timeMs (as Long gets an "opaque" type, perhaps less efficient)
+
   def set(strid: String, timeMs: Long, position: LatLon): Unit = {
     val strTimePos = strTimePoss.get(strid) match {
       case Some(stp) ⇒ stp
