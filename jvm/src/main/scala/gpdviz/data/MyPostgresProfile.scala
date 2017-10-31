@@ -1,7 +1,10 @@
 package gpdviz.data
 
 import com.github.tminglei.slickpg._
+import gpdviz.model.LatLon
+import gpdviz.server.GpdvizJsonImplicits
 import slick.basic.Capability
+import spray.json._
 
 trait MyPostgresProfile extends ExPostgresProfile
   with PgArraySupport
@@ -19,11 +22,13 @@ trait MyPostgresProfile extends ExPostgresProfile
   override val api = MyAPI
 
   object MyAPI extends API with ArrayImplicits
-    with JsonImplicits
+    with JsonImplicits with GpdvizJsonImplicits
     //with DateTimeImplicits
     //with RangeImplicits
   {
     implicit val strListTypeMapper = new SimpleArrayJdbcType[String]("text").to(_.toList)
+
+    implicit val latLonJsonTypeMapper = MappedJdbcType.base[LatLon, JsValue](_.toJson, _.convertTo[LatLon])
   }
 }
 

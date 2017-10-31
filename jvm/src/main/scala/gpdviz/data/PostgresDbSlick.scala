@@ -7,6 +7,7 @@ import gpdviz.model._
 import gpdviz.server.{GnError, GnErrorF, ObservationsAdd, SensorSystemUpdate}
 import slick.dbio.Effect
 import slick.sql.{FixedSqlAction, SqlAction}
+import spray.json.JsValue
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -14,44 +15,42 @@ import scala.concurrent.Future
 
 case class PgSSensorSystem(
                            sysid:        String,
-                           name:         Option[String] = None,
-                           description:  Option[String] = None,
+                           name:         Option[String],
+                           description:  Option[String],
                            pushEvents:   Boolean = true,
-                           centerLat:    Option[Double] = None,
-                           centerLon:    Option[Double] = None,
-                           zoom:         Option[Int] = None,
-                           clickListener: Option[String] = None
+                           center:       Option[LatLon],
+                           zoom:         Option[Int],
+                           clickListener: Option[String]
                          )
 
 case class PgSDataStream(
                          sysid:        String,
                          strid:        String,
-                         name:         Option[String] = None,
-                         description:  Option[String] = None,
-                         mapStyle:     Option[String] = None,
-                         zOrder:       Int = 0,
-                         chartStyle:   Option[String] = None
+                         name:         Option[String],
+                         description:  Option[String],
+                         mapStyle:     Option[JsValue],
+                         zOrder:       Int,
+                         chartStyle:   Option[JsValue]
                        )
 
 case class PgSVariableDef(
                           sysid:         String,
                           strid:         String,
                           name:          String,
-                          units:         Option[String] = None,
-                          chartStyle:    Option[String] = None
+                          units:         Option[String],
+                          chartStyle:    Option[JsValue]
                         )
 
 case class PgSObservation(
                           sysid:         String,
                           strid:         String,
                           time:          String,
-                          feature:       Option[String] = None,
-                          geometry:      Option[String] = None,
+                          feature:       Option[String],
+                          geometry:      Option[String],
                           // scalarData:
                           vars:      List[String],
                           vals:      List[Double],
-                          lat:       Option[Double],
-                          lon:       Option[Double]
+                          position:  Option[LatLon]
                         )
 
 
@@ -67,12 +66,11 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     def name          = column[Option[String]]("name")
     def description   = column[Option[String]]("description")
     def pushEvents    = column[Boolean]("pushEvents")
-    def centerLat     = column[Option[Double]]("centerLat")
-    def centerLon     = column[Option[Double]]("centerLon")
+    def center        = column[Option[LatLon]]("center")
     def zoom          = column[Option[Int]]("zoom")
     def clickListener = column[Option[String]]("clickListener")
 
-    def * = (sysid, name, description, pushEvents, centerLat, centerLon, zoom, clickListener
+    def * = (sysid, name, description, pushEvents, center, zoom, clickListener
             ).mapTo[PgSSensorSystem]
   }
   private val sensorsystem = TableQuery[SensorSystemTable]
@@ -82,9 +80,9 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     def strid         = column[String]("strid")
     def name          = column[Option[String]]("name")
     def description   = column[Option[String]]("description")
-    def mapStyle      = column[Option[String]]("mapStyle")
+    def mapStyle      = column[Option[JsValue]]("mapStyle")
     def zOrder        = column[Int]("zOrder")
-    def chartStyle    = column[Option[String]]("chartStyle")
+    def chartStyle    = column[Option[JsValue]]("chartStyle")
 
     def * = (sysid, strid, name, description, mapStyle, zOrder, chartStyle
             ).mapTo[PgSDataStream]
@@ -99,7 +97,7 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     def strid         = column[String]("strid")
     def name          = column[String]("name")
     def units         = column[Option[String]]("units")
-    def chartStyle    = column[Option[String]]("chartStyle")
+    def chartStyle    = column[Option[JsValue]]("chartStyle")
 
     def * = (sysid, strid, name, units, chartStyle
             ).mapTo[PgSVariableDef]
@@ -117,10 +115,9 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     def geometry      = column[Option[String]]("geometry")
     def vars          = column[List[String]]("vars")
     def vals          = column[List[Double]]("vals")
-    def lat           = column[Option[Double]]("lat")
-    def lon           = column[Option[Double]]("lon")
+    def position      = column[Option[LatLon]]("position")
 
-    def * = (sysid, strid, time, feature, geometry, vars, vals, lat, lon
+    def * = (sysid, strid, time, feature, geometry, vars, vals, position
             ).mapTo[PgSObservation]
 
     def fk_obs_ds = foreignKey("fk_obs_ds", (sysid, strid), datastream)(x ⇒ (x.sysid, x.strid))
@@ -173,8 +170,7 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
             name = ss.name,
             description = ss.description,
             pushEvents = ss.pushEvents,
-            centerLat = ss.center.map(_.lat),
-            centerLon = ss.center.map(_.lon),
+            center = ss.center,
             zoom = ss.zoom,
             clickListener = ss.clickListener
           )
@@ -202,11 +198,10 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
       case None ⇒ DBIO.successful(GnErrorF.sensorSystemUndefined(sysid))
       case Some(pss)  ⇒
         val pushEvents = ssu.pushEvents getOrElse pss.pushEvents
-        val centerLat = ssu.center.map(_.lat) orElse pss.centerLat
-        val centerLon = ssu.center.map(_.lat) orElse pss.centerLon
+        val center = ssu.center orElse pss.center
         sensorsystem.filter(_.sysid === sysid)
-          .map(p ⇒ (p.pushEvents, p.centerLat, p.centerLon))
-          .update((pushEvents, centerLat, centerLon))
+          .map(p ⇒ (p.pushEvents, p.center))
+          .update((pushEvents, center))
     }
 
     db.run(action.transactionally) map {
@@ -328,7 +323,7 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
       name = pss.name,
       description = pss.description,
       pushEvents = pss.pushEvents,
-      center = pss.centerLat.map(lat ⇒ LatLon(lat, pss.centerLon.get)),
+      center = pss.center,
       zoom = pss.zoom,
       clickListener = pss.clickListener,
       streams = streams.map(ds ⇒ (ds.strid, ds)).toMap
@@ -346,9 +341,9 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
       ds.strid,
       name = ds.name,
       description = ds.description,
-      mapStyle = ds.mapStyle.map(utl.toJsonString),
+      mapStyle = ds.mapStyle,
       zOrder = ds.zOrder,
-      chartStyle = ds.chartStyle.map(utl.toJsonString)
+      chartStyle = ds.chartStyle
     )
 
     val vdActions = ds.variables.getOrElse(List.empty).map(variableDefAddAction(sysid, ds.strid, _))
@@ -412,10 +407,10 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
       strid = pds.strid,
       name = pds.name,
       description = pds.description,
-      mapStyle = pds.mapStyle.map(utl.toJsObject),
+      mapStyle = pds.mapStyle,
       zOrder = pds.zOrder,
       variables = variables,
-      chartStyle = pds.chartStyle.map(utl.toJsObject),
+      chartStyle = pds.chartStyle,
       observations = observations
     )
 
@@ -427,7 +422,7 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
       strid,
       name = vd.name,
       units = vd.units,
-      chartStyle = vd.chartStyle.map(utl.toJsonString)
+      chartStyle = vd.chartStyle
     )
 
   private def variableDefsQuery(sysid: String, strid: String): Query[VariableDefTable, PgSVariableDef, Seq] =
@@ -447,7 +442,7 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     VariableDef(
       name = pvd.name,
       units = pvd.units,
-      chartStyle = pvd.chartStyle.map(utl.toJsObject)
+      chartStyle = pvd.chartStyle
     )
 
   //////////////
@@ -463,8 +458,7 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
       geometry = obsData.geometry.map(utl.toJsonString),
       vars = obsData.scalarData.map(_.vars).getOrElse(List.empty),
       vals = obsData.scalarData.map(_.vals).getOrElse(List.empty),
-      lat = obsData.scalarData.flatMap(_.position.map(_.lat)),
-      lon = obsData.scalarData.flatMap(_.position.map(_.lon)),
+      position = obsData.scalarData.flatMap(_.position)
     )
 
   private def observationQuery(sysid: String, strid: String): Query[ObservationTable, PgSObservation, Seq] =
@@ -489,7 +483,9 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
           geometry = obs.geometry.map(utl.toGeometry),
           scalarData = if (obs.vars.nonEmpty)
             Some(ScalarData(
-              obs.vars, obs.vals, position = obs.lat.map(lt ⇒ LatLon(lt, obs.lon.get))
+              vars = obs.vars,
+              vals = obs.vals,
+              position = obs.position
             ))
           else None
         )

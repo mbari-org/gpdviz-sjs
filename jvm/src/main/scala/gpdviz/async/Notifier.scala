@@ -2,14 +2,14 @@ package gpdviz.async
 
 import gpdviz._
 import gpdviz.model._
-import gpdviz.server.JsonImplicits
+import gpdviz.server.GpdvizJsonImplicits
 import spray.json._
 
 import scala.annotation.tailrec
 
 // TODO should check pushEvents flag
 
-class Notifier(pub: Publisher) extends JsonImplicits {
+class Notifier(pub: Publisher) extends GpdvizJsonImplicits {
 
   def notifySensorSystemAdded(ss: SensorSystem): Unit = {
     if (ss.pushEvents) {

@@ -59,7 +59,7 @@ case class DataStreamAdd(strid:        String,
 case class ObservationsAdd(observations: Map[String, List[ObsData]])
 
 
-trait JsonImplicits extends DefaultJsonProtocol with SprayJsonSupport with GeoJsonProtocol {
+trait GpdvizJsonImplicits extends DefaultJsonProtocol with SprayJsonSupport with GeoJsonProtocol {
   implicit val _llFormat       = jsonFormat2(LatLon)
 
   implicit val _sdFormat       = jsonFormat3(ScalarData)

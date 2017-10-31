@@ -2,7 +2,7 @@
 
 2017-10-30
 
-- include PgSprayJsonSupport as preparation to adjust relevant columns
+- use PgSprayJsonSupport
 - adjust swagger spec
 - fix update sensor system
 - remove PostgresDbDoobie and PostgresDbQuill

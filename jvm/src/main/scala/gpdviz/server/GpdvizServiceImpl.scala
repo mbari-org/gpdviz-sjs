@@ -12,7 +12,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 
-trait GpdvizServiceImpl extends JsonImplicits with Logging {
+trait GpdvizServiceImpl extends GpdvizJsonImplicits with Logging {
   def db: DbInterface
   def notifier: Notifier
 

@@ -2,7 +2,7 @@ package gpdviz
 
 import gpdviz.config.configFile
 import gpdviz.data.DbFactory
-import gpdviz.server.{GpdvizServer, JsonImplicits}
+import gpdviz.server.{GpdvizServer, GpdvizJsonImplicits}
 
 object Gpdviz {
   def main(args: Array[String]) {
@@ -76,7 +76,7 @@ object Gpdviz {
 
     val dataDir = "data"
 
-    object getSensorSystemByFilename extends JsonImplicits {
+    object getSensorSystemByFilename extends GpdvizJsonImplicits {
       def apply(filename: String): Option[SensorSystem] = {
         val ssPath = Paths.get(dataDir, filename)
         val ssFile = ssPath.toFile
