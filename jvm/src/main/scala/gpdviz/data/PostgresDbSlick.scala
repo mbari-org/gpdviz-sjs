@@ -177,11 +177,12 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
   }
 
   def addObservations(sysid: String, strid: String)
-                     (obssr: ObservationsAdd): Future[Either[GnError, ObservationsSummary]] = {
+                     (observations: Map[OffsetDateTime, List[ObsData]]
+                     ): Future[Either[GnError, ObservationsSummary]] = {
     var num = 0
-    val actions = obssr.observations flatMap { case (time, list) ⇒
+    val actions = observations flatMap { case (time, list) ⇒
       num += list.length
-      list.map(observationAddAction(sysid, strid, OffsetDateTime.parse(time), _))
+      list.map(observationAddAction(sysid, strid, time, _))
     }
     db.run(DBIO.seq(actions.toSeq: _*).transactionally) map { _ ⇒
       Right(ObservationsSummary(sysid, strid, added = Some(num)))

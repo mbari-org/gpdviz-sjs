@@ -1,10 +1,13 @@
 # Gpdviz
 
-2017-10-30
+2017-10-31
 
+- observation timestamp:
+  - internally captured as timestamptz in database
+  - externally required and exposed as ISO-8601 formatted string 
+
+2017-10-30
 - use OffsetDateTime for time in observation table.
-  TODO it's still String in model (but now expected to be an isoTime).
-  TODO update ss1.demo.sh
 - use PgSprayJsonSupport
 - adjust swagger spec
 - fix update sensor system

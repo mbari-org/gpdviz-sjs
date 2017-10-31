@@ -213,14 +213,14 @@ function setupLLMap(center, zoom, hoveredPoint, clickHandler) {
     console.debug("addVariableDef: variable=", _.cloneDeep(variable));
   }
 
-  function addGeoJson(strid, timestamp, geoJsonStr) {
+  function addGeoJson(strid, timeMs, geoJsonStr) {
     var str = byStrId[strid] && byStrId[strid].str;
     if (!str) {
       console.warn("addGeoJson: unknown stream by strid=", strid);
       return;
     }
 
-    var geoJsonKey = timestamp + "->" + geoJsonStr;
+    var geoJsonKey = timeMs + "->" + geoJsonStr;
     if (byStrId[strid].geoJsons[geoJsonKey]) {
       console.warn("addGeoJson: already added: strid=", strid, "geoJsonKey=", geoJsonKey);
       return;
@@ -235,14 +235,14 @@ function setupLLMap(center, zoom, hoveredPoint, clickHandler) {
       mapStyle = str.mapStyle ? _.cloneDeep(str.mapStyle) : {};
     }
 
-    //console.debug("addGeoJson: timestamp=", timestamp, "geoJson=", geoJson, "mapStyle=", mapStyle);
+    //console.debug("addGeoJson: timeMs=", timeMs, "geoJson=", geoJson, "mapStyle=", mapStyle);
 
     byStrId[strid].geoJsons[geoJsonKey] = geoJson;
 
     addMarker(strid, markerCreator(geoJson, mapStyle));
   }
 
-  function addObsScalarData(strid, timestamp, scalarData) {
+  function addObsScalarData(strid, timeMs, scalarData) {
     var str = byStrId[strid] && byStrId[strid].str;
     if (!str) {
       console.warn("addObsScalarData: unknown stream by strid=", strid);
@@ -259,7 +259,7 @@ function setupLLMap(center, zoom, hoveredPoint, clickHandler) {
     //console.debug("& indexes=", indexes);
     _.each(scalarData.vals, function (v, valIndex) {
       var varIndex = indexes[valIndex];
-      charter.addChartPoint(varIndex, timestamp, v);
+      charter.addChartPoint(varIndex, timeMs, v);
     });
 
     if (!byStrId[str.strid].marker) {

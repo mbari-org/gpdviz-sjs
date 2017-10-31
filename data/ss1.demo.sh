@@ -6,8 +6,14 @@ echo "Using gpdviz server = ${GPDVIZ}"
 
 SS=ss1
 
-BASE_TIMESTAMP_MS=1503090553000
+baseTimeSec=1503090553
+
 RANDOM=1341
+
+function timeSec2iso() {
+    secs=$1
+    gdate --date="@${secs}" --iso-8601=seconds
+}
 
 function run() {
 	unregister
@@ -35,11 +41,11 @@ function register() {
 
 function generate_str1() {
 	add_str1
-	now=${BASE_TIMESTAMP_MS}
+	now=${baseTimeSec}
 	secs=60
-	timestamp=$(( now - secs * 1000 ))
-	add_str1_polygon ${timestamp}
-	add_scalars str1 $(( timestamp + 1000 )) $(( secs - 1 ))
+	timeSec=$(( now - secs ))
+	add_str1_polygon ${timeSec}
+	add_scalars str1 $(( timeSec + 1 )) $(( secs - 1 ))
 }
 
 function add_str1() {
@@ -84,9 +90,9 @@ function add_str1() {
 }
 
 function add_str1_polygon() {
-	timestamp=$1
+	timeSec=$1
     read -r -d '' geometry <<-EOF
-      "${timestamp}": [{
+      "`timeSec2iso ${timeSec}`": [{
         "geometry": {
           "type": "Polygon",
           "coordinates": [
@@ -103,11 +109,11 @@ function generate_str2() {
 	add_str2
 	
 	secs=30
-	timestamp=$(( timestamp - secs * 1000 ))
+	timeSec=$(( timeSec - secs ))
 	
 	# geometries:
 	read -r -d '' geometry <<-EOF
-	  "${timestamp}": [
+	  "`timeSec2iso ${timeSec}`": [
 	    {
 		  "geometry": {
 			"type": "Point",
@@ -133,14 +139,12 @@ EOF
 	observations='{'
 	comma=""
 	for i in `seq ${secs}`; do
-		timestamp=$(( timestamp + 1000 ))
+		timeSec=$(( timeSec + 1 ))
 		val0=$(( (RANDOM % 100) + 1 ))
 		val1=$(( (RANDOM % 100) + 1 ))
 		
-		# element='{ "timestamp": '${timestamp}', "chartTsData": [ { "timestamp": '${timestamp}', "values": [ '${val0}', '${val1}' ] } ]}'
-		
         read -r -d '' element <<-EOF
-          "${timestamp}": [{
+          "`timeSec2iso ${timeSec}`": [{
             "scalarData": {
               "vars": ["foo", "bar"],
               "vals": [${val0}, ${val1}]
@@ -163,9 +167,9 @@ function add_str2() {
 function generate_str3() {
 	add_str3
 
-	timestamp=${BASE_TIMESTAMP_MS}
+	timeSec=${baseTimeSec}
     read -r -d '' geometry <<-EOF
-      "${timestamp}": [{
+      "`timeSec2iso ${timeSec}`": [{
         "geometry": {
 			"type": "LineString",
 			"coordinates": [
@@ -191,9 +195,9 @@ function generate_str4() {
 	    variables:='[ { "name": "temperature", "units": "°C" } ]' \
 	    mapStyle:='{"color":"yellow", "radius": 10}' zOrder:=10 > /dev/null
 
-	timestamp=${BASE_TIMESTAMP_MS}
+	timeSec=${baseTimeSec}
     read -r -d '' geometry <<-EOF
-      "${timestamp}": [{
+      "`timeSec2iso ${timeSec}`": [{
           "geometry": {
             "type": "Point",
             "coordinates": [-122.09,36.865]
@@ -202,7 +206,7 @@ function generate_str4() {
 EOF
     observations="{${geometry}}"
     add_observations "${strid}" "${observations}"
-    echo "added ${strid} point: timestamp=${timestamp}"
+    echo "added ${strid} point: timeSec=${timeSec}"
 	
 	add_delayed_data ${strid} temperature 10
 }
@@ -211,13 +215,13 @@ function add_delayed_data() {
     strid=$1
     varName=$2
 	secs=$3
-    timestamp=${BASE_TIMESTAMP_MS}
+    timeSec=${baseTimeSec}
 	for i in `seq ${secs}`; do
         sleep 1
-	    timestamp=$(( timestamp + 1000 ))
+	    timeSec=$(( timeSec + 1 ))
 		val=$(( (RANDOM % 100) + 1 ))
         read -r -d '' element <<-EOF
-          "${timestamp}": [{
+          "`timeSec2iso ${timeSec}`": [{
             "scalarData": {
               "vars": ["${varName}"],
               "vals": [${val}]
@@ -225,7 +229,7 @@ function add_delayed_data() {
 EOF
         observations="{${element}}"
         add_observations "${strid}" "${observations}"
-	    echo "added observation to ${strid}: timestamp=${timestamp}"  # ${observations}"
+	    echo "added observation to ${strid}: timeSec=${timeSec}"  # ${observations}"
 	done
 }
 
@@ -238,9 +242,9 @@ function add_observations() {
 
 function add_scalars() {
 	strid=$1
-	timestamp=$2
+	timeSec=$2
 	secs=$3
-	echo "scalarData: ${strid} timestamp=${timestamp}  secs=${secs}"
+	echo "scalarData: ${strid} timeSec=${timeSec}  secs=${secs}"
 	observations='{'
 	comma=""
 	for i in `seq ${secs}`; do
@@ -249,7 +253,7 @@ function add_scalars() {
 		lat="36.8$((   RANDOM % 1000 ))"
 		lon="-122.1$(( RANDOM % 1000 ))"
     	read -r -d '' element <<-EOF
-		  "${timestamp}": [{
+		  "`timeSec2iso ${timeSec}`": [{
             "scalarData": {
               "vars": ["baz","temperature"],
               "vals": [${val0}, ${val1}],
@@ -258,7 +262,7 @@ function add_scalars() {
 EOF
 		observations="${observations}${comma}${element}"
 		comma=", "
-		timestamp=$(( timestamp + 1000 ))
+		timeSec=$(( timeSec + 1 ))
 	done
 	observations="${observations}}"
 	add_observations "${strid}" "${observations}"

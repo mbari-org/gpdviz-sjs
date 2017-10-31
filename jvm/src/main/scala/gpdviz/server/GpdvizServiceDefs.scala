@@ -13,7 +13,8 @@ case class GnError(code: Int,
                    msg: String,
                    sysid: Option[String] = None,
                    strid: Option[String] = None,
-                   varName: Option[String] = None
+                   varName: Option[String] = None,
+                   timestamp: Option[String] = None
                    )
 
 object GnErrorF {
@@ -29,6 +30,11 @@ object GnErrorF {
 
   def dataStreamUndefined(sysid: String, strid: String): GnError =
     GnError(404, "data stream undefined", sysid = Some(sysid), strid = Some(strid))
+
+  def malformedTimestamp(sysid: String, strid: String,
+                         timestamp: Option[String] = None, msg: Option[String] = None): GnError =
+    GnError(400, "malformed ISO-8601 string for timestamp" + msg.map(": " + _).getOrElse(""),
+      sysid = Some(sysid), strid = Some(strid), timestamp = timestamp)
 }
 
 case class SensorSystemAdd(sysid: String,
@@ -79,5 +85,5 @@ trait GpdvizJsonImplicits extends DefaultJsonProtocol with SprayJsonSupport with
   implicit val _sssFormat      = jsonFormat6(SensorSystemSummary)
   implicit val _ssFormat       = jsonFormat8(SensorSystem)
 
-  implicit val _dbErrorFormat  = jsonFormat5(GnError)
+  implicit val _dbErrorFormat  = jsonFormat6(GnError)
 }

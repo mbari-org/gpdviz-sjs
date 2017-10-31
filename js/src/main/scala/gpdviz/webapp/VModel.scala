@@ -144,26 +144,24 @@ class VModel(sysid: String, cc: ClientConfig, llmap: LLMap) {
   }
 
   private def addObservationsToMap(str: VmDataStream,
-                                   obss: Map[String, List[VmObsData]]): Unit = {
-    obss.keys.toSeq.sorted foreach { timestamp ⇒
-      obss(timestamp) foreach { obs ⇒
-        obs.feature foreach { feature ⇒
-          llmap.addGeoJson(str.strid, timestamp, feature)
-        }
-        obs.geometry foreach { geometry ⇒
-          llmap.addGeoJson(str.strid, timestamp, geometry)
-        }
+                                   obsMap: Map[String, List[VmObsData]]): Unit = {
+    import moment.Moment
+    obsMap.toSeq.sortBy(_._1) foreach { case (timeIso, obss) ⇒
+      val timeMs = Moment(timeIso).toDate().getTime()
+      obss foreach { obs ⇒
+        obs.feature  foreach { llmap.addGeoJson(str.strid, timeMs, _) }
+        obs.geometry foreach { llmap.addGeoJson(str.strid, timeMs, _) }
         obs.scalarData foreach { scalarData ⇒
-          llmap.addObsScalarData(str.strid, timestamp, Map(
+          llmap.addObsScalarData(str.strid, timeMs, Map(
             "vars" → scalarData.vars.toJSArray,
             "vals" → scalarData.vals.toJSArray,
             "position" → scalarData.position.map(p ⇒
-              Map("lat" → p.lat, "lon" → p.lon).toJSDictionary).orUndefined
+              Map("lat" → p.lat, "lon" → p.lon).toJSDictionary
+            ).orUndefined
           ).toJSDictionary)
 
           scalarData.position foreach { position ⇒
-            val timeMs = timestamp.toLong
-            PositionsByTime.set(str.strid, timeMs, position)
+            PositionsByTime.set(str.strid, timeMs.toLong, position)
           }
         }
       }

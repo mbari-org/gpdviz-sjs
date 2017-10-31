@@ -286,7 +286,8 @@ trait ObsService extends GpdvizServiceImpl with Directives {
       dataTypeClass = classOf[ObservationsAdd], paramType = "body")
   ))
   @ApiResponses(Array(
-    new ApiResponse(code = 404, message = "Undefined sensor system or data stream")
+    new ApiResponse(code = 404, message = "Undefined sensor system or data stream"),
+    new ApiResponse(code = 400, message = "Malformed ISO-8601 timestamp")
   ))
   def obsAdd: Route = {
     pathPrefix("api" / "ss" / Segment / Segment / "obs") { case (sysid, strid) ⇒

@@ -8,7 +8,6 @@ import gpdviz.data.{DbFactory, DbInterface}
 import gpdviz.model._
 import gpdviz.server._
 import org.scalatest.{Matchers, WordSpec}
-//import pprint.PPrinter.Color.{apply ⇒ pp}
 
 
 class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with GpdvizService {
@@ -132,7 +131,7 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
     "add a variable definition" in {
       val vd = VariableDef("bazVar", units = Some("meter"))
       Post(s"/api/ss/${sysid.get}/$strid/vd", vd) ~> routes ~> check {
-        //println(s"::::: status=$status: " + pp(response))
+        //println(s"::::: status=$status: " + pprint.PPrinter.Color(response))
         status shouldBe Created
         contentType shouldBe `application/json`
         val ds = responseAs[VariableDefSummary]
@@ -146,7 +145,7 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
     "fail to add a variable definition to non-existing stream" in {
       val vd = VariableDef("bazVar")
       Post(s"/api/ss/${sysid.get}/NoStr/vd", vd) ~> routes ~> check {
-        //println(s"::::: status=$status: " + pp(response))
+        //println(s"::::: status=$status: " + pprint.PPrinter.Color(response))
         status shouldBe NotFound
         contentType shouldBe `application/json`
         val ds = responseAs[GnError]
@@ -157,7 +156,7 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
 
     "fail to add an existing a stream" in {
       Post(s"/api/ss/${sysid.get}", DataStreamAdd(strid)) ~> routes ~> check {
-        //println(s"::::: status=$status: " + pp(response))
+        //println(s"::::: status=$status: " + pprint.PPrinter.Color(response))
         status shouldBe Conflict
         contentType shouldBe `application/json`
         val error = responseAs[GnError]
@@ -233,7 +232,7 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
         status shouldBe OK
         contentType shouldBe `application/json`
         val ss = responseAs[SensorSystem]
-        //println(s"sensor system: ss=${pp(ss)}")
+        //println(s"sensor system: ss=${pprint.PPrinter.Color(ss)}")
         ss.streams.contains("aStrId") shouldBe true
         val str = ss.streams("aStrId")
         observations foreach { case (time, list) ⇒
@@ -244,6 +243,27 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
           val scalarData = obsDataList.flatMap(_.scalarData)
           scalarData === list
         }
+      }
+    }
+
+    "fail to add observation with malformed timestamp" in {
+      val timestamp = "1503090553"
+      val observations = Map(
+        timestamp → List(ObsData(
+          scalarData = Some(ScalarData(
+            vars = List("temperature"),
+            vals = List(13.0)
+          )))))
+      val obsAdd = ObservationsAdd(observations = observations)
+
+      Post(s"/api/ss/${sysid.get}/$strid/obs", obsAdd) ~> routes ~> check {
+        status shouldBe BadRequest
+        contentType shouldBe `application/json`
+        val error = responseAs[GnError]
+        //println(s"error=${pprint.PPrinter.Color(error)}")
+        error.sysid shouldBe sysid
+        error.strid shouldBe Some(strid)
+        error.timestamp shouldBe Some(timestamp)
       }
     }
 

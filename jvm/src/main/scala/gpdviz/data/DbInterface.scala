@@ -1,5 +1,7 @@
 package gpdviz.data
 
+import java.time.OffsetDateTime
+
 import gpdviz.model._
 import gpdviz.server.{GnError, ObservationsAdd, SensorSystemUpdate}
 
@@ -35,7 +37,8 @@ trait DbInterface {
                     (vd: VariableDef): Future[Either[GnError, VariableDefSummary]]
 
   def addObservations(sysid: String, strid: String)
-                     (obssr: ObservationsAdd): Future[Either[GnError, ObservationsSummary]]
+                     (observations: Map[OffsetDateTime, List[ObsData]]
+                     ): Future[Either[GnError, ObservationsSummary]]
 
   def close(): Unit
 }

@@ -82,17 +82,15 @@ class View(vm: VModel) {
       <div>
         {
           val obss = str.observations.getOrElse(Map.empty)
-          val timestamps = Constants(obss.keys.toSeq.sorted: _*)
-          <div>Observations: { timestamps.bind.length.toString }</div>
+          val timeIsos = Constants(obss.keys.toSeq.sorted: _*)
+          <div>Observations: { timeIsos.bind.length.toString }</div>
           <div style="font-size:small">
-            Latest: {
-            timestamps.bind.lastOption.map(m ⇒ Moment(m.toDouble.toLong).toISOString()).getOrElse("")
-            }
+            Latest: { timeIsos.bind.lastOption.getOrElse("") }
           </div>
           <!--ul>
             {
-            for (timestamp <- timestamps)
-              yield <li>{ timestamp + " -> " + obss(timestamp).map(pp(_)) }</li>
+            for (timeIso <- timeIsos)
+              yield <li>{ timeIso + " -> " + obss(timeIso).map(pp(_)) }</li>
             }
           </ul-->
         }

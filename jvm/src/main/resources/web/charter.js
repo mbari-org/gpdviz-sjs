@@ -68,29 +68,28 @@ function Charter(str, hoveredPoint) {
     deactivateChart: deactivateChart
   };
 
-  function addChartPoint(seriesIndex, x, y) {
-    //console.debug("addChartPoint: strid=", strid, "x=", x, "y=", y);
-    x = +x;
+  function addChartPoint(seriesIndex, timeMs, y) {
+    //console.debug("addChartPoint: strid=", strid, "timeMs=", timeMs, "y=", y);
 
     needRedraw = true;
 
-    initialSeriesData[seriesIndex].data.push([x, y]);
+    initialSeriesData[seriesIndex].data.push([timeMs, y]);
 
     if (serieses) {
       var lastX = lastAddedX[seriesIndex];
       if (lastX === undefined) {
-        lastAddedX[seriesIndex] = x;
-        // console.error("strid=" +strid+ " seriesIndex=" +seriesIndex+": FIRST x(" +x+ ")");
+        lastAddedX[seriesIndex] = timeMs;
+        // console.error("strid=" +strid+ " seriesIndex=" +seriesIndex+": FIRST timeMs(" +timeMs+ ")");
       }
-      else if (x <= lastX) {
-        console.error("strid=" +strid+ " seriesIndex=" +seriesIndex+": x(" +x+ ") <= lastX(" +lastX+ ") diff=" + (lastX - x));
+      else if (timeMs <= lastX) {
+        console.error("strid=" +strid+ " seriesIndex=" +seriesIndex+": timeMs(" +timeMs+ ") <= lastX(" +lastX+ ") diff=" + (lastX - timeMs));
       }
       else {
-        lastAddedX[seriesIndex] = x;
+        lastAddedX[seriesIndex] = timeMs;
       }
 
       // addPoint (Object options, [Boolean redraw], [Boolean shift], [Mixed animation])
-      serieses[seriesIndex].addPoint([x, y], false);
+      serieses[seriesIndex].addPoint([timeMs, y], false);
     }
     // else console.error("!!! no serieses !!!!!");
   }
@@ -167,6 +166,10 @@ function Charter(str, hoveredPoint) {
 
       rangeSelector: {
         buttons: [{
+          count: 5,
+          type: 'minute',
+          text: '5m'
+        }, {
           count: 15,
           type: 'minute',
           text: '15m'
@@ -199,7 +202,7 @@ function Charter(str, hoveredPoint) {
           text: 'All'
         }],
         inputEnabled: false,
-        selected: 1
+        selected: 2
       },
 
       title: { text: title },

@@ -1,11 +1,14 @@
 package gpdviz.server
 
+import java.time.OffsetDateTime
+import java.time.format.DateTimeParseException
+
 import akka.http.scaladsl.marshalling.ToResponseMarshallable
 import akka.http.scaladsl.model._
 import com.typesafe.scalalogging.{LazyLogging ⇒ Logging}
 import gpdviz.async.Notifier
 import gpdviz.data.DbInterface
-import gpdviz.model.{DataStream, SensorSystem, VariableDef}
+import gpdviz.model.{DataStream, ObsData, SensorSystem, VariableDef}
 import spray.json._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -94,19 +97,24 @@ trait GpdvizServiceImpl extends GpdvizJsonImplicits with Logging {
     }
   }
 
-  def addObservations(sysid: String, strid: String, obssr: ObservationsAdd): Future[ToResponseMarshallable] = Future {
+  def addObservations(sysid: String, strid: String, obssr: ObservationsAdd): Future[ToResponseMarshallable] = {
     import pprint.PPrinter.Color.{apply ⇒ pp}
     logger.debug(s"addObservations: sysid=$sysid, strid=$strid, obssr=${pp(obssr.observations)}")
+
     try {
-      db.addObservations(sysid, strid)(obssr) map { obsSum ⇒
+      val observations = obssr.observations map { case (time, obss) ⇒
+        OffsetDateTime.parse(time) -> obss
+      }
+      db.addObservations(sysid, strid)(observations) map { obsSum ⇒
         notifier.notifyObservationsAdded(sysid, strid, obssr.observations)
         goodResponse(StatusCodes.Created, obsSum.toJson)
       }
     }
     catch {
-      case NonFatal(ex) ⇒
-        ex.printStackTrace()
-        errorResponse(GnError(500, ex.getMessage))
+      case e: DateTimeParseException ⇒ Future {
+        errorResponse(GnErrorF.malformedTimestamp(sysid, strid,
+          timestamp = Some(e.getParsedString), msg = Some(e.getMessage)))
+      }
     }
   }
 

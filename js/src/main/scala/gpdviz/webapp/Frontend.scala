@@ -42,9 +42,9 @@ trait LLMap extends js.Object {
 
   def addVariableDef(strid: String, str: js.Dictionary[_]): Unit = js.native
 
-  def addGeoJson(strid: String, timestamp: String, feature: String): Unit = js.native
+  def addGeoJson(strid: String, timeMs: Double, feature: String): Unit = js.native
 
-  def addObsScalarData(strid: String, timestamp: String, scalarData: js.Dictionary[_]): Unit = js.native
+  def addObsScalarData(strid: String, timeMs: Double, scalarData: js.Dictionary[_]): Unit = js.native
 
   def addSelectionPoint(p: js.Array[Double]): Unit = js.native
 
