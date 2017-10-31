@@ -2,6 +2,9 @@
 
 2017-10-30
 
+- use OffsetDateTime for time in observation table.
+  TODO it's still String in model (but now expected to be an isoTime).
+  TODO update ss1.demo.sh
 - use PgSprayJsonSupport
 - adjust swagger spec
 - fix update sensor system

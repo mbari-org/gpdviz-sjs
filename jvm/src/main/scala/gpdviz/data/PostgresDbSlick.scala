@@ -1,5 +1,8 @@
 package gpdviz.data
 
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
+
 import com.cloudera.science.geojson.Feature
 import com.esri.core.geometry.Geometry
 import com.typesafe.config.Config
@@ -178,7 +181,7 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     var num = 0
     val actions = obssr.observations flatMap { case (time, list) ⇒
       num += list.length
-      list.map(observationAddAction(sysid, strid, time, _))
+      list.map(observationAddAction(sysid, strid, OffsetDateTime.parse(time), _))
     }
     db.run(DBIO.seq(actions.toSeq: _*).transactionally) map { _ ⇒
       Right(ObservationsSummary(sysid, strid, added = Some(num)))
@@ -221,7 +224,7 @@ object PostgresDbSlick {
   case class PgObservation(
                             sysid:         String,
                             strid:         String,
-                            time:          String,
+                            time:          OffsetDateTime,
                             feature:       Option[Feature],
                             geometry:      Option[Geometry],
                             scalarData:    Option[ScalarData]
@@ -279,7 +282,7 @@ object PostgresDbSlick {
   class ObservationTable(tag: Tag) extends Table[PgObservation](tag, "observation") {
     def sysid         = column[String]("sysid")
     def strid         = column[String]("strid")
-    def time          = column[String]("time")
+    def time          = column[OffsetDateTime]("time")
     def feature       = column[Option[Feature]]("feature")
     def geometry      = column[Option[Geometry]]("geometry")
     def scalarData    = column[Option[ScalarData]]("scalarData")
@@ -353,7 +356,7 @@ object PostgresDbSlick {
     val vdActions = ds.variables.getOrElse(List.empty).map(variableDefAddAction(sysid, ds.strid, _))
 
     val obsActions = ds.observations.getOrElse(Map.empty) flatMap { case (time, obss) ⇒
-      obss map (observationAddAction(sysid, ds.strid, time, _))
+      obss map (observationAddAction(sysid, ds.strid, OffsetDateTime.parse(time), _))
     }
 
     dsAction andThen DBIO.seq(vdActions ++ obsActions: _*)
@@ -452,7 +455,7 @@ object PostgresDbSlick {
   //////////////
 
   private def observationAddAction(sysid: String, strid: String,
-                                   time: String, obsData: ObsData
+                                   time: OffsetDateTime, obsData: ObsData
                                   ): FixedSqlAction[Int, NoStream, Effect.Write] =
     observation += PgObservation(
       sysid,
@@ -478,8 +481,8 @@ object PostgresDbSlick {
 
   private def observation2model(seq: Seq[PgObservation]): Map[String, List[ObsData]] = {
     val byTime = seq.groupBy(_.time)
-    byTime.mapValues { obss ⇒
-      (obss map { obs ⇒
+    byTime.map { case (time, obss) ⇒
+      time.format(DateTimeFormatter.ISO_INSTANT) → (obss map { obs ⇒
         ObsData(
           feature = obs.feature,
           geometry = obs.geometry,

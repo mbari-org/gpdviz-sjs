@@ -11,9 +11,7 @@ import spray.json._
 trait MyPostgresProfile extends ExPostgresProfile
   with PgArraySupport
   with PgSprayJsonSupport
-  //with PgDate2Support
-  //with PgRangeSupport
-  //with PgPostGISSupport
+  with PgDate2Support
 {
   override def pgjson: String = "json"   // could also be "jsonb"
 
@@ -25,8 +23,7 @@ trait MyPostgresProfile extends ExPostgresProfile
 
   object MyAPI extends API with ArrayImplicits
     with JsonImplicits with GpdvizJsonImplicits
-    //with DateTimeImplicits
-    //with RangeImplicits
+    with DateTimeImplicits
   {
     implicit val strListTypeMapper = new SimpleArrayJdbcType[String]("text").to(_.toList)
 

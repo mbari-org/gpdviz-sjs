@@ -186,30 +186,37 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
       }
     }
 
+    val vars = List("temperature")
+    val list1 = List(ObsData(
+      scalarData = Some(ScalarData(
+        vars = vars,
+        vals = List(13.0)
+      ))))
+    val list2 = List(ObsData(
+      scalarData = Some(ScalarData(
+        vars = vars,
+        vals = List(11.0)
+      ))))
+    val list3 = List(ObsData(
+      scalarData = Some(ScalarData(
+        vars = vars,
+        vals = List(12.0)
+      ))))
+    val list4 = List(ObsData(
+      scalarData = Some(ScalarData(
+        vars = vars,
+        vals = List(11.5)
+      ))))
+
+    val observations = Map(
+      "2017-10-10T10:10:00Z" → list1,
+      "2017-10-10T10:10:01Z" → list2,
+      "2017-10-10T10:10:02Z" → list3,
+      "2017-10-10T10:10:03Z" → list4
+    )
+
     "add observations" in {
-      val vars = List("temperature")
-      val obsAdd = ObservationsAdd(observations = Map(
-        "0" → List(ObsData(
-          scalarData = Some(ScalarData(
-            vars = vars,
-            vals = List(13.0)
-          )))),
-        "1" → List(ObsData(
-          scalarData = Some(ScalarData(
-            vars = vars,
-            vals = List(11.0)
-          )))),
-        "5" → List(ObsData(
-          scalarData = Some(ScalarData(
-            vars = vars,
-            vals = List(12.0)
-          )))),
-        "9" → List(ObsData(
-          scalarData = Some(ScalarData(
-            vars = vars,
-            vals = List(11.5)
-          ))))
-      ))
+      val obsAdd = ObservationsAdd(observations = observations)
 
       Post(s"/api/ss/${sysid.get}/$strid/obs", obsAdd) ~> routes ~> check {
         status shouldBe Created
@@ -218,6 +225,25 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
         map.sysid === sysid.get
         map.strid === strid
         map.added shouldBe Some(4)
+      }
+    }
+
+    "verify added observations" in {
+      Get(s"/api/ss/${sysid.get}") ~> routes ~> check {
+        status shouldBe OK
+        contentType shouldBe `application/json`
+        val ss = responseAs[SensorSystem]
+        //println(s"sensor system: ss=${pp(ss)}")
+        ss.streams.contains("aStrId") shouldBe true
+        val str = ss.streams("aStrId")
+        observations foreach { case (time, list) ⇒
+          str.observations.nonEmpty === true
+          val retrievedObservations = str.observations.get
+          retrievedObservations.get(time).nonEmpty === true
+          val obsDataList = retrievedObservations(time)
+          val scalarData = obsDataList.flatMap(_.scalarData)
+          scalarData === list
+        }
       }
     }
 
