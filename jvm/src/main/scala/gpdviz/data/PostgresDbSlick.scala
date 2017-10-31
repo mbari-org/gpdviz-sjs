@@ -49,10 +49,7 @@ case class PgSObservation(
                           time:          String,
                           feature:       Option[Feature],
                           geometry:      Option[Geometry],
-                          // scalarData:
-                          vars:      List[String],
-                          vals:      List[Double],
-                          position:  Option[LatLon]
+                          scalarData:    Option[ScalarData]
                         )
 
 
@@ -115,11 +112,9 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     def time          = column[String]("time")
     def feature       = column[Option[Feature]]("feature")
     def geometry      = column[Option[Geometry]]("geometry")
-    def vars          = column[List[String]]("vars")
-    def vals          = column[List[Double]]("vals")
-    def position      = column[Option[LatLon]]("position")
+    def scalarData    = column[Option[ScalarData]]("scalarData")
 
-    def * = (sysid, strid, time, feature, geometry, vars, vals, position
+    def * = (sysid, strid, time, feature, geometry, scalarData
             ).mapTo[PgSObservation]
 
     def fk_obs_ds = foreignKey("fk_obs_ds", (sysid, strid), datastream)(x ⇒ (x.sysid, x.strid))
@@ -458,9 +453,7 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
       time,
       feature = obsData.feature,
       geometry = obsData.geometry,
-      vars = obsData.scalarData.map(_.vars).getOrElse(List.empty),
-      vals = obsData.scalarData.map(_.vals).getOrElse(List.empty),
-      position = obsData.scalarData.flatMap(_.position)
+      scalarData = obsData.scalarData
     )
 
   private def observationQuery(sysid: String, strid: String): Query[ObservationTable, PgSObservation, Seq] =
@@ -483,13 +476,7 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
         ObsData(
           feature = obs.feature,
           geometry = obs.geometry,
-          scalarData = if (obs.vars.nonEmpty)
-            Some(ScalarData(
-              vars = obs.vars,
-              vals = obs.vals,
-              position = obs.position
-            ))
-          else None
+          scalarData = obs.scalarData,
         )
       }).toList
     }
