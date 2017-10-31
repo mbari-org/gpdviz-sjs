@@ -15,116 +15,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
-object PostgresDbSlick {
-
-  case class PgSensorSystem(
-                             sysid:        String,
-                             name:         Option[String],
-                             description:  Option[String],
-                             pushEvents:   Boolean = true,
-                             center:       Option[LatLon],
-                             zoom:         Option[Int],
-                             clickListener: Option[String]
-                           )
-
-  case class PgDataStream(
-                           sysid:        String,
-                           strid:        String,
-                           name:         Option[String],
-                           description:  Option[String],
-                           mapStyle:     Option[JsValue],
-                           zOrder:       Int,
-                           chartStyle:   Option[JsValue]
-                         )
-
-  case class PgVariableDef(
-                            sysid:         String,
-                            strid:         String,
-                            name:          String,
-                            units:         Option[String],
-                            chartStyle:    Option[JsValue]
-                          )
-
-  case class PgObservation(
-                            sysid:         String,
-                            strid:         String,
-                            time:          String,
-                            feature:       Option[Feature],
-                            geometry:      Option[Geometry],
-                            scalarData:    Option[ScalarData]
-                          )
-}
-
 class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
   import PostgresDbSlick._
 
-  val details: String = s"PostgreSQL-based database (slick)"
+  val details: String = s"PostgreSQL-based database (Slick)"
 
   // path: ``empty string for the top level of the Config object''
   private val db = Database.forConfig(path = "", slickConfig)
-
-  class SensorSystemTable(tag: Tag) extends Table[PgSensorSystem](tag, "sensorsystem") {
-    def sysid         = column[String]("sysid", O.PrimaryKey)
-    def name          = column[Option[String]]("name")
-    def description   = column[Option[String]]("description")
-    def pushEvents    = column[Boolean]("pushEvents")
-    def center        = column[Option[LatLon]]("center")
-    def zoom          = column[Option[Int]]("zoom")
-    def clickListener = column[Option[String]]("clickListener")
-
-    def * = (sysid, name, description, pushEvents, center, zoom, clickListener
-            ).mapTo[PgSensorSystem]
-  }
-  private val sensorsystem = TableQuery[SensorSystemTable]
-
-  class DataStreamTable(tag: Tag) extends Table[PgDataStream](tag, "datastream") {
-    def sysid         = column[String]("sysid")
-    def strid         = column[String]("strid")
-    def name          = column[Option[String]]("name")
-    def description   = column[Option[String]]("description")
-    def mapStyle      = column[Option[JsValue]]("mapStyle")
-    def zOrder        = column[Int]("zOrder")
-    def chartStyle    = column[Option[JsValue]]("chartStyle")
-
-    def * = (sysid, strid, name, description, mapStyle, zOrder, chartStyle
-            ).mapTo[PgDataStream]
-
-    def pk_ds = primaryKey("pk_ds", (sysid, strid))
-    def fk_ds_ss = foreignKey("fk_ds_ss", sysid, sensorsystem)(_.sysid)
-  }
-  private val datastream = TableQuery[DataStreamTable]
-
-  class VariableDefTable(tag: Tag) extends Table[PgVariableDef](tag, "variabledef") {
-    def sysid         = column[String]("sysid")
-    def strid         = column[String]("strid")
-    def name          = column[String]("name")
-    def units         = column[Option[String]]("units")
-    def chartStyle    = column[Option[JsValue]]("chartStyle")
-
-    def * = (sysid, strid, name, units, chartStyle
-            ).mapTo[PgVariableDef]
-
-    def pk_vd = primaryKey("pk_vd", (sysid, strid, name))
-    def fk_vd_ds = foreignKey("fk_vd_ds", (sysid, strid), datastream)(x ⇒ (x.sysid, x.strid))
-  }
-  private val variabledef = TableQuery[VariableDefTable]
-
-  class ObservationTable(tag: Tag) extends Table[PgObservation](tag, "observation") {
-    def sysid         = column[String]("sysid")
-    def strid         = column[String]("strid")
-    def time          = column[String]("time")
-    def feature       = column[Option[Feature]]("feature")
-    def geometry      = column[Option[Geometry]]("geometry")
-    def scalarData    = column[Option[ScalarData]]("scalarData")
-
-    def * = (sysid, strid, time, feature, geometry, scalarData
-            ).mapTo[PgObservation]
-
-    def fk_obs_ds = foreignKey("fk_obs_ds", (sysid, strid), datastream)(x ⇒ (x.sysid, x.strid))
-  }
-  private val observation = TableQuery[ObservationTable]
-
-  private val schema = sensorsystem.schema ++ datastream.schema ++ variabledef.schema ++ observation.schema
 
   def dropTables(): Future[Int] = {
     val action = sqlu"""
@@ -289,6 +186,113 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
   }
 
   def close(): Unit = db.close
+}
+
+object PostgresDbSlick {
+
+  case class PgSensorSystem(
+                             sysid:        String,
+                             name:         Option[String],
+                             description:  Option[String],
+                             pushEvents:   Boolean = true,
+                             center:       Option[LatLon],
+                             zoom:         Option[Int],
+                             clickListener: Option[String]
+                           )
+
+  case class PgDataStream(
+                           sysid:        String,
+                           strid:        String,
+                           name:         Option[String],
+                           description:  Option[String],
+                           mapStyle:     Option[JsValue],
+                           zOrder:       Int,
+                           chartStyle:   Option[JsValue]
+                         )
+
+  case class PgVariableDef(
+                            sysid:         String,
+                            strid:         String,
+                            name:          String,
+                            units:         Option[String],
+                            chartStyle:    Option[JsValue]
+                          )
+
+  case class PgObservation(
+                            sysid:         String,
+                            strid:         String,
+                            time:          String,
+                            feature:       Option[Feature],
+                            geometry:      Option[Geometry],
+                            scalarData:    Option[ScalarData]
+                          )
+
+  class SensorSystemTable(tag: Tag) extends Table[PgSensorSystem](tag, "sensorsystem") {
+    def sysid         = column[String]("sysid", O.PrimaryKey)
+    def name          = column[Option[String]]("name")
+    def description   = column[Option[String]]("description")
+    def pushEvents    = column[Boolean]("pushEvents")
+    def center        = column[Option[LatLon]]("center")
+    def zoom          = column[Option[Int]]("zoom")
+    def clickListener = column[Option[String]]("clickListener")
+
+    def * = (sysid, name, description, pushEvents, center, zoom, clickListener
+    ).mapTo[PgSensorSystem]
+  }
+
+  private val sensorsystem = TableQuery[SensorSystemTable]
+
+  class DataStreamTable(tag: Tag) extends Table[PgDataStream](tag, "datastream") {
+    def sysid         = column[String]("sysid")
+    def strid         = column[String]("strid")
+    def name          = column[Option[String]]("name")
+    def description   = column[Option[String]]("description")
+    def mapStyle      = column[Option[JsValue]]("mapStyle")
+    def zOrder        = column[Int]("zOrder")
+    def chartStyle    = column[Option[JsValue]]("chartStyle")
+
+    def * = (sysid, strid, name, description, mapStyle, zOrder, chartStyle
+    ).mapTo[PgDataStream]
+
+    def pk_ds = primaryKey("pk_ds", (sysid, strid))
+    def fk_ds_ss = foreignKey("fk_ds_ss", sysid, sensorsystem)(_.sysid)
+  }
+
+  private val datastream = TableQuery[DataStreamTable]
+
+  class VariableDefTable(tag: Tag) extends Table[PgVariableDef](tag, "variabledef") {
+    def sysid         = column[String]("sysid")
+    def strid         = column[String]("strid")
+    def name          = column[String]("name")
+    def units         = column[Option[String]]("units")
+    def chartStyle    = column[Option[JsValue]]("chartStyle")
+
+    def * = (sysid, strid, name, units, chartStyle
+    ).mapTo[PgVariableDef]
+
+    def pk_vd = primaryKey("pk_vd", (sysid, strid, name))
+    def fk_vd_ds = foreignKey("fk_vd_ds", (sysid, strid), datastream)(x ⇒ (x.sysid, x.strid))
+  }
+
+  private val variabledef = TableQuery[VariableDefTable]
+
+  class ObservationTable(tag: Tag) extends Table[PgObservation](tag, "observation") {
+    def sysid         = column[String]("sysid")
+    def strid         = column[String]("strid")
+    def time          = column[String]("time")
+    def feature       = column[Option[Feature]]("feature")
+    def geometry      = column[Option[Geometry]]("geometry")
+    def scalarData    = column[Option[ScalarData]]("scalarData")
+
+    def * = (sysid, strid, time, feature, geometry, scalarData
+    ).mapTo[PgObservation]
+
+    def fk_obs_ds = foreignKey("fk_obs_ds", (sysid, strid), datastream)(x ⇒ (x.sysid, x.strid))
+  }
+
+  private val observation = TableQuery[ObservationTable]
+
+  private val schema = sensorsystem.schema ++ datastream.schema ++ variabledef.schema ++ observation.schema
 
   ///////////////////////////////////////////////////////////////////////////
 
