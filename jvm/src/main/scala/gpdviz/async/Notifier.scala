@@ -1,30 +1,36 @@
 package gpdviz.async
 
 import gpdviz._
+import gpdviz.data.DbInterface
 import gpdviz.model._
 import gpdviz.server.GpdvizJsonImplicits
 import spray.json._
 
 import scala.annotation.tailrec
+import scala.concurrent.ExecutionContext.Implicits.global
 
-// TODO should check pushEvents flag
+class Notifier(db: DbInterface, pub: Publisher) extends GpdvizJsonImplicits {
 
-class Notifier(pub: Publisher) extends GpdvizJsonImplicits {
-
-  def notifySensorSystemAdded(ss: SensorSystem): Unit = {
-    if (ss.pushEvents) {
-      pub.publish(SensorSystemAdded(
-        sysid = ss.sysid,
-        name = ss.name,
-        description = ss.description,
-        center = ss.center,
-        zoom = ss.zoom,
-        clickListener = ss.clickListener
-      ))
-    }
+  def notifySensorSystemAdded(ss: SensorSystem): Unit = if (ss.pushEvents) {
+    pub.publish(SensorSystemAdded(
+      sysid = ss.sysid,
+      name = ss.name,
+      description = ss.description,
+      center = ss.center,
+      zoom = ss.zoom,
+      clickListener = ss.clickListener
+    ))
   }
 
-  def notifyDataStreamAdded(sysid: String, str: DataStream): Unit = {
+  def notifySensorSystemUpdated(sysid: String, pushEvents: Boolean): Unit = if (pushEvents) {
+    pub.publish(SensorSystemUpdated(sysid))
+  }
+
+  def notifySensorSystemDeleted(sysid: String, pushEvents: Boolean): Unit = if (pushEvents) {
+    pub.publish(SensorSystemDeleted(sysid))
+  }
+
+  def notifyDataStreamAdded(sysid: String, str: DataStream): Unit = ifPushing(sysid) {
     // NOTE observations not captured at time of stream registration
     require(str.observations.isEmpty)
 
@@ -42,7 +48,11 @@ class Notifier(pub: Publisher) extends GpdvizJsonImplicits {
     ))
   }
 
-  def notifyVariableDefAdded(sysid: String, strid: String, vd: VariableDef): Unit = {
+  def notifyDataStreamDeleted(sysid: String, strid: String): Unit = ifPushing(sysid) {
+    pub.publish(DataStreamDeleted(sysid, strid))
+  }
+
+  def notifyVariableDefAdded(sysid: String, strid: String, vd: VariableDef): Unit = ifPushing(sysid) {
     pub.publish(VariableDefAdded(
       sysid = sysid,
       strid = strid,
@@ -54,7 +64,8 @@ class Notifier(pub: Publisher) extends GpdvizJsonImplicits {
     ))
   }
 
-  def notifyObservationsAdded(sysid: String, strid: String, observations: Map[String, List[ObsData]]): Unit = {
+  def notifyObservationsAdded(sysid: String, strid: String,
+                              observations: Map[String, List[ObsData]]): Unit = ifPushing(sysid) {
     val obs = observations mapValues { list ⇒
       val obsDataList = collection.mutable.ListBuffer[VmObsData]()
       list foreach  { o ⇒
@@ -83,19 +94,11 @@ class Notifier(pub: Publisher) extends GpdvizJsonImplicits {
     rec(0)
   }
 
-  def notifyDataStreamDeleted(sysid: String, strid: String): Unit = {
-    pub.publish(DataStreamDeleted(sysid, strid))
-  }
-
-  def notifySensorSystemUpdated(sysid: String): Unit = {
-    pub.publish(SensorSystemUpdated(sysid))
-  }
-
-  def notifySensorSystemRefresh(sysid: String): Unit = {
-    pub.publish(SensorSystemRefresh(sysid))
-  }
-
-  def notifySensorSystemDeleted(sysid: String): Unit = {
-    pub.publish(SensorSystemDeleted(sysid))
+  private def ifPushing(sysid: String)(p : ⇒ Unit): Unit = {
+    for {
+      ssOpt <- db.getSensorSystem(sysid)
+      ss ← ssOpt
+      if ss.pushEvents
+    } p
   }
 }

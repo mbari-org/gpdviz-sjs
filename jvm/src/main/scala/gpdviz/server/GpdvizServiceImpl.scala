@@ -8,12 +8,11 @@ import akka.http.scaladsl.model._
 import com.typesafe.scalalogging.{LazyLogging ⇒ Logging}
 import gpdviz.async.Notifier
 import gpdviz.data.DbInterface
-import gpdviz.model.{DataStream, ObsData, SensorSystem, VariableDef}
+import gpdviz.model.{DataStream, SensorSystem, VariableDef}
 import spray.json._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.control.NonFatal
 
 trait GpdvizServiceImpl extends GpdvizJsonImplicits with Logging {
   def db: DbInterface
@@ -47,10 +46,7 @@ trait GpdvizServiceImpl extends GpdvizJsonImplicits with Logging {
     logger.debug(s"updateSensorSystem: sysid=$sysid ssu=$ssu")
     db.updateSensorSystem(sysid, ssu) map {
       case Right(ssSum) ⇒
-        notifier.notifySensorSystemUpdated(sysid)
-        if (ssu.refresh.getOrElse(false)) {
-          notifier.notifySensorSystemRefresh(sysid)
-        }
+        notifier.notifySensorSystemUpdated(sysid, ssSum.pushEvents.contains(true))
         ssSum
 
       case Left(error) ⇒ errorResponse(error)
@@ -61,7 +57,7 @@ trait GpdvizServiceImpl extends GpdvizJsonImplicits with Logging {
     logger.debug(s"deleteSensorSystem: sysid=$sysid")
     db.deleteSensorSystem(sysid) map {
       case Right(ssSum) ⇒
-        notifier.notifySensorSystemDeleted(sysid)
+        notifier.notifySensorSystemDeleted(sysid, ssSum.pushEvents.contains(true))
         ssSum
 
       case Left(error) ⇒ errorResponse(error)

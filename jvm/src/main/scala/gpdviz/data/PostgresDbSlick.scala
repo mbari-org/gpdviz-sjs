@@ -114,19 +114,21 @@ class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
     db.run(sensorSystemAction(sysid))
 
   def deleteSensorSystem(sysid: String): Future[Either[GnError, SensorSystemSummary]] = {
-    val action = existsSensorSystemAction(sysid) flatMap {
-      case false ⇒ DBIO.successful(GnErrorF.sensorSystemUndefined(sysid))
-      case true  ⇒
+    val action = sensorSystemPgAction(sysid) flatMap {
+      case None ⇒ DBIO.successful(GnErrorF.sensorSystemUndefined(sysid))
+      case Some(pss)  ⇒
+        val pushEvents = pss.pushEvents
         val ss = sensorsystem.filter(_.sysid === sysid)
         val dss = datastream.filter(_.sysid === sysid)
         val vds = variabledef.filter(_.sysid === sysid)
         val obs = observation.filter(_.sysid === sysid)
-        obs.delete andThen vds.delete andThen dss.delete andThen ss.delete
+        obs.delete andThen vds.delete andThen dss.delete andThen ss.delete andThen
+          DBIO.successful(pushEvents)
     }
 
     db.run(action.transactionally) map {
-      case e: GnError ⇒ Left(e)
-      case _          ⇒ Right(SensorSystemSummary(sysid))
+      case e: GnError           ⇒ Left(e)
+      case pushEvents: Boolean  ⇒ Right(SensorSystemSummary(sysid, pushEvents = Some(pushEvents)))
     }
   }
 

@@ -29,7 +29,7 @@ class GpdvizServer extends GpdvizService {
       (wsp, routes ~ wsRoute)
   }
 
-  val notifier = new Notifier(publisher)
+  val notifier = new Notifier(db, publisher)
 
   def run(keyToStop: Boolean): Unit = {
     println(s"Gpdviz ${cfg.gpdviz.version} using: DB: ${db.details}  Async Notifications: ${publisher.details}")

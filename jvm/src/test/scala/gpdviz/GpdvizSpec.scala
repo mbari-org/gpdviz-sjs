@@ -3,16 +3,35 @@ package gpdviz
 import akka.http.scaladsl.model.ContentTypes._
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import gpdviz.async.{Notifier, NullPublisher}
+import gpdviz.async.{Notifier, Publisher}
 import gpdviz.data.{DbFactory, DbInterface}
 import gpdviz.model._
 import gpdviz.server._
 import org.scalatest.{Matchers, WordSpec}
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+
+class MockPublisher extends Publisher {
+  def details: String = "mock-publisher"
+
+  def publish(notif: Notif): Unit = {
+    list = notif :: list
+    //println(s"MockPublisher: publish=" + pprint.PPrinter.Color(notif))
+  }
+
+  def lastPublished: Future[Option[Notif]] = Future { list.headOption }
+  // TODO: the global execution context seems to help with the checks
+  // but this needs to be revisited.
+
+  private var list: List[Notif] = List.empty
+}
 
 class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with GpdvizService {
-  val notifier: Notifier = new Notifier(NullPublisher)
+
   val db: DbInterface = DbFactory.testDb
+  val publisher = new MockPublisher
+  val notifier: Notifier = new Notifier(db, publisher)
 
   var sysid: Option[String] = None
   val strid = "aStrId"
@@ -61,6 +80,13 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
       }
     }
 
+    "eventually have generated notification about new sensor system" in {
+      publisher.lastPublished map { lastNotif ⇒
+        lastNotif shouldBe Some(_:SensorSystemAdded)
+        lastNotif.head.asInstanceOf[SensorSystemAdded].sysid === sysid.get
+      }
+    }
+
     "fail to add existing sensor system" in {
       Post(s"/api/ss", SensorSystemAdd(sysid.get)) ~> routes ~> check {
         status shouldBe Conflict
@@ -95,6 +121,32 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
       }
     }
 
+    "not have generated notification about updated sensor system" in {
+      // so check for the same previously notified SensorSystemAdded
+      publisher.lastPublished map { lastNotif ⇒
+        lastNotif shouldBe Some(_: SensorSystemAdded)
+        lastNotif.head.asInstanceOf[SensorSystemAdded].sysid === sysid.get
+      }
+    }
+
+    "update existing sensor system (with pushEvents=true)" in {
+      val ssUpdate = SensorSystemUpdate(pushEvents = Some(true))
+      Put(s"/api/ss/${sysid.get}", ssUpdate) ~> routes ~> check {
+        status shouldBe OK
+        contentType shouldBe `application/json`
+        val ss = responseAs[SensorSystemSummary]
+        ss.sysid shouldBe sysid.get
+        ss.pushEvents shouldBe Some(true)
+      }
+    }
+
+    "eventually have generated notification about updated sensor system (with pushEvents=true)" in {
+      publisher.lastPublished map { lastNotif ⇒
+        lastNotif shouldBe Some(_: SensorSystemUpdated)
+        lastNotif.head.asInstanceOf[SensorSystemUpdated].sysid === sysid.get
+      }
+    }
+
     "fail to update non-existing sensor system" in {
       Put(s"/api/ss/NoSS", SensorSystemUpdate(pushEvents = Some(false))) ~> routes ~> check {
         status shouldBe NotFound
@@ -104,7 +156,7 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
       }
     }
 
-    "add streams" in {
+    "add data streams" in {
       val variables = Some(List(VariableDef("temperature")))
       val dsAdd = DataStreamAdd(strid = strid, variables = variables)
       Post(s"/api/ss/${sysid.get}", dsAdd) ~> routes ~> check {
@@ -128,8 +180,18 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
       }
     }
 
+    "eventually have generated notification about added data streams" in {
+      publisher.lastPublished map { lastNotif ⇒
+        lastNotif shouldBe Some(_: DataStreamAdded)
+        val notif = lastNotif.head.asInstanceOf[DataStreamAdded]
+        notif.sysid === sysid.get
+        notif.str.strid === strid2
+      }
+    }
+
+    val vd = VariableDef("bazVar", units = Some("meter"))
+
     "add a variable definition" in {
-      val vd = VariableDef("bazVar", units = Some("meter"))
       Post(s"/api/ss/${sysid.get}/$strid/vd", vd) ~> routes ~> check {
         //println(s"::::: status=$status: " + pprint.PPrinter.Color(response))
         status shouldBe Created
@@ -139,6 +201,16 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
         ds.strid === strid
         ds.name === "bazVar"
         ds.units === Some("meter")
+      }
+    }
+
+    "eventually have generated notification about added variable definition" in {
+      publisher.lastPublished map { lastNotif ⇒
+        lastNotif shouldBe Some(_: VariableDefAdded)
+        val notif = lastNotif.head.asInstanceOf[VariableDefAdded]
+        notif.sysid === sysid.get
+        notif.strid === strid
+        notif.vd === vd
       }
     }
 
@@ -165,13 +237,22 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
       }
     }
 
-    "delete stream" in {
+    "delete data stream" in {
       Delete(s"/api/ss/${sysid.get}/$strid2") ~> routes ~> check {
         status shouldBe OK
         contentType shouldBe `application/json`
         val ss = responseAs[DataStreamSummary]
         ss.sysid shouldBe sysid.get
         ss.strid shouldBe strid2
+      }
+    }
+
+    "eventually have generated notification about deleted data stream" in {
+      publisher.lastPublished map { lastNotif ⇒
+        lastNotif shouldBe Some(_: DataStreamDeleted)
+        val notif = lastNotif.head.asInstanceOf[DataStreamDeleted]
+        notif.sysid === sysid.get
+        notif.strid === strid
       }
     }
 
@@ -224,6 +305,15 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
         map.sysid === sysid.get
         map.strid === strid
         map.added shouldBe Some(4)
+      }
+    }
+
+    "eventually have generated notification about added observations" in {
+      publisher.lastPublished map { lastNotif ⇒
+        lastNotif shouldBe Some(_: ObservationsAdded)
+        val notif = lastNotif.head.asInstanceOf[ObservationsAdded]
+        notif.sysid === sysid.get
+        notif.strid === strid
       }
     }
 

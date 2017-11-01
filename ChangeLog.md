@@ -1,5 +1,10 @@
 # Gpdviz
 
+2017-11-01
+
+- re-enable event notifications depending on sensor system's pushEvents flag.
+- Added MockPublisher to test the notifications
+
 2017-10-31
 
 - observation timestamp:
