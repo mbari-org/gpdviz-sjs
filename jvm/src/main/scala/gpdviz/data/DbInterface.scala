@@ -3,7 +3,7 @@ package gpdviz.data
 import java.time.OffsetDateTime
 
 import gpdviz.model._
-import gpdviz.server.{GnError, ObservationsAdd, SensorSystemUpdate}
+import gpdviz.server.{GnError, SensorSystemUpdate}
 
 import scala.concurrent.Future
 

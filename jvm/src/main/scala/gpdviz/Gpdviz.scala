@@ -2,7 +2,7 @@ package gpdviz
 
 import gpdviz.config.configFile
 import gpdviz.data.DbFactory
-import gpdviz.server.{GpdvizServer, GpdvizJsonImplicits}
+import gpdviz.server.GpdvizServer
 
 object Gpdviz {
   def main(args: Array[String]) {
@@ -66,8 +66,11 @@ object Gpdviz {
 
   private def importJson(args: Array[String]): Unit = {
     import java.nio.file.Paths
+    import java.time.ZoneOffset
+    import java.time.format.DateTimeFormatter
 
     import gpdviz.model.SensorSystem
+    import gpdviz.server.GpdvizJsonImplicits
 
     import scala.concurrent.Await
     import scala.concurrent.duration._
@@ -83,7 +86,8 @@ object Gpdviz {
         if (ssFile.exists()) try {
           import spray.json._
           val contents = scala.io.Source.fromFile(ssFile).mkString
-          Option(contents.parseJson.convertTo[SensorSystem])
+          val ss = contents.parseJson.convertTo[SensorSystem]
+          Option(replaceTimeMs2iso(ss))
         }
         catch {
           case NonFatal(e) ⇒
@@ -91,6 +95,25 @@ object Gpdviz {
             None
         }
         else None
+      }
+
+      def replaceTimeMs2iso(ss: SensorSystem): SensorSystem = {
+        val streams = ss.streams.mapValues { ds ⇒
+          val newObss = ds.observations.map { obss ⇒
+            obss.map { case (time, list) ⇒
+              val instant = java.time.Instant.ofEpochMilli(time.toDouble.toLong)
+              if (time.startsWith("1")) {
+                val odt = java.time.OffsetDateTime.ofInstant(
+                  instant, ZoneOffset.of("-00:00")
+                )
+                odt.format(DateTimeFormatter.ISO_INSTANT) → list
+              }
+              else time → list
+            }
+          }
+          ds.copy(observations = newObss)
+        }
+        ss.copy(streams = streams)
       }
     }
 
