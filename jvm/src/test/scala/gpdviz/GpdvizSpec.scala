@@ -28,8 +28,8 @@ class MockPublisher extends Publisher {
 }
 
 class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with GpdvizService {
-
-  val db: DbInterface = DbFactory.testDb
+  val dbFactory: DbFactory = new DbFactory
+  val db: DbInterface = dbFactory.testDb
   val publisher = new MockPublisher
   val notifier: Notifier = new Notifier(db, publisher)
 
@@ -39,7 +39,7 @@ class GpdvizSpec extends WordSpec with Matchers with ScalatestRouteTest with Gpd
 
   override def beforeAll(): Unit = {
     super.beforeAll()
-    DbFactory.createTablesSync(db, dropFirst = true)
+    dbFactory.createTablesSync(db, dropFirst = true)
   }
 
   override def afterAll(): Unit = {

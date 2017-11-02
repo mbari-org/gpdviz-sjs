@@ -4,6 +4,9 @@ import gpdviz.config.configFile
 import gpdviz.data.DbFactory
 import gpdviz.server.GpdvizServer
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
+
 object Gpdviz {
   def main(args: Array[String]) {
     if (args.contains("generate-conf")) {
@@ -53,14 +56,16 @@ object Gpdviz {
   }
 
   private def createTables(args: Array[String]): Unit = {
-    val db = DbFactory.openDb
-    DbFactory.createTablesSync(db, dropFirst = args.contains("--drop-first"))
+    val dbFactory: DbFactory = new DbFactory
+    val db = dbFactory.openDb
+    dbFactory.createTablesSync(db, dropFirst = args.contains("--drop-first"))
     db.close()
   }
 
   private def addSomeData(args: Array[String]): Unit = {
-    val db = DbFactory.openDb
-    DbFactory.addSomeDataSync(db)
+    val dbFactory: DbFactory = new DbFactory
+    val db = dbFactory.openDb
+    dbFactory.addSomeDataSync(db)
     db.close()
   }
 
@@ -124,9 +129,8 @@ object Gpdviz {
     }
 
     if (systems.nonEmpty) {
-      import scala.concurrent.ExecutionContext.Implicits.global
-
-      val db = DbFactory.openDb
+      val dbFactory: DbFactory = new DbFactory
+      val db = dbFactory.openDb
       systems foreach { ss ⇒
         println(s"Importing ${ss.sysid} ...")
         Await.ready(db.addSensorSystem(ss) andThen {

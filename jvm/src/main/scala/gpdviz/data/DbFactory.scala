@@ -6,12 +6,11 @@ import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.{LazyLogging ⇒ Logging}
 import gpdviz.config
 
-import scala.concurrent.Await
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration._
 import scala.util.Failure
 
-object DbFactory extends Logging {
+class DbFactory(implicit ec: ExecutionContext) extends Logging {
 
   def openDb: DbInterface = {
     new PostgresDbSlick(config.tsConfig.getConfig("postgres.slick"))

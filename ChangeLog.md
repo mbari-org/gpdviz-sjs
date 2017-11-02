@@ -1,7 +1,10 @@
 # Gpdviz
 
-2017-11-01
+2017-11-02
 
+- pass ExecutionContext in some places.
+  ("The recommended approach is to add `(implicit ec: ExecutionContext)` to methods,
+   or class constructor parameters, which need an `ExecutionContext`.)
 - re-enable event notifications depending on sensor system's pushEvents flag.
 - Added MockPublisher to test the notifications
 

@@ -7,11 +7,12 @@ import gpdviz.server.GpdvizJsonImplicits
 import spray.json._
 import com.typesafe.scalalogging.{LazyLogging ⇒ Logging}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 
-class ApiImpl(db: DbInterface) extends Api with GpdvizJsonImplicits with Logging {
+class ApiImpl(db: DbInterface)
+             (implicit ec: ExecutionContext) extends Api
+  with GpdvizJsonImplicits with Logging {
 
   def clientConfig(): Future[ClientConfig] = Future {
     ClientConfig(

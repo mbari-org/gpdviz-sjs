@@ -7,11 +7,12 @@ import gpdviz.async._
 import gpdviz.config.cfg
 import gpdviz.data.{DbFactory, DbInterface}
 
-import scala.concurrent.ExecutionContextExecutor
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 import scala.io.StdIn
 
 class GpdvizServer extends GpdvizService {
-  val db: DbInterface = DbFactory.openDb
+  val dbFactory: DbFactory = new DbFactory()(ExecutionContext.global)
+  val db: DbInterface = dbFactory.openDb
 
   implicit val system: ActorSystem = ActorSystem()
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
@@ -29,7 +30,7 @@ class GpdvizServer extends GpdvizService {
       (wsp, routes ~ wsRoute)
   }
 
-  val notifier = new Notifier(db, publisher)
+  val notifier = new Notifier(db, publisher)(ExecutionContext.global)
 
   def run(keyToStop: Boolean): Unit = {
     println(s"Gpdviz ${cfg.gpdviz.version} using: DB: ${db.details}  Async Notifications: ${publisher.details}")

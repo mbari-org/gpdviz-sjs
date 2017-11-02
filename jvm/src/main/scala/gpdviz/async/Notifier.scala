@@ -7,9 +7,10 @@ import gpdviz.server.GpdvizJsonImplicits
 import spray.json._
 
 import scala.annotation.tailrec
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 
-class Notifier(db: DbInterface, pub: Publisher) extends GpdvizJsonImplicits {
+class Notifier(db: DbInterface, pub: Publisher)
+              (implicit ec: ExecutionContext) extends GpdvizJsonImplicits {
 
   def notifySensorSystemAdded(ss: SensorSystem): Unit = if (ss.pushEvents) {
     pub.publish(SensorSystemAdded(

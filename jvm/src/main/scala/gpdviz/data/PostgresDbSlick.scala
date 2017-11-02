@@ -14,187 +14,11 @@ import slick.dbio.Effect
 import slick.sql.{FixedSqlAction, SqlAction}
 import spray.json.JsValue
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 
-class PostgresDbSlick(slickConfig: Config) extends DbInterface with Logging {
-  import PostgresDbSlick._
-
-  val details: String = s"PostgreSQL-based database (Slick)"
-
-  // path: ``empty string for the top level of the Config object''
-  private val db = Database.forConfig(path = "", slickConfig)
-
-  def dropTables(): Future[Int] = {
-    val action = sqlu"""
-      SET CONSTRAINTS ALL DEFERRED;
-      DROP TABLE IF EXISTS #${observation.baseTableRow.tableName};
-      DROP TABLE IF EXISTS #${variabledef.baseTableRow.tableName};
-      DROP TABLE IF EXISTS #${datastream.baseTableRow.tableName};
-      DROP TABLE IF EXISTS #${sensorsystem.baseTableRow.tableName};
-      """
-    db.run(action.transactionally)
-  }
-
-  def createTables(): Future[Unit] =
-    db.run(schema.create)
-
-  def listSensorSystems(): Future[Seq[SensorSystemSummary]] = {
-    val q = for {
-      ss ← sensorsystem
-      ds ← datastream if ds.sysid === ss.sysid
-    } yield (ss, ds)
-
-    val action = q.result
-
-    db.run(action).map(_.groupBy(_._1.sysid).map({ case (sysid, ssdss) ⇒
-      val ss = ssdss.head._1
-      val dss = ssdss.map(_._2)
-      SensorSystemSummary(
-        sysid,
-        ss.name,
-        ss.description,
-        streamIds = dss.map(_.strid).toSet
-      )
-    }).toSeq)
-  }
-
-  def addSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystemSummary]] = {
-    val action = existsSensorSystemAction(ss.sysid) flatMap {
-      case true  ⇒ DBIO.successful(GnErrorF.sensorSystemDefined(ss.sysid))
-      case false ⇒
-        val ssAction =
-          sensorsystem += PgSensorSystem(
-            ss.sysid,
-            name = ss.name,
-            description = ss.description,
-            pushEvents = ss.pushEvents,
-            center = ss.center,
-            zoom = ss.zoom,
-            clickListener = ss.clickListener
-          )
-
-        val dsActions = ss.streams.values.map(dataStreamAddAction(ss.sysid, _))
-        val actions = List(ssAction) ++ dsActions
-        DBIO.seq(actions: _*)
-    }
-
-    db.run(action.transactionally) map {
-      case e: GnError ⇒ Left(e)
-      case _          ⇒
-        Right(SensorSystemSummary(
-          ss.sysid,
-          name = ss.name,
-          description = ss.description,
-          pushEvents = Some(ss.pushEvents),
-          center = ss.center
-        ))
-    }
-  }
-
-  def updateSensorSystem(sysid: String, ssu: SensorSystemUpdate): Future[Either[GnError, SensorSystemSummary]] = {
-    val action = sensorSystemPgAction(sysid) flatMap {
-      case None ⇒ DBIO.successful(GnErrorF.sensorSystemUndefined(sysid))
-      case Some(pss)  ⇒
-        val pushEvents = ssu.pushEvents getOrElse pss.pushEvents
-        val center = ssu.center orElse pss.center
-        sensorsystem.filter(_.sysid === sysid)
-          .map(p ⇒ (p.pushEvents, p.center))
-          .update((pushEvents, center))
-    }
-
-    db.run(action.transactionally) map {
-      case e: GnError ⇒ Left(e)
-      case _          ⇒ Right(SensorSystemSummary(sysid, pushEvents = ssu.pushEvents, center = ssu.center))
-    }
-  }
-
-  def getSensorSystem(sysid: String): Future[Option[SensorSystem]] =
-    db.run(sensorSystemAction(sysid))
-
-  def deleteSensorSystem(sysid: String): Future[Either[GnError, SensorSystemSummary]] = {
-    val action = sensorSystemPgAction(sysid) flatMap {
-      case None ⇒ DBIO.successful(GnErrorF.sensorSystemUndefined(sysid))
-      case Some(pss)  ⇒
-        val pushEvents = pss.pushEvents
-        val ss = sensorsystem.filter(_.sysid === sysid)
-        val dss = datastream.filter(_.sysid === sysid)
-        val vds = variabledef.filter(_.sysid === sysid)
-        val obs = observation.filter(_.sysid === sysid)
-        obs.delete andThen vds.delete andThen dss.delete andThen ss.delete andThen
-          DBIO.successful(pushEvents)
-    }
-
-    db.run(action.transactionally) map {
-      case e: GnError           ⇒ Left(e)
-      case pushEvents: Boolean  ⇒ Right(SensorSystemSummary(sysid, pushEvents = Some(pushEvents)))
-    }
-  }
-
-  def addDataStream(sysid: String)
-                   (ds: DataStream): Future[Either[GnError, DataStreamSummary]] = {
-
-    val action = existsDataStreamAction(sysid, ds.strid) flatMap {
-      case true  ⇒ DBIO.successful(GnErrorF.dataStreamDefined(sysid, ds.strid))
-      case false ⇒ dataStreamAddAction(sysid, ds)
-    }
-
-    db.run(action.transactionally) map {
-      case e: GnError ⇒ Left(e)
-      case _          ⇒ Right(DataStreamSummary(sysid, ds.strid))
-    }
-  }
-
-  def getDataStream(sysid: String, strid: String): Future[Option[DataStream]] =
-    db.run(dataStreamAction(sysid, strid))
-
-  def deleteDataStream(sysid: String, strid: String): Future[Either[GnError, DataStreamSummary]] = {
-    val action = existsDataStreamAction(sysid, strid) flatMap {
-      case false ⇒ DBIO.successful(GnErrorF.dataStreamUndefined(sysid, strid))
-      case true  ⇒
-        val dss = datastream.filter( r ⇒ r.sysid === sysid && r.strid === strid)
-        val vds = variabledef.filter(r ⇒ r.sysid === sysid && r.strid === strid)
-        val obs = observation.filter(r ⇒ r.sysid === sysid && r.strid === strid)
-        obs.delete andThen vds.delete andThen dss.delete
-    }
-
-    db.run(action.transactionally) map {
-      case e: GnError ⇒ Left(e)
-      case _          ⇒ Right(DataStreamSummary(sysid, strid))
-    }
-  }
-
-  def addVariableDef(sysid: String, strid: String)
-                    (vd: VariableDef): Future[Either[GnError, VariableDefSummary]] = {
-    val action = existsDataStreamAction(sysid, strid) flatMap {
-      case false ⇒ DBIO.successful(GnErrorF.dataStreamUndefined(sysid, strid))
-      case true  ⇒ variableDefAddAction(sysid, strid, vd)
-    }
-
-    db.run(action) map {
-      case e: GnError ⇒ Left(e)
-      case _          ⇒ Right(VariableDefSummary(sysid, strid, vd.name, vd.units))
-    }
-  }
-
-  def addObservations(sysid: String, strid: String)
-                     (observations: Map[OffsetDateTime, List[ObsData]]
-                     ): Future[Either[GnError, ObservationsSummary]] = {
-    var num = 0
-    val actions = observations flatMap { case (time, list) ⇒
-      num += list.length
-      list.map(observationAddAction(sysid, strid, time, _))
-    }
-    db.run(DBIO.seq(actions.toSeq: _*).transactionally) map { _ ⇒
-      Right(ObservationsSummary(sysid, strid, added = Some(num)))
-    }
-  }
-
-  def close(): Unit = db.close
-}
-
-object PostgresDbSlick {
+class PostgresDbSlick(slickConfig: Config)
+                     (implicit ec: ExecutionContext) extends DbInterface with Logging {
 
   case class PgSensorSystem(
                              sysid:        String,
@@ -494,4 +318,176 @@ object PostgresDbSlick {
       }).toList
     }
   }
+
+  val details: String = s"PostgreSQL-based database (Slick)"
+
+  // path: ``empty string for the top level of the Config object''
+  private val db = Database.forConfig(path = "", slickConfig)
+
+  def dropTables(): Future[Int] = {
+    val action = sqlu"""
+      SET CONSTRAINTS ALL DEFERRED;
+      DROP TABLE IF EXISTS #${observation.baseTableRow.tableName};
+      DROP TABLE IF EXISTS #${variabledef.baseTableRow.tableName};
+      DROP TABLE IF EXISTS #${datastream.baseTableRow.tableName};
+      DROP TABLE IF EXISTS #${sensorsystem.baseTableRow.tableName};
+      """
+    db.run(action.transactionally)
+  }
+
+  def createTables(): Future[Unit] =
+    db.run(schema.create)
+
+  def listSensorSystems(): Future[Seq[SensorSystemSummary]] = {
+    val q = for {
+      ss ← sensorsystem
+      ds ← datastream if ds.sysid === ss.sysid
+    } yield (ss, ds)
+
+    val action = q.result
+
+    db.run(action).map(_.groupBy(_._1.sysid).map({ case (sysid, ssdss) ⇒
+      val ss = ssdss.head._1
+      val dss = ssdss.map(_._2)
+      SensorSystemSummary(
+        sysid,
+        ss.name,
+        ss.description,
+        streamIds = dss.map(_.strid).toSet
+      )
+    }).toSeq)
+  }
+
+  def addSensorSystem(ss: SensorSystem): Future[Either[GnError, SensorSystemSummary]] = {
+    val action = existsSensorSystemAction(ss.sysid) flatMap {
+      case true  ⇒ DBIO.successful(GnErrorF.sensorSystemDefined(ss.sysid))
+      case false ⇒
+        val ssAction =
+          sensorsystem += PgSensorSystem(
+            ss.sysid,
+            name = ss.name,
+            description = ss.description,
+            pushEvents = ss.pushEvents,
+            center = ss.center,
+            zoom = ss.zoom,
+            clickListener = ss.clickListener
+          )
+
+        val dsActions = ss.streams.values.map(dataStreamAddAction(ss.sysid, _))
+        val actions = List(ssAction) ++ dsActions
+        DBIO.seq(actions: _*)
+    }
+
+    db.run(action.transactionally) map {
+      case e: GnError ⇒ Left(e)
+      case _          ⇒
+        Right(SensorSystemSummary(
+          ss.sysid,
+          name = ss.name,
+          description = ss.description,
+          pushEvents = Some(ss.pushEvents),
+          center = ss.center
+        ))
+    }
+  }
+
+  def updateSensorSystem(sysid: String, ssu: SensorSystemUpdate): Future[Either[GnError, SensorSystemSummary]] = {
+    val action = sensorSystemPgAction(sysid) flatMap {
+      case None ⇒ DBIO.successful(GnErrorF.sensorSystemUndefined(sysid))
+      case Some(pss)  ⇒
+        val pushEvents = ssu.pushEvents getOrElse pss.pushEvents
+        val center = ssu.center orElse pss.center
+        sensorsystem.filter(_.sysid === sysid)
+          .map(p ⇒ (p.pushEvents, p.center))
+          .update((pushEvents, center))
+    }
+
+    db.run(action.transactionally) map {
+      case e: GnError ⇒ Left(e)
+      case _          ⇒ Right(SensorSystemSummary(sysid, pushEvents = ssu.pushEvents, center = ssu.center))
+    }
+  }
+
+  def getSensorSystem(sysid: String): Future[Option[SensorSystem]] =
+    db.run(sensorSystemAction(sysid))
+
+  def deleteSensorSystem(sysid: String): Future[Either[GnError, SensorSystemSummary]] = {
+    val action = sensorSystemPgAction(sysid) flatMap {
+      case None ⇒ DBIO.successful(GnErrorF.sensorSystemUndefined(sysid))
+      case Some(pss)  ⇒
+        val pushEvents = pss.pushEvents
+        val ss = sensorsystem.filter(_.sysid === sysid)
+        val dss = datastream.filter(_.sysid === sysid)
+        val vds = variabledef.filter(_.sysid === sysid)
+        val obs = observation.filter(_.sysid === sysid)
+        obs.delete andThen vds.delete andThen dss.delete andThen ss.delete andThen
+          DBIO.successful(pushEvents)
+    }
+
+    db.run(action.transactionally) map {
+      case e: GnError           ⇒ Left(e)
+      case pushEvents: Boolean  ⇒ Right(SensorSystemSummary(sysid, pushEvents = Some(pushEvents)))
+    }
+  }
+
+  def addDataStream(sysid: String)
+                   (ds: DataStream): Future[Either[GnError, DataStreamSummary]] = {
+
+    val action = existsDataStreamAction(sysid, ds.strid) flatMap {
+      case true  ⇒ DBIO.successful(GnErrorF.dataStreamDefined(sysid, ds.strid))
+      case false ⇒ dataStreamAddAction(sysid, ds)
+    }
+
+    db.run(action.transactionally) map {
+      case e: GnError ⇒ Left(e)
+      case _          ⇒ Right(DataStreamSummary(sysid, ds.strid))
+    }
+  }
+
+  def getDataStream(sysid: String, strid: String): Future[Option[DataStream]] =
+    db.run(dataStreamAction(sysid, strid))
+
+  def deleteDataStream(sysid: String, strid: String): Future[Either[GnError, DataStreamSummary]] = {
+    val action = existsDataStreamAction(sysid, strid) flatMap {
+      case false ⇒ DBIO.successful(GnErrorF.dataStreamUndefined(sysid, strid))
+      case true  ⇒
+        val dss = datastream.filter( r ⇒ r.sysid === sysid && r.strid === strid)
+        val vds = variabledef.filter(r ⇒ r.sysid === sysid && r.strid === strid)
+        val obs = observation.filter(r ⇒ r.sysid === sysid && r.strid === strid)
+        obs.delete andThen vds.delete andThen dss.delete
+    }
+
+    db.run(action.transactionally) map {
+      case e: GnError ⇒ Left(e)
+      case _          ⇒ Right(DataStreamSummary(sysid, strid))
+    }
+  }
+
+  def addVariableDef(sysid: String, strid: String)
+                    (vd: VariableDef): Future[Either[GnError, VariableDefSummary]] = {
+    val action = existsDataStreamAction(sysid, strid) flatMap {
+      case false ⇒ DBIO.successful(GnErrorF.dataStreamUndefined(sysid, strid))
+      case true  ⇒ variableDefAddAction(sysid, strid, vd)
+    }
+
+    db.run(action) map {
+      case e: GnError ⇒ Left(e)
+      case _          ⇒ Right(VariableDefSummary(sysid, strid, vd.name, vd.units))
+    }
+  }
+
+  def addObservations(sysid: String, strid: String)
+                     (observations: Map[OffsetDateTime, List[ObsData]]
+                     ): Future[Either[GnError, ObservationsSummary]] = {
+    var num = 0
+    val actions = observations flatMap { case (time, list) ⇒
+      num += list.length
+      list.map(observationAddAction(sysid, strid, time, _))
+    }
+    db.run(DBIO.seq(actions.toSeq: _*).transactionally) map { _ ⇒
+      Right(ObservationsSummary(sysid, strid, added = Some(num)))
+    }
+  }
+
+  def close(): Unit = db.close
 }

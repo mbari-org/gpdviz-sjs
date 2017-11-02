@@ -8,7 +8,6 @@ import gpdviz.model._
 import gpdviz.{ApiImpl, AutowireServer}
 import io.swagger.annotations._
 
-import scala.concurrent.ExecutionContext.Implicits.global
 
 trait GpdvizService extends
   SsService with OneSsService with OneStrService with VariableDefService with ObsService
@@ -332,20 +331,21 @@ trait StaticAndAjaxService extends GpdvizServiceImpl with Directives {
       index ~ staticFile ~ jsStuff ~ staticWeb ~ staticRoot
     }
 
-    val apiImpl = new ApiImpl(db)
-
-    val autowireServer = new AutowireServer(apiImpl)
-
-    val ajax = post {
-      path("ajax" / Segments) { s ⇒
-        entity(as[String]) { e ⇒
-          complete {
-            autowireServer.route[gpdviz.Api](apiImpl)(
-              autowire.Core.Request(
-                s,
-                upickle.default.read[Map[String, String]](e)
+    val ajax = {
+      import scala.concurrent.ExecutionContext.Implicits.global
+      val apiImpl = new ApiImpl(db)
+      val autowireServer = new AutowireServer(apiImpl)
+      post {
+        path("ajax" / Segments) { s ⇒
+          entity(as[String]) { e ⇒
+            complete {
+              autowireServer.route[gpdviz.Api](apiImpl)(
+                autowire.Core.Request(
+                  s,
+                  upickle.default.read[Map[String, String]](e)
+                )
               )
-            )
+            }
           }
         }
       }
