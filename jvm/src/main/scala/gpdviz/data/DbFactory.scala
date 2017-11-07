@@ -17,12 +17,12 @@ class DbFactory(implicit ec: ExecutionContext) extends Logging {
   }
 
   def testDb: DbInterface = {
-    val config = ConfigFactory.parseString(
+    val testConfig = ConfigFactory.parseString(
       s"""
          |dataSourceClass = "org.postgresql.ds.PGSimpleDataSource"
          |properties = {
-         |  user         = postgres
-         |  password     = ""
+         |  user         = "${config.tsConfig.getString("postgres.slick.properties.user")}"
+         |  password     = "${config.tsConfig.getString("postgres.slick.properties.password")}"
          |  databaseName = gpdviz_test
          |  portNumber   = 5432
          |  serverName   = localhost
@@ -31,7 +31,7 @@ class DbFactory(implicit ec: ExecutionContext) extends Logging {
      """.stripMargin
     ).resolve()
 
-    new PostgresDbSlick(config)
+    new PostgresDbSlick(testConfig)
   }
 
   def createTablesSync(db: DbInterface, dropFirst: Boolean = false): Unit = {
