@@ -1,5 +1,9 @@
 # Gpdviz
 
+2017-11-07
+
+- preliminaries for dockerization
+
 2017-11-02
 
 - pass ExecutionContext in some places.
