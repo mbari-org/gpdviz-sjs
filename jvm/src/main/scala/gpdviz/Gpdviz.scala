@@ -51,7 +51,7 @@ object Gpdviz {
       import java.nio.file.Files
       val bytes = conf.getBytes(StandardCharsets.UTF_8)
       Files.write(configFile.toPath, bytes)
-      println(s" Configuration generated: $configFile\n")
+      println(s"\nConfiguration generated: ${fansi.Color.Yellow(configFile.toString)}\n")
     }
   }
 
