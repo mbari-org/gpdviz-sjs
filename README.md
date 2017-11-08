@@ -59,20 +59,20 @@ updates reported by the provider.
 
 Download the latest executable JAR `gpdviz-x.y.z.jar` from https://github.com/gpdviz/gpdviz/releases/.
 
-To execute Gpdviz you will need a [Java runtime environment](https://www.java.com/) and
-access to a PostgreSQL server. 
+To execute Gpdviz you will need a [Java runtime environment](https://www.java.com/),
+access to a PostgreSQL server, and ability to create a database and a user on that
+server for Gpdviz purposes.
 
 - Gpdviz expects a number of parameters for its regular execution. These parameters are to be
-  indicated in a local `gpdviz.conf` file on the current directory. A template of such file, with
+  indicated in a local `conf/gpdviz.conf` file. A template of such file, with
   a description of the various parameters, can be generated as follows:
 
         $ java -jar gpdviz-x.y.z.jar generate-conf
 
-- Edit `gpdviz.conf` as indicated.
+- Edit `conf/gpdviz.conf` as needed.
 
-- Create the database according to the relevant parameters in `gpdviz.conf`, e.g.:
-
-        $ psql -c 'create database gpdviz;' -U postgres
+- Create the database and user indicated in `gpdviz.conf`, with the user being granted
+  all privileges on the database.
 
 - Execute the Gpdviz server: 
 
@@ -90,6 +90,8 @@ For a similar demo in Python, see https://github.com/gpdviz/gpdviz_python_client
 Gpdviz implementation is based on:
 
 - [Akka-HTTP](http://doc.akka.io/docs/akka-http/current/scala/http/)
+- [Slick](https://github.com/slick/slick)
+- [PostgreSQL](https://github.com/postgres/postgres)
 - [ScalaJS](https://www.scala-js.org/)
 - [Leaflet](http://leafletjs.com/)
 - [Highcharts](http://www.highcharts.com/)
@@ -117,9 +119,11 @@ On another terminal (this requires [httpie](https://httpie.org/)):
 
 ### Dist
 
+To generate executable JAR `jvm/target/scala-2.12/gpdviz-x.y.z.jar`:
+
 	$ sbt gpdvizJVM/assembly
 
-generates: `jvm/target/scala-2.12/gpdviz-assembly-x.y.z.jar`.
+For dockerized version, see [docker/readme.md](docker/readme.md).
 
 ### Model
 
