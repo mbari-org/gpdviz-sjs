@@ -9,4 +9,4 @@ echo -e "\
 host    gpdviz       gpdviz     all  md5\n\
 host    gpdviz_test  gpdviz     all  md5\n\
 host    all          postgres   all  md5\n\
-local   all          all             md5" > ${PGDATA}/pg_hba.conf
+local   all          all             trust" > ${PGDATA}/pg_hba.conf
