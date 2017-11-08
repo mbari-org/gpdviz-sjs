@@ -40,9 +40,6 @@ def commonSettings = Seq(
   )
 )
 
-mainClass in assembly := Some("gpdviz.Gpdviz")
-assemblyJarName in assembly := s"gpdviz-$gpdvizVersion.jar"
-
 lazy val root = project.in(file("."))
   .aggregate(gpdvizJS, gpdvizJVM)
   .settings(
@@ -80,9 +77,10 @@ lazy val gpdviz = crossProject
     ),
     addCompilerPlugin(
       ("org.scalameta" % "paradise" % "3.0.0-M8").cross(CrossVersion.full)
-    )
+    ),
+    mainClass in assembly := Some("gpdviz.Gpdviz"),
+    assemblyJarName in assembly := s"gpdviz-$gpdvizVersion.jar"
   )
-  //.jsConfigure(_.enablePlugins(ScalaJSPlugin, JSDependenciesPlugin)).
   .jsSettings(
     libraryDependencies ++= Seq(
       "org.scala-js"              %%%  "scalajs-dom"        %  scalaJsDomV,
