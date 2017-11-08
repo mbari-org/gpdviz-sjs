@@ -1,0 +1,30 @@
+{
+  "sysid": "firehose",
+  "streams": {
+    "waveglider": {
+      "strid": "waveglider",
+      "mapStyle": {
+        "color": "red",
+        "radius": 1
+      },
+      "zOrder": 0,
+      "variables": []
+    },
+    "ctd": {
+      "strid": "ctd",
+      "mapStyle": {
+        "color": "yellow",
+        "radius": 1
+      },
+      "zOrder": 0,
+      "variables": [{
+        "name": "temperature"
+      }]
+    }
+  },
+  "pushEvents": true,
+  "center": {
+    "lat": 36.8,
+    "lon": -122.25
+  }
+}

@@ -84,7 +84,7 @@ object Gpdviz {
     import scala.util.Failure
     import scala.util.control.NonFatal
 
-    val dataDir = "data"
+    val dataDir = "data/old"
 
     object getSensorSystemByFilename extends GpdvizJsonImplicits {
       def apply(filename: String): Option[SensorSystem] = {

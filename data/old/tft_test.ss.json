@@ -1,0 +1,266 @@
+{
+  "sysid": "tft_test",
+  "streams": {
+    "q1.2": {
+      "mapStyle": {
+        "color": "green"
+      },
+      "variables": [],
+      "zOrder": 0,
+      "strid": "q1.2",
+      "observations": {
+        "1508443749158": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-121.97993411338862, 36.83993695918703]
+          }
+        }]
+      }
+    },
+    "w1.2": {
+      "mapStyle": {
+        "color": "blue"
+      },
+      "variables": [],
+      "zOrder": 0,
+      "strid": "w1.2",
+      "observations": {
+        "1508443749145": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.08, 36.74]
+          }
+        }]
+      }
+    },
+    "p2.1": {
+      "mapStyle": {
+        "color": "red"
+      },
+      "variables": [],
+      "zOrder": 0,
+      "strid": "p2.1",
+      "observations": {
+        "1508443749189": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.08, 36.74]
+          }
+        }]
+      }
+    },
+    "p1.2": {
+      "mapStyle": {
+        "color": "red"
+      },
+      "variables": [],
+      "zOrder": 0,
+      "strid": "p1.2",
+      "observations": {
+        "1508443749138": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-121.93, 36.89]
+          }
+        }]
+      }
+    },
+    "w2.2": {
+      "mapStyle": {
+        "color": "blue"
+      },
+      "variables": [],
+      "zOrder": 0,
+      "strid": "w2.2",
+      "observations": {
+        "1508443749247": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.08, 36.74]
+          }
+        }]
+      }
+    },
+    "q1.1": {
+      "mapStyle": {
+        "color": "green"
+      },
+      "variables": [],
+      "zOrder": 0,
+      "strid": "q1.1",
+      "observations": {
+        "1508443749099": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.03019593340578, 36.79010587451219]
+          }
+        }]
+      }
+    },
+    "q2.2": {
+      "mapStyle": {
+        "color": "green"
+      },
+      "variables": [],
+      "zOrder": 0,
+      "strid": "q2.2",
+      "observations": {
+        "1508443749260": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.22670365947577, 36.83992033946637]
+          }
+        }]
+      }
+    },
+    "w1.1": {
+      "mapStyle": {
+        "color": "blue"
+      },
+      "variables": [],
+      "zOrder": 0,
+      "strid": "w1.1",
+      "observations": {
+        "1508443749088": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-121.93, 36.89]
+          }
+        }]
+      }
+    },
+    "L1.2": {
+      "mapStyle": {
+        "color": "yellow"
+      },
+      "variables": [],
+      "zOrder": 0,
+      "strid": "L1.2",
+      "observations": {
+        "1508443749150": [{
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[-121.93, 36.89], [-122.08, 36.74]]
+          }
+        }]
+      }
+    },
+    "L2.2": {
+      "mapStyle": {
+        "color": "yellow"
+      },
+      "variables": [],
+      "zOrder": 0,
+      "strid": "L2.2",
+      "observations": {
+        "1508443749253": [{
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[-122.3, 36.89], [-122.08, 36.74]]
+          }
+        }]
+      }
+    },
+    "p2.2": {
+      "mapStyle": {
+        "color": "red"
+      },
+      "variables": [],
+      "zOrder": 0,
+      "strid": "p2.2",
+      "observations": {
+        "1508443749241": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.3, 36.89]
+          }
+        }]
+      }
+    },
+    "q2.1": {
+      "mapStyle": {
+        "color": "green"
+      },
+      "variables": [],
+      "zOrder": 0,
+      "strid": "q2.1",
+      "observations": {
+        "1508443749206": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.1531055274511, 36.790170866758984]
+          }
+        }]
+      }
+    },
+    "p1.1": {
+      "mapStyle": {
+        "color": "red"
+      },
+      "variables": [],
+      "zOrder": 0,
+      "strid": "p1.1",
+      "observations": {
+        "1508443749082": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.08, 36.74]
+          }
+        }]
+      }
+    },
+    "w2.1": {
+      "mapStyle": {
+        "color": "blue"
+      },
+      "variables": [],
+      "zOrder": 0,
+      "strid": "w2.1",
+      "observations": {
+        "1508443749194": [{
+          "geometry": {
+            "type": "Point",
+            "coordinates": [-122.3, 36.89]
+          }
+        }]
+      }
+    },
+    "L2.1": {
+      "mapStyle": {
+        "color": "yellow"
+      },
+      "variables": [],
+      "zOrder": 0,
+      "strid": "L2.1",
+      "observations": {
+        "1508443749201": [{
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[-122.08, 36.74], [-122.3, 36.89]]
+          }
+        }]
+      }
+    },
+    "L1.1": {
+      "mapStyle": {
+        "color": "yellow"
+      },
+      "variables": [],
+      "zOrder": 0,
+      "strid": "L1.1",
+      "observations": {
+        "1508443749093": [{
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [[-122.08, 36.74], [-121.93, 36.89]]
+          }
+        }]
+      }
+    }
+  },
+  "pushEvents": true,
+  "center": {
+    "lat": 36.8,
+    "lon": -122.04
+  }
+}
