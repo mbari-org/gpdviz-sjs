@@ -1,0 +1,39 @@
+version: '3.3'
+
+services:
+  gpdviz_db:
+    build:
+      context: docker/
+      dockerfile: Dockerfile-db
+
+    volumes:
+      - "${POSTGRES_DATA}:/var/lib/postgresql/data"
+
+    ports:
+      - "${GPDVIZ_HOST_POSTGRES_PORT}:5432"
+
+    environment:
+      - POSTGRES_PASSWORD=${GPDVIZ_DB_USERPASS}
+      - GPDVIZ_DB_USERNAME=${GPDVIZ_DB_USERNAME}
+      - GPDVIZ_DB_USERPASS=${GPDVIZ_DB_USERPASS}
+
+    container_name: gpdviz_db
+    image: "gpdviz_db:0.0.1"
+
+  gpdviz:
+    build:
+      context: .
+      args:
+        - GPDVIZ_VERSION=0.3.2
+
+    depends_on:
+      - gpdviz_db
+
+    volumes:
+      - "${GPDVIZ_CONF_DIR}:/opt/gpdviz/conf/"
+
+    ports:
+      - "5050:5050"
+
+    container_name: gpdviz
+    image: "gpdviz:0.3.2"

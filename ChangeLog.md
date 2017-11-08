@@ -2,6 +2,7 @@
 
 2017-11-07
 
+- complete initial working dockerization
 - create tables in run-server if nonexistent
 
 2017-11-02

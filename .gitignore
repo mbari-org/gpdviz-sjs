@@ -1,5 +1,7 @@
 gpdviz.conf
 setenv.sh
+docker/postgres_data
+docker/conf
 data_test/
 jvm/src/main/resources/swaggerui/
 project/project/
