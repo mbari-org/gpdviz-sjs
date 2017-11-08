@@ -11,6 +11,7 @@ import gpdviz.data.MyPostgresProfile.api._
 import gpdviz.model._
 import gpdviz.server.{GnError, GnErrorF, SensorSystemUpdate}
 import slick.dbio.Effect
+import slick.jdbc.meta.MTable
 import slick.sql.{FixedSqlAction, SqlAction}
 import spray.json.JsValue
 
@@ -335,8 +336,24 @@ class PostgresDbSlick(slickConfig: Config)
     db.run(action.transactionally)
   }
 
-  def createTables(): Future[Unit] =
-    db.run(schema.create)
+  def createTables(ifNotExist: Boolean = true): Future[Unit] = {
+    if (ifNotExist) {
+      val tables = List(sensorsystem, datastream, variabledef, observation)
+      val existing = db.run(MTable.getTables)
+      existing.flatMap(v ⇒ {
+        val names = v.map(mt ⇒ mt.name.name)
+        val nonexistent = tables filter { table ⇒
+          val non = !names.contains(table.baseTableRow.tableName)
+          if (non) println("  creating nonexistent table: " +
+            fansi.Color.Yellow(table.baseTableRow.tableName))
+          non
+        }
+        val createIfNotExist = nonexistent.map(_.schema.create)
+        db.run(DBIO.sequence(createIfNotExist)).map(_ ⇒ ())
+      })
+    }
+    else db.run(schema.create)
+  }
 
   def listSensorSystems(): Future[Seq[SensorSystemSummary]] = {
     val q = for {

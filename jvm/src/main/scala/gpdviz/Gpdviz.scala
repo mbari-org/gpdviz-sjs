@@ -1,5 +1,6 @@
 package gpdviz
 
+import fansi.Color._
 import gpdviz.config.configFile
 import gpdviz.data.DbFactory
 import gpdviz.server.GpdvizServer
@@ -23,7 +24,7 @@ object Gpdviz {
     }
     else if (args.contains("run-server")) {
       if (!configFile.canRead) {
-        System.err.println(s"cannot access $configFile")
+        System.err.println(Red(s"cannot access $configFile"))
       }
       else new GpdvizServer().run(keyToStop = !args.contains("-d"))
     }
@@ -51,7 +52,7 @@ object Gpdviz {
       import java.nio.file.Files
       val bytes = conf.getBytes(StandardCharsets.UTF_8)
       Files.write(configFile.toPath, bytes)
-      println(s"\nConfiguration generated: ${fansi.Color.Yellow(configFile.toString)}\n")
+      println(s"\nConfiguration generated: ${Yellow(configFile.toString)}\n")
     }
   }
 

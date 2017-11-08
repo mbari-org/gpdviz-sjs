@@ -14,7 +14,7 @@ trait DbInterface {
 
   def dropTables(): Future[Int]
 
-  def createTables(): Future[Unit]
+  def createTables(ifNotExist: Boolean = true): Future[Unit]
 
   def listSensorSystems(): Future[Seq[SensorSystemSummary]]
 
