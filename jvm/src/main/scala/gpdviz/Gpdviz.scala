@@ -51,6 +51,7 @@ object Gpdviz {
       import java.nio.charset.StandardCharsets
       import java.nio.file.Files
       val bytes = conf.getBytes(StandardCharsets.UTF_8)
+      configFile.getParentFile.mkdirs()
       Files.write(configFile.toPath, bytes)
       println(s"\nConfiguration generated: ${Yellow(configFile.toString)}\n")
     }
