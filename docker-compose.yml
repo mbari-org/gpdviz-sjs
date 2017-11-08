@@ -9,7 +9,7 @@ services:
     ports:
       - "${GPDVIZ_HOST_PORT}:5050"
     container_name: gpdviz
-    image: "gpdviz:0.4.0"
+    image: "gpdviz/gpdviz:0.4.0"
 
   gpdviz_db:
     volumes:
@@ -21,4 +21,4 @@ services:
       - GPDVIZ_DB_USERNAME=${GPDVIZ_DB_USERNAME}
       - GPDVIZ_DB_USERPASS=${GPDVIZ_DB_USERPASS}
     container_name: gpdviz_db
-    image: "gpdviz_db:0.0.1"
+    image: "gpdviz/gpdviz_db:0.0.1"
