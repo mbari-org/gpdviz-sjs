@@ -1,7 +1,10 @@
 # Gpdviz
 
-2017-11-07
+2017-11-07 0.4.0
 
+- version source for all build stuff is now jvm/src/main/resources/reference.conf.
+  At run time, when using dockerized image, the version is only to be indicated 
+  explicitly in docker-compose.yml.
 - complete initial working dockerization
 - create tables in run-server if nonexistent
 

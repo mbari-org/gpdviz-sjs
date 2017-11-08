@@ -36,9 +36,11 @@ class DbFactory(implicit ec: ExecutionContext) extends Logging {
 
   def createTablesSync(db: DbInterface, dropFirst: Boolean = false): Unit = {
     val (msg, fut) = if (dropFirst)
-      ("dropping and creating tables", db.dropTables() flatMap {_ ⇒ db.createTables()})
+      ("dropping and creating tables", db.dropTables() flatMap {_ ⇒
+        db.createTables(ifNotExist = false)
+      })
     else
-      ("creating tables", db.createTables())
+      ("creating tables", db.createTables(ifNotExist = false))
     logger.info(msg)
     Await.ready(fut andThen {
       case Failure(e) ⇒ logger.error(s"error while $msg", e)

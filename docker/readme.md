@@ -1,17 +1,16 @@
-Set environment variables
-
-    POSTGRES_DATA="$(pwd)/postgres_data"
-    GPDVIZ_DB_USERNAME="gpdviz"
-    GPDVIZ_DB_USERPASS=?
-    GPDVIZ_HOST_POSTGRES_PORT=5432    
-    GPDVIZ_VERSION=0.3.2
-    GPDVIZ_CONF_DIR="$(pwd)/docker/conf"
-
-Assuming those variables are set in `setenv.sh`:
+Set required environment variables indicated in `setenv.template.sh`
+in a local file `setenv.sh`:
     
+    cp setenv.template.sh setenv.sh
+    vi setenv.sh
     source setenv.sh
     
-Build images and launch services:    
+Build images:    
 
     cd ..
-    docker-compose up --build
+    docker/build.sh gpdviz_db
+    docker/build.sh gpdviz
+
+Launch gpdviz:    
+
+    docker-compose up -d

@@ -1,4 +1,4 @@
-lazy val gpdvizVersion = setVersion("0.3.2")
+lazy val gpdvizVersion = getVersion
 val scalaV        = "2.12.2"
 val akkaHttpV     = "10.0.9"
 val akkaHttpCorsV = "0.2.1"
@@ -125,12 +125,19 @@ resourceGenerators in Compile += Def.task {
   )
 }.taskValue
 
-def setVersion(version: String): String = {
-  println(s"setting version $version")
+def getVersion: String = {
+  val version = {
+    val refFile = file("jvm/src/main/resources/reference.conf")
+    val versionRe = """gpdviz\.version\s*=\s*(.+)""".r
+    IO.read(refFile).trim match {
+      case versionRe(v) ⇒ v
+      case _ ⇒ sys.error(s"could not parse gpdviz.version from $refFile")
+    }
+  }
+  println(s"gpdviz.version = $version")
   val indexFile = file("jvm/src/main/resources/web/index.html")
   val contents = IO.readLines(indexFile).mkString("\n")
   val updated = contents.replaceAll("<!--v-->[^<]*<!--v-->", s"<!--v-->$version<!--v-->")
   IO.write(indexFile, updated)
-  IO.write(file("jvm/src/main/resources/reference.conf"), s"gpdviz.version = $version")
   version
 }
