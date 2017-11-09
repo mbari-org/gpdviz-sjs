@@ -18,4 +18,4 @@ before_script:
 - psql -c 'create database gpdviz_test;' -U postgres
 - sbt clean "gpdvizJVM/runMain gpdviz.Gpdviz generate-conf --overwrite"
 
-script: sbt test
+script: sbt gpdvizJVM/test
