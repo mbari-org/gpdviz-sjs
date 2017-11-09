@@ -1,5 +1,5 @@
 lazy val gpdvizVersion = getVersion
-val scalaV        = "2.12.2"
+val scalaV        = "2.12.4"
 val akkaHttpV     = "10.0.9"
 val akkaHttpCorsV = "0.2.1"
 val cfgV          = "0.0.7"
@@ -76,7 +76,7 @@ lazy val gpdviz = crossProject
       ,"ch.qos.logback"      % "logback-classic"       % logbackV
     ),
     addCompilerPlugin(
-      ("org.scalameta" % "paradise" % "3.0.0-M8").cross(CrossVersion.full)
+      ("org.scalameta" % "paradise" % "3.0.0-M10").cross(CrossVersion.full)
     ),
     mainClass in assembly := Some("gpdviz.Gpdviz"),
     assemblyJarName in assembly := s"gpdviz-$gpdvizVersion.jar"
