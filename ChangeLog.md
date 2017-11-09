@@ -1,5 +1,9 @@
 # Gpdviz
 
+2017-11-08 0.4.1
+
+- update sbt to v1 (1.0.2)
+
 2017-11-07 0.4.0
 
 - docker images under gpdviz organization (https://hub.docker.com/u/gpdviz/)
