@@ -2,6 +2,7 @@
 
 2017-11-08 0.4.1
 
+- update scalajs to 0.6.21
 - update sbt to v1 (1.0.2)
 
 2017-11-07 0.4.0

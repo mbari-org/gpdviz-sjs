@@ -88,7 +88,7 @@ lazy val gpdviz = crossProject
       "ru.pavkin"                 %%%  "scala-js-momentjs"  %  momentScalaJsV
     ),
     addCompilerPlugin("org.scalamacros" % "paradise" % macrosParadiseV cross CrossVersion.full),
-    jsDependencies += RuntimeDOM % "test",
+    mainClass in Compile := Some("gpdviz.webapp.Frontend"),
     jsDependencies ++= Seq(
       "org.webjars"       %  "momentjs"     %  "2.18.1"  / "moment.js"      minified "moment.min.js",
       "org.webjars"       %  "lodash"       %  "4.17.4"  / "lodash.js"      minified "lodash.min.js",
@@ -113,7 +113,7 @@ resourceGenerators in Compile += Def.task {
     val sourceFile = parentDir / name
     require (sourceFile.exists())
     val destFile = (classDirectory in Compile in gpdvizJVM).value / sourceFile.name
-    println(s"Copying $sourceFile --> $destFile")
+    println(s"::: copying $sourceFile --> $destFile")
     IO.copyFile(sourceFile, destFile)
     destFile
   }

@@ -51,7 +51,7 @@ trait LLMap extends js.Object {
   def setView(center: js.Array[Double], zoom: Int): Unit = js.native
 }
 
-object Frontend extends js.JSApp {
+object Frontend {
   def main(): Unit = if (elm.scalajs != null) {
     AutowireClient[Api].clientConfig().call() foreach { new WebApp(_) }
   }
