@@ -2,6 +2,7 @@
 
 2017-11-10 0.4.1
 
+- don't include pusher.js sensor system page if not configured to use it
 - use Double for timeMs in PositionsByTime
 - update akka-http to 10.0.10
 - update highstock to 6.0.2
