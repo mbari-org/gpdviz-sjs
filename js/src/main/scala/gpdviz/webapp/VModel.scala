@@ -161,7 +161,7 @@ class VModel(sysid: String, cc: ClientConfig, llmap: LLMap) {
           ).toJSDictionary)
 
           scalarData.position foreach { position ⇒
-            PositionsByTime.set(str.strid, timeMs.toLong, position)
+            PositionsByTime.set(str.strid, timeMs, position)
           }
         }
       }

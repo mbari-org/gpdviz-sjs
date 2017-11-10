@@ -1,7 +1,8 @@
 # Gpdviz
 
-2017-11-09 0.4.1
+2017-11-10 0.4.1
 
+- use Double for timeMs in PositionsByTime
 - update akka-http to 10.0.10
 - update highstock to 6.0.2
 - update scala to 2.12.4

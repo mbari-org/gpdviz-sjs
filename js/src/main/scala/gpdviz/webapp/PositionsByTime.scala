@@ -4,9 +4,7 @@ import gpdviz.model.LatLon
 
 object PositionsByTime {
 
-  // TODO use Double for timeMs (as Long gets an "opaque" type, perhaps less efficient)
-
-  def set(strid: String, timeMs: Long, position: LatLon): Unit = {
+  def set(strid: String, timeMs: Double, position: LatLon): Unit = {
     val strTimePos = strTimePoss.get(strid) match {
       case Some(stp) ⇒ stp
       case None ⇒
@@ -17,7 +15,7 @@ object PositionsByTime {
     strTimePos.push(TimePos(timeMs, position))
   }
 
-  def get(strid: String, timeMs: Long): Option[LatLon] = {
+  def get(strid: String, timeMs: Double): Option[LatLon] = {
     strTimePoss.get(strid).map { stp ⇒
       val list = stp.sort()
       var ii = 0
@@ -45,7 +43,7 @@ object PositionsByTime {
 
   private val strTimePoss = collection.mutable.HashMap[String, StrTimePos]()
 
-  private case class TimePos(timeMs: Long, position: LatLon)
+  private case class TimePos(timeMs: Double, position: LatLon)
 
   private class StrTimePos {
     def push(tp: TimePos): Unit = {
