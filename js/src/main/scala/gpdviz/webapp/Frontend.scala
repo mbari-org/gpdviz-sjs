@@ -25,7 +25,8 @@ object DOMGlobalScope extends js.Object {
   def setupLLMap(center: js.Array[Double],
                  zoom: Int,
                  hoveredPoint: js.Function1[js.Dictionary[_], Any],
-                 clickHandler: js.Function1[js.Dictionary[_], Any]
+                 clickHandler: js.Function1[js.Dictionary[_], Any],
+                 includeGoogleMap: Boolean
                 ): LLMap = js.native
 }
 
@@ -62,7 +63,8 @@ class WebApp(cc: ClientConfig) {
   val sysid: String = DOMGlobalScope.sysid
   val llmap: LLMap  = {
     val center = js.Array(cc.center.lat, cc.center.lon)
-    DOMGlobalScope.setupLLMap(center, cc.zoom, hoveredPoint, clickHandler)
+    DOMGlobalScope.setupLLMap(center, cc.zoom, hoveredPoint, clickHandler,
+      includeGoogleMap = cc.includeGoogleMap)
   }
 
   val vm = new VModel(sysid, cc, llmap)

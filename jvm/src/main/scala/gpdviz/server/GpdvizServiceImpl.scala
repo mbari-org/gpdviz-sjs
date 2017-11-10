@@ -142,6 +142,10 @@ trait GpdvizServiceImpl extends GpdvizJsonImplicits with Logging {
         .replace("#externalUrl", cfg.externalUrl)
         .replace("#pusher", cfg.pusher.map(_ ⇒
           """<script src="//js.pusher.com/3.2/pusher.min.js"></script>""").getOrElse(""))
+        .replace("#googleMap", cfg.map.googleMapApiKey.map(key ⇒
+          s"""<script src="//maps.googleapis.com/maps/api/js?key=$key" async defer></script>""" +
+            """<script src="leaflet/leaflet.gridlayer.googlemutant/Leaflet.GoogleMutant.js"></script>"""
+            ).getOrElse(""))
     }
 
     logger.debug(s"getSensorSystemIndex calling getSensorSystem sysid=$sysid")

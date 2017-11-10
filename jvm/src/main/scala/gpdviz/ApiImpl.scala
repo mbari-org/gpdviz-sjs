@@ -19,7 +19,8 @@ class ApiImpl(db: DbInterface)
       serverName = cfg.serverName,
       center = LatLon(cfg.map.center.lat, cfg.map.center.lon),
       zoom = cfg.map.zoom,
-      pusher = cfg.pusher.map(p ⇒ ClientPusherConfig(p.key))
+      pusher = cfg.pusher.map(p ⇒ ClientPusherConfig(p.key)),
+      includeGoogleMap = cfg.map.googleMapApiKey.isDefined
     )
   }
 

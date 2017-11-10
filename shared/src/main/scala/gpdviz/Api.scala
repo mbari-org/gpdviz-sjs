@@ -8,7 +8,8 @@ case class ClientConfig(
                          serverName: String,
                          center:     LatLon,
                          zoom:       Int,
-                         pusher:     Option[ClientPusherConfig]
+                         pusher:     Option[ClientPusherConfig],
+                         includeGoogleMap: Boolean
                        )
 
 case class ClientPusherConfig(

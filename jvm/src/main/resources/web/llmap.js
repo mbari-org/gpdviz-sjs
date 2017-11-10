@@ -1,4 +1,4 @@
-function setupLLMap(center, zoom, hoveredPoint, clickHandler) {
+function setupLLMap(center, zoom, hoveredPoint, clickHandler, includeGoogleMap) {
 
   var debug = window && window.location.toString().match(/.*\?debug/);
 
@@ -13,10 +13,12 @@ function setupLLMap(center, zoom, hoveredPoint, clickHandler) {
     'ESRI Oceans': esriOceansLayer,
     'OpenStreetMap': osm
     ,'Empty': L.tileLayer('', {opacity:0})
-    // ,'Google satellite': L.gridLayer.googleMutant({
-    //   type: 'satellite' // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
-    // })
   };
+  if (includeGoogleMap) {
+    baseLayers['Google satellite'] = L.gridLayer.googleMutant({
+      type: 'satellite' // valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
+    });
+  }
 
   var map = L.map('mapid', {
     maxZoom: 20,

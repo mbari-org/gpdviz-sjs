@@ -19,7 +19,8 @@ case class GpdvizCfg(
 @Cfg
 case class MapCfg(
                    center:  LatLonCfg = LatLonCfg(36.79, -122.02),
-                   zoom:    Int = 11
+                   zoom:    Int = 11,
+                   googleMapApiKey: Option[String] = None
                  )
 
 @Cfg
