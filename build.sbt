@@ -95,7 +95,7 @@ lazy val gpdviz = crossProject
       "org.webjars"       %  "jquery"       %  "3.2.1"   / "jquery.js"      minified "jquery.min.js",
       "org.webjars"       %  "leaflet"      %  "1.0.0"   / "leaflet.js",
       "org.webjars"       %  "esri-leaflet" %  "2.0.7"   / "esri-leaflet.js" dependsOn "leaflet.js",
-      "org.webjars"       %  "highstock"    %  "5.0.14"  / "5.0.14/highstock.js"
+      "org.webjars"       %  "highstock"    %  "6.0.2"   / "6.0.2/highstock.js"
     )
   )
 
