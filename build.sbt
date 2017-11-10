@@ -1,7 +1,7 @@
 lazy val gpdvizVersion = getVersion
 val scalaV        = "2.12.4"
-val akkaHttpV     = "10.0.9"
-val akkaHttpCorsV = "0.2.1"
+val akkaHttpV     = "10.0.10"
+val akkaHttpCorsV = "0.2.2"
 val cfgV          = "0.0.7"
 val scalatestV    = "3.0.3"
 val esriV         = "1.2.1"

@@ -1,7 +1,8 @@
 # Gpdviz
 
-2017-11-08 0.4.1
+2017-11-09 0.4.1
 
+- update akka-http to 10.0.10
 - update highstock to 6.0.2
 - update scala to 2.12.4
 - update scalajs to 0.6.21
