@@ -59,11 +59,11 @@ trait SsService extends GpdvizServiceImpl with Directives {
     httpMethod = "GET", response = classOf[Array[SensorSystemSummary]])
   def ssList: Route = path("api" / "ss") {
     cors() {
-      get {
+      get { encodeResponse {
         complete {
           db.listSensorSystems()
         }
-      }
+      }}
     }
   }
 }
@@ -114,11 +114,11 @@ trait OneSsService extends GpdvizServiceImpl with Directives {
   ))
   def ssGet: Route = pathPrefix("api" / "ss" / Segment) { sysid ⇒
     cors() {
-      get {
+      get { encodeResponse {
         complete {
           getSensorSystem(sysid)
         }
-      }
+      }}
     }
   }
 
@@ -191,11 +191,11 @@ trait OneStrService extends GpdvizServiceImpl with Directives {
   def strGet: Route = {
     pathPrefix("api" / "ss" / Segment / Segment) { case (sysid, strid) ⇒
       cors() {
-        get {
+        get { encodeResponse {
           complete {
             getDataStream(sysid, strid)
           }
-        }
+        }}
       }
     }
   }
