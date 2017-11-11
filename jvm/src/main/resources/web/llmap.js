@@ -183,7 +183,8 @@ function setupLLMap(center, zoom, hoveredPoint, clickHandler, includeGoogleMap) 
     }
     //console.debug("addDataStream: str=", _.cloneDeep(str));
 
-    str.observations = {}; // TODO check already provided observation (not the case at the moment)
+    // initialize observations to empty (stream addition not expected to include any)
+    str.observations = {};
     byStrId[str.strid] = {
       str:      str,
       geoJsons: {}
