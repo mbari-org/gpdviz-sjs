@@ -54,11 +54,13 @@ updates reported by the provider.
 
 ## Running
 
-Download the latest executable JAR `gpdviz-x.y.z.jar` from https://github.com/gpdviz/gpdviz/releases/.
+### Direct execution
 
 To execute Gpdviz you will need a [Java runtime environment](https://www.java.com/),
 access to a PostgreSQL server, and ability to create a database and a user on that
 server for Gpdviz purposes.
+
+Download the latest executable JAR `gpdviz-x.y.z.jar` from https://github.com/gpdviz/gpdviz/releases/.
 
 - Gpdviz expects a number of parameters for its regular execution. These parameters are to be
   indicated in a local `conf/gpdviz.conf` file. A template of such file, with
@@ -75,6 +77,16 @@ server for Gpdviz purposes.
 
         $ java -jar gpdviz-x.y.z.jar run-server
 
+
+### Docker
+
+With a Docker engine on your target system, you will only need to define some 
+parameters (via environment variables) and launch the services defined in 
+[docker-compose.yml](https://github.com/gpdviz/gpdviz/blob/master/docker-compose.yml).  
+This set-up includes the PostgreSQL server and database. 
+Please see https://hub.docker.com/r/gpdviz/gpdviz/.
+
+### Demo
 
 This [httpie](https://httpie.org/)-based 
 [bash script](https://github.com/gpdviz/gpdviz/blob/master/data/ss1.demo.sh)
