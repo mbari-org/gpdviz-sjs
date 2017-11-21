@@ -4,24 +4,21 @@
 
 Gpdviz is a tool for web-based visualization of geo-located point data streams in real-time.
 
+Gpdviz is motivated by the value of having a web-based, lightweight tool for easy
+visualization of sensor data information especially in non-data intensive scenarios.
+It is intended to complement the available tool set for the user.
+
 Gpdviz uses a simple data model and a REST API for data providers to register sensor systems,
 data streams, and observations.
 This API is specified using [OpenAPI 2.0](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md).
 The visualization is updated in real-time using WebSockets.
 
-Assuming Gpdviz is deployed at `http://example.net/gpdviz` and particular sensor system with 
+Assuming Gpdviz is deployed at `http://example.net/gpdviz` and a particular sensor system with 
 ID `mysysid`:
-- Data provider uses the REST API endpoint at `http://example.net/gpdviz/api`.
-  A page with the complete API documentation, with ability to directly exercise it (powered by Swagger UI),
-  is located at `http://example.net/gpdviz/api-docs`.
-- Users visualize the system at `http://example.net/gpdviz/mysysid/`
-
-**Motivation** 
-
-Gpdviz is motivated by the value of having a web-based, lightweight tool for easy
-visualization of sensor data information especially in non-data intensive scenarios.
-It is intended to complement the available tool set for the user.
-
+- Users would visualize the system at `http://example.net/gpdviz/mysysid/`
+- The REST API endpoint would be located at `http://example.net/gpdviz/api`, 
+  and a page with the complete API documentation, with ability to directly exercise it 
+  (powered by Swagger UI), would be located at `http://example.net/gpdviz/api-docs`.
 
 **Data model**
 
@@ -79,11 +76,14 @@ server for Gpdviz purposes.
         $ java -jar gpdviz-x.y.z.jar run-server
 
 
-This [bash script](https://github.com/gpdviz/gpdviz/blob/master/data/ss1.demo.sh)
+This [httpie](https://httpie.org/)-based 
+[bash script](https://github.com/gpdviz/gpdviz/blob/master/data/ss1.demo.sh)
 can be used as a demo of a data provider. Define the `GPDVIZ_SERVER` environment
-variable prior to running this [httpie](https://httpie.org/)-based script.
+variable prior to running this script.
 
-For a similar demo in Python, see https://github.com/gpdviz/gpdviz_python_client_example.
+For a similar demo in Python, see https://github.com/gpdviz/gpdviz_python_client_example,
+which uses the automatically generated client module https://github.com/gpdviz/gpdviz_python_client
+based on the Swagger REST API specification.
 
 ## Development
 
@@ -97,7 +97,7 @@ Gpdviz implementation is based on:
 - [Highcharts](http://www.highcharts.com/)
 
 
-### build and run
+### Build and run
 
     $ npm install jsdom source-map-support
 	$ sbt
@@ -107,11 +107,15 @@ Gpdviz implementation is based on:
 	> gpdvizJVM/runMain gpdviz.Gpdviz add-some-data
 	> gpdvizJVM/runMain gpdviz.Gpdviz run-server
 
-Open http://localhost:5050/ss1/
+For the demo with sensor system ID "ss1":
+ 
+- Open http://localhost:5050/ss1/ in your browser.
+- On another terminal, either run the bash script:
 
-On another terminal (this requires [httpie](https://httpie.org/)):
-
-	$ data/ss1.demo.sh
+	    $ data/ss1.demo.sh
+	
+    or the similar client in python as explained at 
+    https://github.com/gpdviz/gpdviz_python_client_example
 
 
 ![](https://github.com/gpdviz/gpdviz/blob/master/static/gpdviz2.gif)
@@ -119,11 +123,11 @@ On another terminal (this requires [httpie](https://httpie.org/)):
 
 ### Dist
 
-To generate executable JAR `jvm/target/scala-2.12/gpdviz-x.y.z.jar`:
+To generate the executable JAR `jvm/target/scala-2.12/gpdviz-x.y.z.jar`:
 
 	$ sbt gpdvizJVM/assembly
 
-For dockerized version, see [docker/readme.md](docker/readme.md).
+For the dockerized version, see [docker/readme.md](docker/readme.md).
 
 ### Model
 
