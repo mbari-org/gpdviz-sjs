@@ -4,46 +4,44 @@
 
 Gpdviz is a tool for web-based visualization of geo-located point data streams in real-time.
 
+**Status**: Functional but still considered experimental.
+
 Gpdviz is motivated by the value of having a web-based, lightweight tool for easy
 visualization of sensor data information especially in non-data intensive scenarios.
 It is intended to complement the available tool set for the user.
 
-Gpdviz uses a simple data model and a REST API for data providers to register sensor systems,
+Gpdviz's REST API allows data providers to register sensor systems,
 data streams, and observations.
 This API is specified using [OpenAPI 2.0](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md).
 The visualization is updated in real-time using WebSockets.
 
-Assuming Gpdviz is deployed at `http://example.net/gpdviz` and a particular sensor system with 
-ID `mysysid`:
-- Users would visualize the system at `http://example.net/gpdviz/mysysid/`
-- The REST API endpoint would be located at `http://example.net/gpdviz/api`, 
-  and a page with the complete API documentation, with ability to directly exercise it 
-  (powered by Swagger UI), would be located at `http://example.net/gpdviz/api-docs`.
+Assuming Gpdviz is deployed at `http://example.net/gpdviz`:
+- `http://example.net/gpdviz/mysysid/`: visualization of sensor system with ID `mysysid` 
+- `http://example.net/gpdviz/api`:      The REST API endpoint
+- `http://example.net/gpdviz/api-docs`: API documentation (powered by Swagger UI)
 
 **Data model**
 
-Gpdviz's data model is intended to be simple.
-There are three main entities in the data model:
-_sensor systems_, _data streams_, and _observations_.
+The main entities in the data model are:
+_sensor systems_, _data streams_, _variable definitions_, and _observations_.
 
-- A sensor system has associated metadata (name, description, etc.) 
-  and consists of a set of data streams.
+- A _sensor system_ has associated metadata (name, description, etc.) 
+  and consists of a set of _data streams_.
 
-- A data stream has associated metadata (name, description, map/chart styles, etc.) 
-  and consists of a set of variable definitions and associated timestamped data observations.
+- A _data stream_ has associated metadata (name, description, map/chart styles, etc.) 
+  and consists of a set of _variable definitions_ and associated _observations_.
 
-- A variable definition consists of a name, units, and chart style. 
+- A _variable definition_ consists of a name, units, and chart style. 
 
-- An observation is timestamped and can capture scalar data (eg., temperature values),
-  as well as features and geometries (in geo-json format).
+- An _observation_ is timestamped and can capture scalar data (e.g., temperature values),
+  as well as features and geometries (in GeoJson format).
  
 **Operations for data providers**
 
-Data providers interact with a Gpdviz endpoint to perform the following operations:
-
 - Register/unregister sensor systems
 - Add/remove data streams
-- Register data stream observations
+- Add/remove variable definitions
+- Register observations
 
 The Gpdviz server maintains a registry with the provided information for each sensor system
 including a window of most recent reported observations for each stream in the system.
@@ -94,8 +92,8 @@ can be used as a demo of a data provider. Define the `GPDVIZ_SERVER` environment
 variable prior to running this script.
 
 For a similar demo in Python, see https://github.com/gpdviz/gpdviz_python_client_example,
-which uses the automatically generated client module https://github.com/gpdviz/gpdviz_python_client
-based on the Swagger REST API specification.
+which uses the client module https://github.com/gpdviz/gpdviz_python_client
+automatically generated from the OpenAPI specification.
 
 ## Development
 
