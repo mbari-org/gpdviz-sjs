@@ -19,3 +19,10 @@ body {
   border:1px solid grey;
   display:none;
 }
+
+.ws-connected {
+  background: rgba(168, 255, 174, 0.7);
+}
+.ws-disconnected {
+  background: rgba(255, 0, 0, 0.23);
+}

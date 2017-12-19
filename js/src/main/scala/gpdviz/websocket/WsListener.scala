@@ -25,6 +25,7 @@ class WsListener(sysid: String, handleNotification: (Notif) ⇒ Unit) {
 
   private def connect(): Unit = {
     connectButton.textContent = "Connecting ..."
+    connectButton.className = ""
     connectButton.disabled = true
 
     val ws = new WebSocket(getWebSocketUri)
@@ -62,6 +63,7 @@ class WsListener(sysid: String, handleNotification: (Notif) ⇒ Unit) {
 
   private def updateButtons(): Unit = {
     connectButton.disabled = wsOpt.isDefined
+    connectButton.className = if (wsOpt.isDefined) "ws-connected" else "ws-disconnected"
     connectButton.textContent = wsOpt.map(_ ⇒ "Connected").getOrElse("Reconnect")
   }
 
