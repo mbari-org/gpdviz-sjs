@@ -1,4 +1,4 @@
-function setupLLMap(center, zoom, hoveredPoint, clickHandler, includeGoogleMap) {
+function setupLLMap(center, zoom, hoveredPoint, mouseOutside, clickHandler, includeGoogleMap) {
 
   var debug = window && window.location.toString().match(/.*\?debug/);
 
@@ -346,7 +346,7 @@ function setupLLMap(center, zoom, hoveredPoint, clickHandler, includeGoogleMap) 
           isoTime: isoTime
         });
       }
-    });
+    }, mouseOutside);
   }
 
   function addSelectionPoint(p) {

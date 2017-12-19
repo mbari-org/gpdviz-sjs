@@ -1,4 +1,4 @@
-function Charter(str, hoveredPoint) {
+function Charter(str, hoveredPoint, mouseOutside) {
   var strid = str.strid;
   var variables = str.variables;
 
@@ -53,6 +53,8 @@ function Charter(str, hoveredPoint) {
 
   var needRedraw = true;
 
+  var mouseIn = false;
+
   setInterval(function() {
     if (chart && needRedraw) {
       // console.debug("redrawing chart ", strid);
@@ -60,6 +62,18 @@ function Charter(str, hoveredPoint) {
       needRedraw = false;
     }
   }, 2000);
+
+  var mousemove = (function() {
+    function throttled(e) {
+      if (mouseIn && seriesIndexTemperature !== undefined && chart) {
+        var event = chart.pointer.normalize(e.originalEvent);
+        var point = chart.series[seriesIndexTemperature].searchPoint(event, true);
+        // console.debug("strid=", strid, "normalizedEvent=", event, "point=", point);
+        hoveredPoint(point);
+      }
+    }
+    return _.throttle(throttled, 250)
+  })();
 
   return {
     strid: strid,
@@ -103,16 +117,20 @@ function Charter(str, hoveredPoint) {
     chart = createChart();
 
     if (hoveredPoint) {
-      $(chart.container).on('mousemove', _.throttle(mousemove, 250) )
+      $(chart.container).on('mouseenter', mouseenter);
+      $(chart.container).on('mousemove', mousemove);
+      $(chart.container).on('mouseleave', mouseleave);
     }
+  }
 
-    function mousemove(e) {
-      if (seriesIndexTemperature !== undefined && chart) {
-        var event = chart.pointer.normalize(e.originalEvent);
-        var point = chart.series[seriesIndexTemperature].searchPoint(event, true);
-        // console.debug("strid=", strid, "normalizedEvent=", event, "point=", point);
-        hoveredPoint(point);
-      }
+  function mouseenter(e) {
+    mouseIn = true;
+  }
+
+  function mouseleave(e) {
+    if (mouseIn) {
+      mouseIn = false;
+      mouseOutside();
     }
   }
 
@@ -122,8 +140,12 @@ function Charter(str, hoveredPoint) {
     if (chart) chart.destroy();
     chart = undefined;
     serieses = undefined;
+    mouseIn = false;
+    mouseOutside();
     if (hoveredPoint && chart && chart.container) {
+      $(chart.container).off('mouseenter', mouseenter);
       $(chart.container).off('mousemove', mousemove);
+      $(chart.container).off('mouseleave', mouseleave);
     }
   }
 

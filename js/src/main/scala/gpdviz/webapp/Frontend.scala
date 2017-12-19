@@ -24,7 +24,8 @@ object DOMGlobalScope extends js.Object {
 
   def setupLLMap(center: js.Array[Double],
                  zoom: Int,
-                 hoveredPoint: js.Function1[js.Dictionary[_], Any],
+                 hoveredPoint: js.Function1[js.UndefOr[js.Dictionary[_]], Any],
+                 mouseOutside: js.Function0[Unit],
                  clickHandler: js.Function1[js.Dictionary[_], Any],
                  includeGoogleMap: Boolean
                 ): LLMap = js.native
@@ -47,7 +48,7 @@ trait LLMap extends js.Object {
 
   def addObsScalarData(strid: String, timeMs: Double, scalarData: js.Dictionary[_]): Unit = js.native
 
-  def addSelectionPoint(p: js.Array[Double]): Unit = js.native
+  def addSelectionPoint(p: js.UndefOr[js.Array[Double]]): Unit = js.native
 
   def setView(center: js.Array[Double], zoom: Int): Unit = js.native
 }
@@ -63,7 +64,10 @@ class WebApp(cc: ClientConfig) {
   val sysid: String = DOMGlobalScope.sysid
   val llmap: LLMap  = {
     val center = js.Array(cc.center.lat, cc.center.lon)
-    DOMGlobalScope.setupLLMap(center, cc.zoom, hoveredPoint, clickHandler,
+    DOMGlobalScope.setupLLMap(center, cc.zoom,
+      hoveredPoint,
+      mouseOutside,
+      clickHandler,
       includeGoogleMap = cc.includeGoogleMap)
   }
 
@@ -122,17 +126,22 @@ class WebApp(cc: ClientConfig) {
     }
   }
 
-  private def hoveredPoint: js.Function1[js.Dictionary[_], Any] = {
-    (dict: js.Dictionary[_]) ⇒ {
-      val p: mutable.Map[String, _] = dict
-      val strid = p("strid").asInstanceOf[String]
-      val x = p("x").asInstanceOf[Float].toLong
-      //val y = p("y").asInstanceOf[Double].toLong
-      //val isoTime = p("isoTime").asInstanceOf[String]
-      //console.log("hoveredPoint: p=" + p + " x=" +x+ " strid=" + strid)
+  private def mouseOutside: js.Function0[Unit] =
+    () ⇒ llmap.addSelectionPoint(js.undefined)
 
-      PositionsByTime.get(strid, x) foreach { latLon ⇒
-        llmap.addSelectionPoint(js.Array(latLon.lat, latLon.lon))
+  private def hoveredPoint: js.Function1[js.UndefOr[js.Dictionary[_]], Any] = {
+    (dict: js.UndefOr[js.Dictionary[_]]) ⇒ {
+      dict.toOption foreach { dic ⇒
+        val p: mutable.Map[String, _] = dic
+        val strid = p("strid").asInstanceOf[String]
+        val x = p("x").asInstanceOf[Float].toLong
+        //val y = p("y").asInstanceOf[Double].toLong
+        //val isoTime = p("isoTime").asInstanceOf[String]
+        //console.log("hoveredPoint: p=" + p + " x=" +x+ " strid=" + strid)
+
+        PositionsByTime.get(strid, x) foreach { latLon ⇒
+          llmap.addSelectionPoint(js.Array(latLon.lat, latLon.lon))
+        }
       }
     }
   }

@@ -1,5 +1,10 @@
 # Gpdviz
 
+2017-12-19 0.4.2
+
+- hide position marker on map when mouse goes outside of chart
+  and when chart is closed
+
 2017-11-10 0.4.1
 
 - encodeResponse in some GET's
@@ -16,7 +21,7 @@
 
 - docker images under gpdviz organization (https://hub.docker.com/u/gpdviz/)
 - version source for all build stuff is now jvm/src/main/resources/reference.conf.
-  At run time, when using dockerized image, the version is only to be indicated 
+  At run time, when using dockerized image, the version is only to be indicated
   explicitly in docker-compose.yml.
 - complete initial working dockerization
 - create tables in run-server if nonexistent
@@ -33,7 +38,7 @@
 
 - observation timestamp:
   - internally captured as timestamptz in database
-  - externally required and exposed as ISO-8601 formatted string 
+  - externally required and exposed as ISO-8601 formatted string
 
 2017-10-30
 - use OffsetDateTime for time in observation table.
@@ -60,17 +65,17 @@
 - due to doobie issues, trying slick
 - due to quill issues, trying again with doobie
 - some db-related refact
-- nested embedded with intermediate Option still not handled by quill 
+- nested embedded with intermediate Option still not handled by quill
 
 2017-10-19
 
 - do not forget to also update the swagger response types!
 - adjustments to API mainly in terms of responses (so they are all objects)
-- tests re-enabled (except for one involving quill's update operation) 
+- tests re-enabled (except for one involving quill's update operation)
 
 2017-10-14
 
-- focus on quill/postgres as the database system. 
+- focus on quill/postgres as the database system.
   Some tests ignored for now.
   ss1.demo.sh working.
   Define config property `gpdviz.postgres` to exercise it.
@@ -105,7 +110,7 @@
 - use swagger to generate openApi spec and api-docs ui
   - generated spec at `.../api-docs/swagger.json`, eg., http://localhost:5050/api-docs/swagger.json
   - Swagger UI at `.../api-docs/`, eg., http://localhost:5050/api-docs
-    
+  
 2017-08-31
 
 - some refact - separation of rest services
@@ -129,16 +134,16 @@
 - publish websocket messages for the specific sysid
 - simplify details panel
 - restore window resize handling
-- some investigation re "Websocket handler failed with Processor actor" when exiting the server 
-  while some client currently connected. TODO check https://stackoverflow.com/a/41359874/830737 
+- some investigation re "Websocket handler failed with Processor actor" when exiting the server
+  while some client currently connected. TODO check https://stackoverflow.com/a/41359874/830737
 - handle chart height and minWidth
 - handle map center and zoom
 - enable the new scalajs based dispatch
 - websocket client: connect upon page load and keep connection alive.
-  "Reconnect" button enabled if connection closed by server; this just tries to 
+  "Reconnect" button enabled if connection closed by server; this just tries to
   re-establish connection. (Complete refresh needs page reload.)
 - refresh initial state of sensor system
-- factor out publish functionality 
+- factor out publish functionality
 
 2017-08-18
 
@@ -150,14 +155,14 @@
 - pass mapStyle, chartStyle to js part
 - incorporating charts in new scalajs-based scheme
 - TODO: consider using https://scalacenter.github.io/scalajs-bundler/
- 
+
 2017-08-16
 
 - extract Charter from app.js to charter.js for reuse
- 
+
 2017-08-15
 
-- exploring some stuff ... before adding Var/Vars within the Vm model... 
+- exploring some stuff ... before adding Var/Vars within the Vm model...
   https://github.com/OlivierBlanvillain/monadic-html/issues/13
 - LLMap to interface with Leaflet
 - make ss1.demo.sh generate deterministic timestamps and values
@@ -169,7 +174,7 @@
 2017-08-12
 
 - using webjars for several of the js libraries.
-  Note: still using `leaflet.css` from CDN as I could not find a way to extract css 
+  Note: still using `leaflet.css` from CDN as I could not find a way to extract css
   resources from the leaflet webjar.
 - `sbt package` to copy js resources so they get resolved for webapp
 - start using autowire
@@ -182,7 +187,7 @@
 
 2017-08-10
 
-- tried again to enable scoverage, but got warnings/errors 
+- tried again to enable scoverage, but got warnings/errors
  (coverage: `[warn] Could not instrument [EmptyTree$/null]. No pos.`;
  coverageReport: `(*:coverageReport) No source root found for '/Users/carueda/github/carueda/gpdviz2/<macro>' (source roots: '/Users/carueda/github/carueda/gpdviz2/src/main/scala/')`)
  ).
@@ -204,7 +209,7 @@
 
 2017-05-12
 
-- sensor system can now have a clickListener, a URL that will be called with information about 
+- sensor system can now have a clickListener, a URL that will be called with information about
   clicks on the map but only those with at least one of the shiftKey/altKey/metaKey modifiers.
 
 2017-05-11
@@ -241,13 +246,13 @@
         
 2017-05-07
 
-- extract Db trait to prepare for use of actual database system 
+- extract Db trait to prepare for use of actual database system
 
 2017-05-06
 
-- chart: addPoint with no redraw, and set timer for redraw 
-- update numberObs and latestIso per stream 
-- removal of previous "chart_ts_data" stuff 
+- chart: addPoint with no redraw, and set timer for redraw
+- update numberObs and latestIso per stream
+- removal of previous "chart_ts_data" stuff
 - yAxis indicated by client
 - DataStream: 'variables' as an JsObject to be able to associate properties per variable definition
 - DataStream: rename style to mapStyle, and add chartStyle
@@ -271,19 +276,19 @@
 - exploring new model for observations
 - capture position in timestamped data element; along with timestamp this allows to show it on mousemove on chart
 - preliminaries for handling of hovered mouse position on chart toward highlighting corresponding locations on map
-- dynamic adjustment of map height depending on window height (rather ad hoc for now) 
+- dynamic adjustment of map height depending on window height (rather ad hoc for now)
 - capture iso time of latest observation (still under revision) and other very sketchy display adjustments
 
 2017-04-24
 
 - add cfg.gpdviz.serverName as a way to specify particular instance (so UI subscribes
   only to events from corresponding server instance)
-- highchart adjustments 
+- highchart adjustments
 
 2017-04-23
 
 - now chartTsData, not chartData: as a next step toward better model (but still preliminary)
-- at init, add non-charData observations first so the marker has already been 
+- at init, add non-charData observations first so the marker has already been
   associated to the relevant streams when adding the charData
 
 2017-04-20
