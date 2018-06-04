@@ -1,5 +1,10 @@
 # Gpdviz
 
+2018-06-04 0.4.3
+
+- really quick add "leaflet-measure"
+  TODO cleanup as way too much not needed in version control
+
 2017-12-19 0.4.2
 
 - hide position marker on map when mouse goes outside of chart
@@ -110,7 +115,7 @@
 - use swagger to generate openApi spec and api-docs ui
   - generated spec at `.../api-docs/swagger.json`, eg., http://localhost:5050/api-docs/swagger.json
   - Swagger UI at `.../api-docs/`, eg., http://localhost:5050/api-docs
-  
+
 2017-08-31
 
 - some refact - separation of rest services
@@ -232,9 +237,9 @@
 
         psql -c 'create user postgres createdb'
         psql -c 'create database gpdviz;' -U postgres
-        
+
         psql -d gpdviz -U postgres
-        
+
         gpdviz=# CREATE EXTENSION Postgis;
         CREATE EXTENSION
         gpdviz=# \dT geography
@@ -243,7 +248,7 @@
         --------+-----------+----------------------------------------------
          public | geography | postgis type: Ellipsoidal spatial data type.
         (1 row)
-        
+
 2017-05-07
 
 - extract Db trait to prepare for use of actual database system

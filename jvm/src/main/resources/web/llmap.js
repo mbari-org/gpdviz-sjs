@@ -60,6 +60,13 @@ function setupLLMap(center, zoom, hoveredPoint, mouseOutside, clickHandler, incl
     });
   })();
 
+  (function setMeasure() {
+    L.control.measure({
+      primaryLengthUnit: 'meters', secondaryLengthUnit: 'kilometers',
+      primaryAreaUnit: 'sqmeters'
+    }).addTo(map)
+  })();
+
   var selectionIcon = new L.Icon({
     iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
