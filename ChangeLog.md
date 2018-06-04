@@ -2,6 +2,10 @@
 
 2018-06-04 0.4.3
 
+- quick "fix" for upcoming exercise with 'salinity':
+  along with 'temperature' also check for 'salinity' for
+  `seriesIndexForMouseHover` in charter.js
+
 - really quick add "leaflet-measure"
   TODO cleanup as way too much not needed in version control
 

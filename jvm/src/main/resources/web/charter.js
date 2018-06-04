@@ -2,8 +2,7 @@ function Charter(str, hoveredPoint, mouseOutside) {
   var strid = str.strid;
   var variables = str.variables;
 
-  // FIXME should be indicated which series to use for map location
-  var seriesIndexTemperature = undefined;
+  var seriesIndexForMouseHover = undefined;
 
   var title = (function() {
     var t = str.chartStyle && str.chartStyle.title || (str.strid + (str.name ? ' - ' + str.name : ''));
@@ -18,8 +17,9 @@ function Charter(str, hoveredPoint, mouseOutside) {
     //console.debug("varProps=", varProps);
     var varName = varProps.name;
 
-    if (varName === 'temperature') {
-      seriesIndexTemperature = initialSeriesData.length;
+    // FIXME should be indicated which series to use for map location
+    if (varName === 'temperature' || varName === 'salinity') {
+      seriesIndexForMouseHover = initialSeriesData.length;
     }
     var chartStyle = varProps.chartStyle || {};
 
@@ -65,9 +65,9 @@ function Charter(str, hoveredPoint, mouseOutside) {
 
   var mousemove = (function() {
     function throttled(e) {
-      if (mouseIn && seriesIndexTemperature !== undefined && chart) {
+      if (mouseIn && seriesIndexForMouseHover !== undefined && chart) {
         var event = chart.pointer.normalize(e.originalEvent);
-        var point = chart.series[seriesIndexTemperature].searchPoint(event, true);
+        var point = chart.series[seriesIndexForMouseHover].searchPoint(event, true);
         // console.debug("strid=", strid, "normalizedEvent=", event, "point=", point);
         hoveredPoint(point);
       }
