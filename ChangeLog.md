@@ -2,6 +2,12 @@
 
 2018-06-04 0.4.3
 
+- publish new docker image:
+
+        sbt gpdvizJVM/assembly
+        docker/build.sh gpdviz
+        docker push gpdviz/gpdviz:0.4.3
+
 - quick "fix" for upcoming exercise with 'salinity':
   along with 'temperature' also check for 'salinity' for
   `seriesIndexForMouseHover` in charter.js
