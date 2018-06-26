@@ -36,6 +36,7 @@ function setupLLMap(center, zoom, hoveredPoint, mouseOutside, clickHandler, incl
   var overlayGroupByStreamId = {};
 
   var selectionGroup = new L.LayerGroup().addTo(map);
+  var selectionLatLon = null;
 
   (function setMagnifyingGlass() {
     var magnifyingGlass = L.magnifyingGlass({
@@ -158,6 +159,8 @@ function setupLLMap(center, zoom, hoveredPoint, mouseOutside, clickHandler, incl
 
   function clearMarkers() {
     selectionGroup.clearLayers();
+    selectionLatLon = null;
+
     markersLayer.clearLayers();
     markersLayerMG.clearLayers();
     _.each(overlayGroupByStreamId, function(group) {
@@ -357,11 +360,38 @@ function setupLLMap(center, zoom, hoveredPoint, mouseOutside, clickHandler, incl
   }
 
   function addSelectionPoint(p) {
-    // console.debug("addSelectionPoint: p=", p);
-    selectionGroup.clearLayers();
-    if (!p) return;
+    if (!p) {
+      selectionGroup.clearLayers();
+      selectionLatLon = null;
+      return;
+    }
 
-    var marker = L.marker([p[0], p[1]], {
+    var newLatLon = [p[0], p[1]];
+
+    if (selectionLatLon &&
+        selectionLatLon[0] === newLatLon[0] &&
+        selectionLatLon[0] === newLatLon[0]) {
+        return;
+    }
+
+    selectionGroup.clearLayers();
+    selectionLatLon = newLatLon;
+
+    // console.debug("addSelectionPoint: p=", p);
+
+    if (false) {
+      // ad hoc for front tracking
+      var circle = L.circle(newLatLon, {
+        radius: 300,
+        stroke: 2,
+        color: "gray",
+        weight: 1,
+        fillOpacity: 0.1
+      }).addTo(map);
+      selectionGroup.addLayer(circle);
+    }
+
+    var marker = L.marker(newLatLon, {
       keyboard: false,
       icon: selectionIcon,
       riseOnHover: true,

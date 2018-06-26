@@ -1,5 +1,9 @@
 # Gpdviz
 
+2018-06-25 0.4.4
+
+- remember last given point for a more efficient addSelectionPoint
+
 2018-06-04 0.4.3
 
 - publish new docker image:
