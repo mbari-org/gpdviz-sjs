@@ -2,6 +2,7 @@
 
 2018-06-27 0.4.4
 
+- some minor docker notes
 - fix in PositionsByTime.get to actually get position of very latest
   element (when that's the case of course) instead of the previous one
 - for now, include circle for selected point (useful for front tracking)

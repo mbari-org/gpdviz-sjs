@@ -12,7 +12,7 @@ services:
       - GPDVIZ_DB_USERNAME=${GPDVIZ_DB_USERNAME}
       - GPDVIZ_DB_USERPASS=${GPDVIZ_DB_USERPASS}
     container_name: gpdviz
-    image: "gpdviz/gpdviz:0.4.1"
+    image: "gpdviz/gpdviz:0.4.4"
 
   gpdviz_db:
     volumes:
