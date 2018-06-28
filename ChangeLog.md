@@ -1,7 +1,11 @@
 # Gpdviz
 
-2018-06-25 0.4.4
+2018-06-27 0.4.4
 
+- fix in PositionsByTime.get to actually get position of very latest
+  element (when that's the case of course) instead of the previous one
+- for now, include circle for selected point (useful for front tracking)
+  TODO make this optional via some map attribute
 - remember last given point for a more efficient addSelectionPoint
 
 2018-06-04 0.4.3

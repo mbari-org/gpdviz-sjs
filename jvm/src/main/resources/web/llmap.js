@@ -379,7 +379,7 @@ function setupLLMap(center, zoom, hoveredPoint, mouseOutside, clickHandler, incl
 
     // console.debug("addSelectionPoint: p=", p);
 
-    if (false) {
+    if (true) {
       // ad hoc for front tracking
       var circle = L.circle(newLatLon, {
         radius: 300,

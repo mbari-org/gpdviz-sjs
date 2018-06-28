@@ -33,6 +33,12 @@ object PositionsByTime {
         }
         else break = true
       }
+      // TODO: revise the above to avoid the following special handling,
+      // which for now solves the issue of returning the position
+      // of list(list.size - 2) instead of list(list.size - 1):
+      if (mid >= list.size - 2 && timeMs >= list.last.timeMs)
+        list.last.position
+      else
       list(mid).position
     }
   }
