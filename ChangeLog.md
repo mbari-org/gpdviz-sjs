@@ -1,5 +1,10 @@
 # Gpdviz
 
+2018-07-10 0.4.5
+
+- capture and handle zoom in POST and PUT sensor system
+- publish docker image gpdviz/gpdviz:0.4.5
+
 2018-06-27 0.4.4
 
 - some minor docker notes

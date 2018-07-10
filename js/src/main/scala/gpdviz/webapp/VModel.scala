@@ -40,6 +40,7 @@ class VModel(sysid: String, cc: ClientConfig, llmap: LLMap) {
       description = description,
       streams = List.empty,
       center = center,
+      zoom = zoom,
       clickListener = clickListener
     )
     llmap.sensorSystemAdded(jsCenter(center), zoom.getOrElse(cc.zoom))

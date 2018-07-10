@@ -403,7 +403,8 @@ class PostgresDbSlick(slickConfig: Config)
           name = ss.name,
           description = ss.description,
           pushEvents = Some(ss.pushEvents),
-          center = ss.center
+          center = ss.center,
+          zoom = ss.zoom
         ))
     }
   }
@@ -414,14 +415,16 @@ class PostgresDbSlick(slickConfig: Config)
       case Some(pss)  ⇒
         val pushEvents = ssu.pushEvents getOrElse pss.pushEvents
         val center = ssu.center orElse pss.center
+        val zoom = ssu.zoom orElse pss.zoom
         sensorsystem.filter(_.sysid === sysid)
-          .map(p ⇒ (p.pushEvents, p.center))
-          .update((pushEvents, center))
+          .map(p ⇒ (p.pushEvents, p.center, p.zoom))
+          .update((pushEvents, center, zoom))
     }
 
     db.run(action.transactionally) map {
       case e: GnError ⇒ Left(e)
-      case _          ⇒ Right(SensorSystemSummary(sysid, pushEvents = ssu.pushEvents, center = ssu.center))
+      case _          ⇒ Right(SensorSystemSummary(sysid,
+        pushEvents = ssu.pushEvents, center = ssu.center, zoom = ssu.zoom))
     }
   }
 

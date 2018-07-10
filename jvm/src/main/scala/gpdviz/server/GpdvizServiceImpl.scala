@@ -25,6 +25,7 @@ trait GpdvizServiceImpl extends GpdvizJsonImplicits with Logging {
       description = ssr.description,
       pushEvents = ssr.pushEvents.getOrElse(true),
       center = ssr.center,
+      zoom = ssr.zoom,
       clickListener = ssr.clickListener
     )
     db.addSensorSystem(ss) map {

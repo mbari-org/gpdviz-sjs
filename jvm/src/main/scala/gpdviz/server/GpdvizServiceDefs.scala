@@ -43,11 +43,13 @@ case class SensorSystemAdd(sysid: String,
                            @(ApiModelProperty @field)(dataType = "boolean")
                            pushEvents: Option[Boolean] = None,
                            center: Option[LatLon] = None,
+                           zoom:   Option[Int] = None,
                            clickListener: Option[String] = None
                           )
 
 case class SensorSystemUpdate(pushEvents: Option[Boolean] = None,
-                              center: Option[LatLon] = None
+                              center: Option[LatLon] = None,
+                              zoom:   Option[Int] = None
                              )
 
 case class DataStreamAdd(strid:        String,
@@ -79,9 +81,9 @@ trait GpdvizJsonImplicits extends DefaultJsonProtocol with SprayJsonSupport with
   implicit val _dssFormat      = jsonFormat2(DataStreamSummary)
   implicit val _dsFormat       = jsonFormat8(DataStream)
 
-  implicit val _ssAddFormat    = jsonFormat6(SensorSystemAdd)
-  implicit val _ssUpdFormat    = jsonFormat2(SensorSystemUpdate)
-  implicit val _sssFormat      = jsonFormat6(SensorSystemSummary)
+  implicit val _ssAddFormat    = jsonFormat7(SensorSystemAdd)
+  implicit val _ssUpdFormat    = jsonFormat3(SensorSystemUpdate)
+  implicit val _sssFormat      = jsonFormat7(SensorSystemSummary)
   implicit val _ssFormat       = jsonFormat8(SensorSystem)
 
   implicit val _dbErrorFormat  = jsonFormat6(GnError)

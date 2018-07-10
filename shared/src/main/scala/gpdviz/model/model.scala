@@ -5,6 +5,7 @@ case class SensorSystemSummary(sysid:        String,
                                description:  Option[String] = None,
                                pushEvents:   Option[Boolean] = None,
                                center:       Option[LatLon] = None,
+                               zoom:         Option[Int] = None,
                                streamIds:    Set[String] = Set.empty
                               )
 
