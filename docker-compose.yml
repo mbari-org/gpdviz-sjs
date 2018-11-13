@@ -13,6 +13,7 @@ services:
       - GPDVIZ_DB_USERPASS=${GPDVIZ_DB_USERPASS}
     container_name: gpdviz
     image: "gpdviz/gpdviz:0.4.4"
+    restart: always
 
   gpdviz_db:
     volumes:
@@ -25,3 +26,4 @@ services:
       - GPDVIZ_DB_USERPASS=${GPDVIZ_DB_USERPASS}
     container_name: gpdviz_db
     image: "gpdviz/gpdviz_db:0.0.1"
+    restart: always

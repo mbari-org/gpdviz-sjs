@@ -1,5 +1,9 @@
 # Gpdviz
 
+2018-11-13
+
+- minor: `restart: always` in docker-compose
+
 2018-07-10 0.4.5
 
 - capture and handle zoom in POST and PUT sensor system
