@@ -21,7 +21,4 @@ Set required environment variables indicated in
     cp setenv.template.sh setenv.sh
     vi setenv.sh
     source setenv.sh
-
-    cd ..  # root again
-
     docker-compose up -d

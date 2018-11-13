@@ -2,6 +2,9 @@
 
 2018-11-13
 
+- minor docker adjustments to run this again on my local machine:
+    - move docker-compose.yml to `docker/`
+    - edit `docker/setenv.sh` to adjust couple paths
 - minor: `restart: always` in docker-compose
 
 2018-07-10 0.4.5
