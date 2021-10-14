@@ -1,5 +1,10 @@
 # Gpdviz
 
+2021-10
+
+- minor adjustments while revisiting this project.
+  Adding some old, previously untracked files (under misc/)/
+
 2018-11-13
 
 - minor docker adjustments to run this again on my local machine:

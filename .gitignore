@@ -1,4 +1,4 @@
-gpdviz.conf
+conf/
 setenv.sh
 docker/postgres_data
 docker/conf
@@ -7,3 +7,5 @@ jvm/src/main/resources/swaggerui/
 project/project/
 project/target/
 target/
+.ammonite/
+.vscode/

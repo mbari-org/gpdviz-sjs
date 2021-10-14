@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/gpdviz/gpdviz.svg?branch=master)](https://travis-ci.org/gpdviz/gpdviz)
+[![Build Status](https://api.travis-ci.org/gpdviz/gpdviz.svg?branch=master)](https://travis-ci.org/gpdviz/gpdviz)
 
 # Gpdviz
 
@@ -7,9 +7,9 @@ visualization of geo-located point data streams in real-time.
 
 **Status**: Functional but still considered experimental.
 
-Data providers use Gpdviz's REST API to register sensor systems,
+Data providers use the Gpdviz REST API to register sensor systems,
 data streams, and observations.
-This API is specified using [OpenAPI 2.0](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md).
+This API is specified using [OpenAPI 2.0](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/2.0.md).
 The visualization is updated in real-time using WebSockets.
 
 Assuming Gpdviz is deployed at `http://example.net/gpdviz`:
@@ -81,14 +81,14 @@ Download the latest executable JAR `gpdviz-x.y.z.jar` from https://github.com/gp
 
 With a Docker engine on your target system, you will only need to define some
 parameters (via environment variables) and launch the services defined in
-[docker-compose.yml](https://github.com/gpdviz/gpdviz/blob/master/docker-compose.yml).
+[docker-compose.yml](docker/docker-compose.yml).
 This set-up includes the PostgreSQL server and database.
 Please see https://hub.docker.com/r/gpdviz/gpdviz/.
 
 ### Demo
 
-This [httpie](https://httpie.org/)-based
-[bash script](https://github.com/gpdviz/gpdviz/blob/master/data/ss1.demo.sh)
+This [httpie](https://httpie.io/)-based
+[bash script](data/ss1.demo.sh)
 can be used as a demo of a data provider. Define the `GPDVIZ_SERVER` environment
 variable prior to running this script.
 
@@ -100,12 +100,12 @@ automatically generated from the OpenAPI specification.
 
 Gpdviz implementation is based on:
 
-- [Akka-HTTP](http://doc.akka.io/docs/akka-http/current/scala/http/)
+- [Akka-HTTP](https://doc.akka.io/docs/akka-http/current/)
 - [Slick](https://github.com/slick/slick)
 - [PostgreSQL](https://github.com/postgres/postgres)
 - [ScalaJS](https://www.scala-js.org/)
-- [Leaflet](http://leafletjs.com/)
-- [Highcharts](http://www.highcharts.com/)
+- [Leaflet](https://leafletjs.com/)
+- [Highcharts](https://www.highcharts.com/)
 
 
 ### Build and run
@@ -129,7 +129,7 @@ For the demo with sensor system ID "ss1":
     https://github.com/gpdviz/gpdviz_python_client_example
 
 
-![](https://github.com/gpdviz/gpdviz/blob/master/static/gpdviz2.gif)
+![](static/gpdviz2.gif)
 
 
 ### Dist
