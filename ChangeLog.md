@@ -1,5 +1,9 @@
 # Gpdviz
 
+2022-01
+
+- fix data from `add-some-data`
+
 2021-10
 
 - minor adjustments while revisiting this project.

@@ -78,7 +78,7 @@ class DbFactory(implicit ec: ExecutionContext) extends Logging {
             )
           )),
           observations = Some(Map(
-            "1503090553000" → List(
+            "2017-10-10T10:10:00Z" → List(
               ObsData(
                 scalarData = Some(ScalarData(
                   vars = List("temperature", "distance"),
@@ -94,7 +94,7 @@ class DbFactory(implicit ec: ExecutionContext) extends Logging {
                 ))
               )
             ),
-            "1503090555000" → List(
+            "2017-10-10T10:10:02Z" → List(
               ObsData(
                 scalarData = Some(ScalarData(
                   vars = List("temperature", "distance"),
