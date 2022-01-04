@@ -2,6 +2,11 @@
 
 2022-01
 
+- TODO: focus this project on the backend, not frontend.
+  Use something like [scala-tsi](https://github.com/scala-tsi/scala-tsi)
+  to help capture the data models for the UI.
+- TODO: overall cleanup and upgrade to scala3
+
 - fix data from `add-some-data`
 
 2021-10

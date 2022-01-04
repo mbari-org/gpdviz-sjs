@@ -9,3 +9,7 @@ project/target/
 target/
 .ammonite/
 .vscode/
+.metals/
+.bloop/
+.js/
+.jvm/
